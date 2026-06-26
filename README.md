@@ -24,6 +24,19 @@ captures evidence, and **tears it down automatically** so idle cost stays at ~$0
 Every "approx. cost" assumes the run completes and tears down (a few minutes). The
 runner destroys resources even if a step fails — see **Cost safety** below.
 
+## Networking labs
+
+Hands-on networking labs (Linux + Raspberry Pi + AWS). Each is a study-grade writeup
+with objectives, topology, key steps, and an honest "be ready to explain" list.
+
+| # | Lab | Demonstrates | Stack |
+|---|-----|--------------|-------|
+| N1 | [Site-to-Site WireGuard VPN](networking/net-01-wireguard-s2s-vpn) | Encrypted Pi↔AWS tunnel, routing, crypto keys | WireGuard, Linux, AWS VPC |
+| N2 | [Subnetting & VLAN segmentation](networking/net-02-subnetting-vlans) | VLSM design, broadcast domains, inter-VLAN routing | IP, VLAN, 802.1Q |
+| N3 | [DNS & DHCP services](networking/net-03-dns-dhcp) | Authoritative DNS, DHCP scopes, name resolution | dnsmasq, BIND, Linux |
+| N4 | [Stateful firewall & least-privilege ACLs](networking/net-04-firewall-acls) | nftables rules, AWS SG/NACL, default-deny | nftables, iptables, AWS SG |
+| N5 | [Packet capture & traffic analysis](networking/net-05-packet-analysis) | TCP handshake, DNS/TLS dissection, latency | tcpdump, Wireshark |
+
 ## Repo layout
 ```
 aws-devops-labs/
