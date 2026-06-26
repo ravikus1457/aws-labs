@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Ravi Kumar cloud and network engineering portfolio: AWS labs, hybrid VPN, enterprise infrastructure support, Linux, PowerShell, DNS, DHCP, and network troubleshooting.">
+    <title>Ravi Kumar | Cloud & Network Engineering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header" id="top">
+      <nav class="nav-shell" aria-label="Primary navigation">
+        <a class="brand" href="#top" aria-label="Ravi Kumar home">
+          <span class="brand-mark">RK</span>
+          <span>
+            <strong>Ravi Kumar</strong>
+            <small>Cloud / Network Engineering</small>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="#roadmap">Roadmap</a>
+          <a href="#labs">Labs</a>
+          <a href="#experience">Experience</a>
+          <a href="#skills">Skills</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-bg" src="assets/cloud-network-hero.png" alt="Cloud and network operations workstation with AWS architecture diagrams and terminal logs">
+        <div class="hero-overlay"></div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Portfolio Lab Environment</p>
+            <h1 id="hero-title">Cloud and network engineering, proven with live AWS labs.</h1>
+            <p class="hero-summary">
+              I build, troubleshoot, and document infrastructure across AWS, VPNs, Linux,
+              identity systems, endpoint platforms, and enterprise networks.
+            </p>
+            <div class="hero-actions" aria-label="Primary actions">
+              <a class="button primary" href="#labs">View AWS Labs</a>
+              <a class="button secondary" href="mailto:ravikus1457@gmail.com">Email Me</a>
+            </div>
+          </div>
+
+          <aside class="terminal-panel" aria-label="Current focus">
+            <div class="terminal-top">
+              <span></span><span></span><span></span>
+            </div>
+            <pre><code>$ ./scripts/run-lab.sh labs/01-vpc-networking
+[ ok ] account verified
+[ ok ] terraform validate
+[PASS] public route -> internet gateway
+[PASS] private route -> nat gateway
+[ ok ] report captured
+[ ok ] terraform destroy</code></pre>
+          </aside>
+        </div>
+      </section>
+
+      <section class="status-strip" aria-label="Portfolio highlights">
+        <div>
+          <strong>AWS</strong>
+          <span>VPC, EC2, IAM, S3, ECS, CloudWatch</span>
+        </div>
+        <div>
+          <strong>Network</strong>
+          <span>TCP/IP, DNS, DHCP, VPN, LAN/WAN</span>
+        </div>
+        <div>
+          <strong>Systems</strong>
+          <span>Linux, PowerShell, AD, Azure AD, MDM</span>
+        </div>
+        <div>
+          <strong>Evidence</strong>
+          <span>Terraform apply, live checks, auto-destroy</span>
+        </div>
+      </section>
+
+      <section class="section" id="roadmap">
+        <div class="section-head">
+          <p class="eyebrow">Engineering Roadmap</p>
+          <h2>Cloud operations path</h2>
+          <p>
+            The page is organized like an operations runbook: foundation first, then
+            resilient compute, access control, containers, observability, and field experience.
+          </p>
+        </div>
+
+        <div class="phase-grid">
+          <article class="phase-card">
+            <span class="phase-number">01</span>
+            <h3>Network Foundation</h3>
+            <p>Design VPCs, public/private subnets, routing, VPN tunnels, DNS, DHCP, and firewall boundaries.</p>
+            <ul>
+              <li>Hybrid AWS and Raspberry Pi Site-to-Site VPN lab</li>
+              <li>WireGuard routing and Linux CLI configuration</li>
+              <li>Security group and local ACL review</li>
+            </ul>
+          </article>
+          <article class="phase-card accent-green">
+            <span class="phase-number">02</span>
+            <h3>Cloud Compute</h3>
+            <p>Deploy EC2, load balancing, Auto Scaling, and container services with repeatable Terraform.</p>
+            <ul>
+              <li>Application Load Balancer and ASG web tier</li>
+              <li>ECS Fargate service with CloudWatch logs</li>
+              <li>Automated validation and teardown workflow</li>
+            </ul>
+          </article>
+          <article class="phase-card accent-amber">
+            <span class="phase-number">03</span>
+            <h3>Security & Identity</h3>
+            <p>Use least privilege, role-based access, private storage, and enterprise identity support.</p>
+            <ul>
+              <li>IAM role and S3 least-privilege policy</li>
+              <li>Active Directory and Azure AD operational support</li>
+              <li>PowerShell auditing and onboarding automation</li>
+            </ul>
+          </article>
+          <article class="phase-card accent-red">
+            <span class="phase-number">04</span>
+            <h3>Observability</h3>
+            <p>Find root causes through metrics, logs, dashboards, alarms, and repeatable documentation.</p>
+            <ul>
+              <li>CloudWatch custom metrics, alarm, SNS, dashboard</li>
+              <li>System log analysis and remote diagnostics</li>
+              <li>Runbooks for repeatable troubleshooting</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split-section" id="labs">
+        <div class="section-head compact">
+          <p class="eyebrow">Hands-On Proof</p>
+          <h2>AWS DevOps Labs</h2>
+          <p>
+            Each lab provisions real AWS infrastructure, tests it against live APIs or
+            HTTP checks, captures evidence, then destroys resources to control cost.
+          </p>
+          <a class="text-link" href="README.md">Open lab repository README</a>
+        </div>
+
+        <div class="lab-list">
+          <a class="lab-row" href="labs/01-vpc-networking/README.md">
+            <span>01</span>
+            <strong>VPC Networking</strong>
+            <em>Public/private subnets, IGW, NAT, routes, security groups</em>
+          </a>
+          <a class="lab-row" href="labs/02-ec2-alb-asg/README.md">
+            <span>02</span>
+            <strong>EC2 + ALB + ASG</strong>
+            <em>Highly available web tier with health verification</em>
+          </a>
+          <a class="lab-row" href="labs/03-iam-s3-least-privilege/README.md">
+            <span>03</span>
+            <strong>IAM + S3 Least Privilege</strong>
+            <em>Scoped role policy with IAM simulator proof</em>
+          </a>
+          <a class="lab-row" href="labs/04-ecs-fargate/README.md">
+            <span>04</span>
+            <strong>ECS Fargate</strong>
+            <em>Serverless container, task definition, service, logs</em>
+          </a>
+          <a class="lab-row" href="labs/05-cloudwatch-monitoring/README.md">
+            <span>05</span>
+            <strong>CloudWatch Monitoring</strong>
+            <em>Custom metric, alarm, SNS topic, dashboard</em>
+          </a>
+        </div>
+      </section>
+
+      <section class="section" id="experience">
+        <div class="section-head">
+          <p class="eyebrow">Field Experience</p>
+          <h2>Infrastructure support history</h2>
+          <p>
+            My resume centers on enterprise troubleshooting, network diagnostics,
+            cloud-connected device operations, endpoint management, and documentation.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <article class="timeline-item">
+            <span class="timeline-date">Nov 2025 - Present</span>
+            <h3>Information Systems Technician</h3>
+            <p class="company">Contra Costa County Department of Public Works</p>
+            <p>Troubleshoot DNS, DHCP, Active Directory authentication, VPN routing, logs, and distributed infrastructure issues while coordinating high-volume device deployments.</p>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-date">Oct 2025 - Nov 2025</span>
+            <h3>IT Support Technician II</h3>
+            <p class="company">Meta</p>
+            <p>Supported Linux, macOS, and Windows endpoints in high-availability environments, resolving escalated networking, authentication, VPN, and cloud-connected issues.</p>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-date">Apr 2024 - Jun 2025</span>
+            <h3>Cloud Operator</h3>
+            <p class="company">Bay Alarm</p>
+            <p>Monitored cloud-connected enterprise devices, validated remote connectivity, configured network devices, and maintained uptime through cloud management consoles.</p>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-date">Feb 2023 - Jan 2024</span>
+            <h3>IS&T Helpline Analyst</h3>
+            <p class="company">Apple Inc.</p>
+            <p>Resolved authentication, network, MDM profile, and OS issues across large-scale networked environments.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split-section" id="skills">
+        <div class="skill-panel">
+          <p class="eyebrow">Core Stack</p>
+          <h2>What I operate</h2>
+          <div class="skill-cloud" aria-label="Technical skills">
+            <span>AWS VPC</span>
+            <span>EC2</span>
+            <span>Security Groups</span>
+            <span>Site-to-Site VPN</span>
+            <span>WireGuard</span>
+            <span>TCP/IP</span>
+            <span>DNS</span>
+            <span>DHCP</span>
+            <span>LAN/WAN</span>
+            <span>Firewalls</span>
+            <span>Linux CLI</span>
+            <span>PowerShell</span>
+            <span>Active Directory</span>
+            <span>Azure AD</span>
+            <span>MDM</span>
+            <span>Log Analysis</span>
+          </div>
+        </div>
+
+        <div class="cert-panel">
+          <p class="eyebrow">Education & Certifications</p>
+          <h2>Current track</h2>
+          <ul class="cert-list">
+            <li><strong>B.S. Cloud and Network Engineering</strong><span>Western Governors University - in progress</span></li>
+            <li><strong>CompTIA Security+</strong><span>04/2026</span></li>
+            <li><strong>CompTIA Network+</strong><span>02/2026</span></li>
+            <li><strong>Linux Essentials</strong><span>02/2026</span></li>
+            <li><strong>CompTIA A+</strong><span>02/2026</span></li>
+            <li><strong>CompTIA ITF+</strong><span>06/2024</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contact">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2>Cloud and network engineering roles</h2>
+          <p>Based in Pittsburg, CA. Open to infrastructure, cloud operations, network engineering, and technical support engineering work.</p>
+        </div>
+        <div class="contact-actions">
+          <a class="button primary" href="mailto:ravikus1457@gmail.com">ravikus1457@gmail.com</a>
+          <a class="button secondary" href="https://www.linkedin.com/in/ravik1457">LinkedIn</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

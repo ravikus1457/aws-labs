@@ -1,0 +1,22 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+.terraform.lock.hcl
+
+# Evidence runs (these can be large / account-specific). Keep the dir, ignore runs.
+evidence/*/
+!evidence/.gitkeep
+
+# Local env / secrets — NEVER commit these
+.env
+*.pem
+*.key
+aws-credentials*
+secrets*
+
+# OS
+.DS_Store
