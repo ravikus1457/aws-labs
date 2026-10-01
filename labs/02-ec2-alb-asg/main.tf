@@ -22,6 +22,8 @@ provider "aws" {
 
 locals {
   name = "${var.project}-${var.run_id}"
+  # ALB and target-group names are capped at 32 chars; the full run_id is a tag, the name keeps its last 8
+  short = "${var.project}-${substr(var.run_id, length(var.run_id) - 8, 8)}"
 }
 
 # Two AZs for a realistic, highly-available layout.
@@ -127,7 +129,7 @@ resource "aws_security_group" "instance" {
 # Application Load Balancer (internet-facing) + target group + listener
 # ---------------------------------------------------------------------------
 resource "aws_lb" "web" {
-  name               = "${local.name}-alb"
+  name               = "${local.short}-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
@@ -136,7 +138,7 @@ resource "aws_lb" "web" {
 }
 
 resource "aws_lb_target_group" "web" {
-  name     = "${local.name}-tg"
+  name     = "${local.short}-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
