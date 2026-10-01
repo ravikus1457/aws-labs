@@ -39,11 +39,24 @@ echo "$TASK_ARN" > "$EVID/task-arn.txt"
 # 2. Resolve the task's ENI -> public IP.
 # ---------------------------------------------------------------------------
 echo "--- Resolving public IP ---"
-aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$TASK_ARN" --region "$REGION" \
-  --output json > "$EVID/describe-tasks.json"
+# 2026-10-01: the ENI id appears in the task's attachment details only once the attachment is ATTACHED, which can be
+# seconds after the task first reports RUNNING; the first real run read an empty id and crashed. Poll for it.
+for attempt in $(seq 1 12); do
+  aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$TASK_ARN" --region "$REGION" \
+    --output json > "$EVID/describe-tasks.json"
+  if [ -n "$(jq -r '.tasks[0].attachments[].details[]? | select(.name=="networkInterfaceId") | .value' "$EVID/describe-tasks.json" | head -n1)" ]; then
+    break
+  fi
+  echo "  attempt $attempt/12: ENI not attached yet, retrying in 5s..."
+  sleep 5
+done
 
 ENI_ID="$(jq -r '.tasks[0].attachments[].details[]? | select(.name=="networkInterfaceId") | .value' "$EVID/describe-tasks.json" | head -n1)"
 echo "ENI: $ENI_ID"
+if [ -z "$ENI_ID" ]; then
+  echo "FAIL: task never reported an attached network interface" | tee "$EVID/eni.txt"
+  exit 1
+fi
 
 PUBLIC_IP="$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --region "$REGION" \
   --query 'NetworkInterfaces[0].Association.PublicIp' --output text)"
