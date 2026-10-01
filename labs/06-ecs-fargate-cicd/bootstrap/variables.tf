@@ -36,6 +36,12 @@ variable "github_environment" {
   default     = "lab06-production"
 }
 
+variable "extra_github_environments" {
+  description = "Further GitHub environments whose approval-gated apply jobs may assume the deploy role (lab 07 reuses this role; its apply job runs in lab07-production). Re-apply this stack after adding one: it is an in-place trust-policy update"
+  type        = list(string)
+  default     = ["lab07-production"]
+}
+
 variable "create_oidc_provider" {
   description = "An AWS account can hold only ONE OIDC provider for token.actions.githubusercontent.com. Set false to reuse an existing one"
   type        = bool

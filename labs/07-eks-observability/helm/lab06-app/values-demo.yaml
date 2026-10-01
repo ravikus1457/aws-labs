@@ -1,0 +1,22 @@
+# Values for the lab 07 demo (what the workflow and exercise.sh install).
+# Layered on top of values.yaml:
+#   helm upgrade --install lab06-app ./helm/lab06-app -n lab06 --create-namespace \
+#     -f ./helm/lab06-app/values-demo.yaml \
+#     --set image.repository=<ecr_repository_url> --set image.tag=<sha> \
+#     --set serviceAccount.roleArn=<app_irsa_role_arn>
+monitoring:
+  enabled: true
+  releaseLabel: monitoring # the kube-prometheus-stack release name used in the workflow
+  scrapeInterval: 15s
+  dashboard:
+    enabled: true
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

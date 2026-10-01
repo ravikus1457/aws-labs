@@ -46,7 +46,8 @@ flowchart LR
 ## Layout
 ```
 labs/06-ecs-fargate-cicd/
-├── app/                 app.py (stdlib HTTP: /healthz, /version), test_app.py, Dockerfile
+├── app/                 app.py (stdlib HTTP: /healthz, /version, /metrics, /boom), test_app.py, Dockerfile
+│                        (/metrics + /boom were added for lab 07: Prometheus scrape target + 5xx fault injection)
 ├── bootstrap/           ONE-TIME, local: state bucket, ECR, GitHub OIDC provider,
 │                        deploy role, $5 budget  (all free, long-lived)
 ├── versions.tf          app stack: provider + default tags (no backend here)

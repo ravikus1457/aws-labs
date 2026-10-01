@@ -1,0 +1,445 @@
+# Lab 07 — lint, plan, approve, apply the EKS cluster, Helm-install the app +
+# monitoring, smoke-test with evidence.
+#
+#   push to main (lab files)  ->  lint -> validate -> plan -> [manual approval]
+#                                 -> apply -> helm (app + kube-prometheus-stack) -> smoke
+#   pull request              ->  lint -> validate only (no AWS credentials)
+#
+# No long-lived AWS keys: every AWS step assumes lab 06's deploy role through
+# GitHub's OIDC token (its trust policy lists environment lab07-production;
+# ./bootstrap adds the EKS permissions). The image is NOT built here: it is
+# whatever lab 06's pipeline last pushed to ECR (or the image_tag input).
+#
+# COST: an EKS control plane is $0.10/h from the second `apply` finishes, plus
+# 2 × t3.small, a NAT and an NLB (~$0.22/h all in). The lab is meant to live
+# about an hour: run it, look, then run lab07-destroy (the 03:00 UTC cron does
+# it regardless).
+name: lab07-eks-observability
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "labs/07-eks-observability/**"
+      - ".github/workflows/lab07.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "labs/07-eks-observability/**"
+      - ".github/workflows/lab07.yml"
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Lab 06 image tag (git SHA) to deploy. Empty = newest tag in the ECR repo"
+        required: false
+        default: ""
+      kubernetes_version:
+        description: "EKS version (1.NN). Empty = newest version in STANDARD support"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write # required to request the OIDC token
+
+# One deploy at a time; a second push queues behind the first.
+concurrency:
+  group: lab07-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/07-eks-observability
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  HELM_VERSION: "v3.22.0"
+  KUBECONFORM_VERSION: "v0.8.0"
+  KPS_VERSION: "91.8.2" # kube-prometheus-stack chart
+  APP_NAMESPACE: lab06
+  MON_NAMESPACE: monitoring
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'awslabs-lab06/app' }}
+
+jobs:
+  lint:
+    name: lint (fmt, tflint, helm lint, kubeconform)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform fmt -check
+        working-directory: ${{ env.LAB_DIR }}
+        run: terraform fmt -check -recursive -diff
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: tflint (app + bootstrap stacks)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          tflint --init --config "$PWD/.tflint.hcl"
+          tflint --recursive --config "$PWD/.tflint.hcl" --format compact
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: kubeconform (checksum-verified from the GitHub release)
+        run: |
+          set -euo pipefail
+          base="https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}"
+          curl -sSL -o kubeconform.tar.gz "$base/kubeconform-linux-amd64.tar.gz"
+          curl -sSL -o CHECKSUMS "$base/CHECKSUMS"
+          grep ' kubeconform-linux-amd64.tar.gz$' CHECKSUMS | sed 's# kubeconform-linux-amd64.tar.gz$#  kubeconform.tar.gz#' | sha256sum -c -
+          tar -xzf kubeconform.tar.gz kubeconform && sudo install -m 0755 kubeconform /usr/local/bin/kubeconform
+          kubeconform -v
+
+      - name: helm lint (app chart, demo values)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          helm lint helm/lab06-app -f helm/lab06-app/values-demo.yaml \
+            --set image.repository=000000000000.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app \
+            --set image.tag=lint \
+            --set serviceAccount.roleArn=arn:aws:iam::000000000000:role/awslabs-lab07-app-irsa
+
+      # -strict rejects unknown fields; CRD kinds (ServiceMonitor, PrometheusRule)
+      # come from the datree CRD catalog so they are checked too, not skipped.
+      - name: helm template | kubeconform -strict (app chart + kube-prometheus-stack with the lab values)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          set -euo pipefail
+          CRD='https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+          helm template lab06-app helm/lab06-app -n "$APP_NAMESPACE" -f helm/lab06-app/values-demo.yaml \
+            --set image.repository=000000000000.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app \
+            --set image.tag=lint \
+            --set serviceAccount.roleArn=arn:aws:iam::000000000000:role/awslabs-lab07-app-irsa \
+            | kubeconform -strict -summary -kubernetes-version 1.36.0 -schema-location default -schema-location "$CRD"
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm template monitoring prometheus-community/kube-prometheus-stack --version "$KPS_VERSION" -n "$MON_NAMESPACE" \
+            -f helm/monitoring/values.yaml --set grafana.adminPassword=lint \
+            | kubeconform -strict -summary -kubernetes-version 1.36.0 -schema-location default -schema-location "$CRD"
+
+      - name: dashboard JSON parses
+        working-directory: ${{ env.LAB_DIR }}
+        run: python3 -c "import json,sys; d=json.load(open('helm/lab06-app/dashboards/lab06-app.json')); print(d['title'], len(d['panels']), 'panels')"
+
+      - name: bash -n (scripts)
+        run: bash -n "$LAB_DIR/exercise.sh"
+
+  validate:
+    name: terraform validate
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+      - name: validate app stack
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -backend=false
+          terraform validate
+      - name: validate bootstrap stack
+        working-directory: ${{ env.LAB_DIR }}/bootstrap
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  plan:
+    name: terraform plan
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.resolve.outputs.image_tag }}
+      kubernetes_version: ${{ steps.resolve.outputs.kubernetes_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab07-plan-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      # Two things are resolved against AWS at plan time and travel with the plan:
+      #   image tag  : the newest tag lab 06's pipeline pushed (tags are git SHAs, immutable)
+      #   k8s version: the newest version EKS lists in STANDARD support, so a cluster is
+      #                never created straight into $0.60/h extended-support pricing
+      - name: Resolve image tag + Kubernetes version
+        id: resolve
+        env:
+          INPUT_IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+          INPUT_K8S: ${{ github.event.inputs.kubernetes_version }}
+        run: |
+          set -euo pipefail
+          TAG="${INPUT_IMAGE_TAG:-}"
+          if [ -z "$TAG" ]; then
+            TAG="$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" \
+                   --query 'sort_by(imageDetails,&imagePushedAt)[-1].imageTags[0]' --output text)"
+          fi
+          [ -n "$TAG" ] && [ "$TAG" != "None" ] || { echo "::error::no image tag in ECR repo $ECR_REPOSITORY - run lab 06's pipeline first"; exit 1; }
+          aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids imageTag="$TAG" >/dev/null
+          K8S="${INPUT_K8S:-}"
+          if [ -z "$K8S" ]; then
+            K8S="$(aws eks describe-cluster-versions \
+                     --query "clusterVersions[?clusterType=='eks' && (versionStatus=='STANDARD_SUPPORT' || status=='STANDARD_SUPPORT')].clusterVersion" \
+                     --output text 2>/dev/null | tr '\t' '\n' | grep -E '^1\.[0-9]+$' | sort -V | tail -n 1 || true)"
+          fi
+          if [ -z "$K8S" ]; then
+            K8S="$(grep -A3 'variable "kubernetes_version"' "$LAB_DIR/variables.tf" | sed -n 's/.*default *= *"\([0-9.]*\)".*/\1/p')"
+            echo "::warning::could not resolve the EKS version list; using the variable default $K8S"
+          fi
+          echo "image_tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "kubernetes_version=$K8S" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$TAG" > "$LAB_DIR/image-tag.txt"
+          {
+            echo "### Resolved"
+            echo "- image: \`${ECR_REPOSITORY}:${TAG}\`"
+            echo "- Kubernetes: \`${K8S}\` (newest in standard support)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write backend.tf (lab 06's state bucket, lab07/ key)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set (see README: Bootstrap order)"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab07/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: terraform init + plan
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+          TF_VAR_ecr_repository_name: ${{ env.ECR_REPOSITORY }}
+          TF_VAR_deploy_role_arn: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          TF_VAR_kubernetes_version: ${{ steps.resolve.outputs.kubernetes_version }}
+          TF_VAR_app_namespace: ${{ env.APP_NAMESPACE }}
+        run: |
+          terraform init
+          terraform plan -out=tfplan -no-color | tee plan.txt
+          {
+            echo "### terraform plan"
+            echo '```'
+            grep -E '^(Plan:|No changes)' plan.txt || tail -n 5 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The apply job re-inits in a fresh runner; shipping the lock file with
+      # the plan guarantees it resolves the identical provider build.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab07-plan-${{ github.run_id }}
+          path: |
+            ${{ env.LAB_DIR }}/tfplan
+            ${{ env.LAB_DIR }}/plan.txt
+            ${{ env.LAB_DIR }}/image-tag.txt
+            ${{ env.LAB_DIR }}/.terraform.lock.hcl
+          include-hidden-files: true   # the lock file is a dotfile; v4 drops dotfiles by default
+          retention-days: 3
+          if-no-files-found: error
+
+  apply:
+    name: terraform apply (manual approval)
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 45 # EKS control plane ~10 min + node group ~5 min + add-on
+    # The environment carries the "required reviewers" rule: the job pauses here
+    # until a reviewer approves in the Actions UI. Its OIDC 'sub' claim becomes
+    # repo:<owner/repo>:environment:lab07-production, which the deploy role trusts.
+    environment:
+      name: lab07-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab07-apply-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab07-plan-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab07/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      # Applies EXACTLY the reviewed plan. If the nightly destroy ran in between,
+      # Terraform refuses ("saved plan is stale") - re-run the workflow.
+      - name: terraform apply tfplan
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -lockfile=readonly
+          terraform apply -no-color tfplan
+          terraform output -json > outputs.json
+          {
+            echo "### Cluster"
+            echo "- name: \`$(jq -r '.cluster_name.value' outputs.json)\`  version: \`$(jq -r '.cluster_version.value' outputs.json)\` (platform \`$(jq -r '.cluster_platform_version.value' outputs.json)\`)"
+            echo "- nodes: $(jq -r '.node_count.value' outputs.json) × $(jq -r '.node_instance_type.value' outputs.json)"
+            echo "- metrics-server add-on: \`$(jq -r '.metrics_server_addon_version.value' outputs.json)\`"
+            echo "- IRSA role: \`$(jq -r '.app_irsa_role_arn.value' outputs.json)\`"
+            echo "- billing started: $(date -u '+%Y-%m-%dT%H:%M:%SZ') — destroy with lab07-destroy when done (cron 03:00 UTC)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab07-outputs-${{ github.run_id }}
+          path: |
+            ${{ env.LAB_DIR }}/outputs.json
+            ${{ env.LAB_DIR }}/image-tag.txt
+          retention-days: 3
+
+  deploy:
+    name: helm upgrade --install (monitoring + app)
+    needs: apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      nlb_url: ${{ steps.nlb.outputs.nlb_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab07-deploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab07-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: kubeconfig (IAM role -> EKS access entry -> cluster-admin)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          aws eks update-kubeconfig --region "$AWS_REGION" --name "$(jq -r '.cluster_name.value' outputs.json)"
+          kubectl get nodes -o wide
+
+      - name: kube-prometheus-stack
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          set -euo pipefail
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update prometheus-community
+          PW="$(openssl rand -hex 16)"; echo "::add-mask::$PW"   # read it back later from secret monitoring-grafana
+          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --version "$KPS_VERSION" \
+            -n "$MON_NAMESPACE" --create-namespace -f helm/monitoring/values.yaml \
+            --set "grafana.adminPassword=${PW}" --wait --timeout 12m
+          kubectl -n "$MON_NAMESPACE" get pods
+
+      - name: lab06-app chart
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          set -euo pipefail
+          helm upgrade --install lab06-app ./helm/lab06-app -n "$APP_NAMESPACE" --create-namespace \
+            -f ./helm/lab06-app/values-demo.yaml \
+            --set "image.repository=$(jq -r '.ecr_repository_url.value' outputs.json)" \
+            --set "image.tag=$(cat image-tag.txt)" \
+            --set "serviceAccount.roleArn=$(jq -r '.app_irsa_role_arn.value' outputs.json)" \
+            --set "serviceAccount.name=$(jq -r '.app_service_account.value' outputs.json)" \
+            --set "monitoring.releaseLabel=monitoring" \
+            --wait --timeout 8m
+          kubectl -n "$APP_NAMESPACE" get deploy,pods,svc,hpa,pdb -o wide
+
+      - name: NLB hostname
+        id: nlb
+        run: |
+          for i in $(seq 1 36); do
+            H="$(kubectl -n "$APP_NAMESPACE" get svc lab06-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)"
+            [ -n "$H" ] && break; sleep 5
+          done
+          echo "nlb_url=http://${H:-pending}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Deployed"
+            echo "- app: http://${H:-pending}/healthz"
+            echo "- Grafana (not exposed): \`kubectl -n $MON_NAMESPACE port-forward svc/monitoring-grafana 3000:80\`, user admin, password: \`kubectl -n $MON_NAMESPACE get secret monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 -d\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  smoke:
+    name: smoke test (rollout, 2 ready pods, NLB /healthz, IRSA, HPA, Prometheus target, Grafana)
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab07-smoke-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab07-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: exercise.sh (same assertions the local runner uses; installs skipped, the deploy job did them)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          OUTPUTS_JSON: outputs.json
+          EXERCISE_INSTALL: "0"
+          EXERCISE_FAULT: "1"
+        run: |
+          mkdir -p evidence
+          bash ./exercise.sh evidence 2>&1 | tee evidence/exercise.log
+          {
+            echo "### Smoke test"
+            echo '```'
+            grep -E '^(PASS|FAIL|WARN)' evidence/exercise.log
+            echo '```'
+            echo "Cluster is UP and billing (~\$0.22/h). Tear down: Actions -> lab07-destroy -> Run workflow (cron 03:00 UTC regardless)."
+          } >> "$GITHUB_STEP_SUMMARY"
+          ! grep -q '^FAIL' evidence/exercise.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab07-evidence-${{ github.run_id }}
+          path: |
+            ${{ env.LAB_DIR }}/evidence
+            !${{ env.LAB_DIR }}/evidence/kubeconfig
+          retention-days: 14

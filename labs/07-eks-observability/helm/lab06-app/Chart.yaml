@@ -1,0 +1,22 @@
+apiVersion: v2
+name: lab06-app
+description: >-
+  The lab 06 container (stdlib Python HTTP service: /healthz, /version, /metrics) packaged
+  for Kubernetes: 2 replicas behind a Service of type LoadBalancer (NLB), resource
+  requests/limits, readiness + liveness probes, a PodDisruptionBudget, an HPA at 70% CPU,
+  and, when monitoring is enabled, a ServiceMonitor, two PrometheusRule alerts and a
+  Grafana dashboard for kube-prometheus-stack.
+type: application
+version: 0.1.0
+# appVersion is informational; the image tag is a value (image.tag = lab 06 git SHA).
+appVersion: "lab06"
+kubeVersion: ">=1.29.0-0"
+keywords:
+  - awslabs
+  - eks
+  - observability
+home: https://github.com/ravikus1457/aws-labs/tree/main/labs/07-eks-observability
+sources:
+  - https://github.com/ravikus1457/aws-labs
+maintainers:
+  - name: Ravi Kumar

@@ -1,0 +1,175 @@
+# Lab 07 — scheduled teardown. Runs every night so no EKS cluster is left
+# billing $0.10/h + nodes, whatever happened during the day. Also runnable by hand.
+#
+# Order matters:
+#   1. helm uninstall  -> Kubernetes deletes the NLB and the security-group rules it
+#                         added (Terraform never knew about them; destroying the VPC
+#                         with an NLB still inside it hangs for 20 min then fails)
+#   2. force-delete    -> any NLB still tagged with the cluster, in case (1) could not run
+#   3. terraform destroy
+#   4. count survivors from the OWNING services (eks/ec2/elbv2/logs/iam/autoscaling).
+#      The tagging index is listed for information only: it lagged a clean lab 06
+#      destroy by >10 min twice and cried wolf.
+#
+# A failed run shows red in Actions and GitHub emails the repo owner - that is
+# the alert path; `scripts/guardrails.sh orphans` is the manual check.
+name: lab07-destroy
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC daily (20:00 PDT / 19:00 PST the evening before)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: lab07-destroy
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/07-eks-observability
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  HELM_VERSION: "v3.22.0"
+  CLUSTER_NAME: awslabs-lab07-eks
+  APP_NAMESPACE: lab06
+  MON_NAMESPACE: monitoring
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  destroy:
+    name: helm uninstall + terraform destroy (app stack)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab07-destroy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab07/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: helm uninstall (app first, then monitoring) if the cluster exists
+        run: |
+          set -euo pipefail
+          STATUS="$(aws eks describe-cluster --name "$CLUSTER_NAME" --query 'cluster.status' --output text 2>/dev/null || echo NONE)"
+          echo "cluster $CLUSTER_NAME: $STATUS"
+          if [ "$STATUS" = "ACTIVE" ]; then
+            aws eks update-kubeconfig --region "$AWS_REGION" --name "$CLUSTER_NAME"
+            helm uninstall lab06-app -n "$APP_NAMESPACE" --wait --timeout 5m 2>&1 || echo "lab06-app: not installed or already gone"
+            helm uninstall monitoring -n "$MON_NAMESPACE" --wait --timeout 5m 2>&1 || echo "monitoring: not installed or already gone"
+            # The Service's finalizer holds until the cloud provider has deleted the NLB.
+            for i in $(seq 1 24); do
+              LEFT="$(kubectl get svc -A -o json | jq '[.items[] | select(.spec.type=="LoadBalancer")] | length')"
+              [ "$LEFT" = "0" ] && break
+              echo "waiting for $LEFT LoadBalancer service(s) to finish deleting ($i/24)"; sleep 5
+            done
+          else
+            echo "no active cluster: skipping helm uninstall"
+          fi
+
+      # Belt and braces: an NLB Kubernetes created carries the kubernetes.io/cluster/<name>
+      # tag. If it is still here (cluster gone before uninstall, finalizer stuck), delete it
+      # ourselves or the VPC destroy below cannot complete.
+      - name: Force-delete any load balancer still tagged with the cluster
+        run: |
+          set -euo pipefail
+          ARNS="$(aws elbv2 describe-load-balancers --query 'LoadBalancers[].LoadBalancerArn' --output text 2>/dev/null || true)"
+          for arn in $ARNS; do
+            if aws elbv2 describe-tags --resource-arns "$arn" --query 'TagDescriptions[0].Tags[].Key' --output text | tr '\t' '\n' | grep -qx "kubernetes.io/cluster/${CLUSTER_NAME}"; then
+              echo "deleting leftover load balancer $arn"
+              aws elbv2 delete-load-balancer --load-balancer-arn "$arn"
+            fi
+          done
+          # Target groups the cloud provider created for it (same tag).
+          TGS="$(aws elbv2 describe-target-groups --query 'TargetGroups[].TargetGroupArn' --output text 2>/dev/null || true)"
+          for tg in $TGS; do
+            if aws elbv2 describe-tags --resource-arns "$tg" --query 'TagDescriptions[0].Tags[].Key' --output text | tr '\t' '\n' | grep -qx "kubernetes.io/cluster/${CLUSTER_NAME}"; then
+              echo "deleting leftover target group $tg"
+              aws elbv2 delete-target-group --target-group-arn "$tg" || true
+            fi
+          done
+          sleep 20 # ENIs of a deleted NLB take a moment to release
+
+      - name: terraform destroy
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+          TF_VAR_ecr_repository_name: ${{ vars.ECR_REPOSITORY || 'awslabs-lab06/app' }}
+          TF_VAR_deploy_role_arn: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+        run: |
+          terraform init
+          terraform destroy -auto-approve -no-color | tee destroy.txt
+          {
+            echo "### terraform destroy"
+            echo '```'
+            grep -E '^(Destroy complete|No changes)' destroy.txt || tail -n 5 destroy.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify nothing from the app stack survived (owning services, not the tagging index)
+        run: |
+          set -euo pipefail
+          F="Name=tag:project,Values=awslabs Name=tag:lab,Values=07-eks-observability"
+          CLUSTERS=$(aws eks list-clusters --region "$AWS_REGION" --query "clusters[?@=='${CLUSTER_NAME}']" --output text)
+          VPCS=$(aws ec2 describe-vpcs --region "$AWS_REGION" --filters $F --query 'Vpcs[].VpcId' --output text)
+          NATS=$(aws ec2 describe-nat-gateways --region "$AWS_REGION" --filter $F Name=state,Values=pending,available --query 'NatGateways[].NatGatewayId' --output text)
+          EIPS=$(aws ec2 describe-addresses --region "$AWS_REGION" --filters $F --query 'Addresses[].AllocationId' --output text)
+          NODES=$(aws ec2 describe-instances --region "$AWS_REGION" --filters "Name=tag:eks:cluster-name,Values=${CLUSTER_NAME}" Name=instance-state-name,Values=pending,running,stopping,stopped --query 'Reservations[].Instances[].InstanceId' --output text)
+          ASGS=$(aws autoscaling describe-auto-scaling-groups --region "$AWS_REGION" --query "AutoScalingGroups[?Tags[?Key=='eks:cluster-name' && Value=='${CLUSTER_NAME}']].AutoScalingGroupName" --output text)
+          LBS=""
+          for arn in $(aws elbv2 describe-load-balancers --region "$AWS_REGION" --query 'LoadBalancers[].LoadBalancerArn' --output text); do
+            if aws elbv2 describe-tags --resource-arns "$arn" --query 'TagDescriptions[0].Tags[].Key' --output text | tr '\t' '\n' | grep -qx "kubernetes.io/cluster/${CLUSTER_NAME}"; then LBS="$LBS $arn"; fi
+          done
+          LOGS=$(aws logs describe-log-groups --region "$AWS_REGION" --log-group-name-prefix "/aws/eks/${CLUSTER_NAME}" --query 'logGroups[].logGroupName' --output text)
+          ROLES=$(aws iam list-roles --query "Roles[?starts_with(RoleName, 'awslabs-lab07-')].RoleName" --output text)
+          OIDC=""
+          for arn in $(aws iam list-open-id-connect-providers --query 'OpenIDConnectProviderList[].Arn' --output text); do
+            case "$arn" in *oidc.eks.*)
+              if aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$arn" --query "Tags[?Key=='lab' && Value=='07-eks-observability']" --output text | grep -q .; then OIDC="$OIDC $arn"; fi;;
+            esac
+          done
+          printf 'eks clusters: %s\nvpcs: %s\nnat gateways (pending/available): %s\neips: %s\nnode instances: %s\nasgs: %s\nload balancers (cluster-tagged): %s\nlog groups: %s\niam roles (awslabs-lab07-*): %s\noidc providers (lab 07): %s\n' \
+            "${CLUSTERS:-none}" "${VPCS:-none}" "${NATS:-none}" "${EIPS:-none}" "${NODES:-none}" "${ASGS:-none}" "${LBS:-none}" "${LOGS:-none}" "${ROLES:-none}" "${OIDC:-none}"
+          COUNT=0
+          for v in "$CLUSTERS" "$VPCS" "$NATS" "$EIPS" "$NODES" "$ASGS" "$LBS" "$LOGS" "$ROLES" "$OIDC"; do
+            for item in $v; do COUNT=$((COUNT + 1)); done
+          done
+          aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
+            --tag-filters Key=project,Values=awslabs Key=lab,Values=07-eks-observability Key=stack,Values=app \
+            --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json || echo '[]' > leftovers.json
+          echo "tagging index still lists $(jq 'length' leftovers.json) ARN(s) (informational; the index lags deletes by 10+ min)"
+          echo "lab 07 app-stack resources still alive: $COUNT"
+          if [ "$COUNT" -ne 0 ]; then
+            echo "::error::$COUNT lab 07 app-stack resources still exist after destroy (see above). Run: scripts/guardrails.sh orphans"
+            exit 1
+          fi
+          echo "- leftovers: 0" >> "$GITHUB_STEP_SUMMARY"

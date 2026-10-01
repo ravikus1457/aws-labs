@@ -21,13 +21,15 @@ captures evidence, and **tears it down automatically** so idle cost stays at ~$0
 | 04 | [ECS Fargate](labs/04-ecs-fargate) | Serverless containers, task defs vs services, CloudWatch logs | < $0.01 |
 | 05 | [CloudWatch monitoring](labs/05-cloudwatch-monitoring) | Metrics, alarms, SNS alerts, dashboards | ~$0 |
 | 06 | [ECS Fargate CI/CD (flagship)](labs/06-ecs-fargate-cicd) | Private Fargate service behind an ALB, ECR, GitHub OIDC deploy role, CloudWatch alarms to SNS, AWS Budget, GitHub Actions pipeline with manual approval, scheduled destroy | ~$0.11/hr while up; destroyed nightly by CI |
+| 07 | [EKS + observability](labs/07-eks-observability) | EKS cluster, managed node group, IRSA, Helm chart, HPA + PDB, Prometheus + Grafana, PrometheusRule alerts, NLB Service, control-plane logs, OIDC pipeline with manual approval, fault-injected smoke test, scheduled destroy | ~$0.22/hr while up (control plane $0.10); meant to live ~1 hr; destroyed nightly by CI |
 
 Every "approx. cost" assumes the run completes and tears down (a few minutes). The
 runner destroys resources even if a step fails — see **Cost safety** below.
 
-Lab 06 is the exception to "the runner destroys it": it is deployed by **GitHub
-Actions** (no access keys — an OIDC role) and torn down by a **scheduled workflow**
-every night. See its README for the bootstrap order.
+Labs 06 and 07 are the exception to "the runner destroys it": they are deployed by
+**GitHub Actions** (no access keys — an OIDC role) and torn down by a **scheduled
+workflow** every night (lab 06 at 07:00 UTC, lab 07 at 03:00 UTC). See their READMEs
+for the bootstrap order; lab 07 reuses lab 06's bootstrap (role, state bucket, ECR image).
 
 ## Networking labs
 
@@ -59,11 +61,16 @@ aws-devops-labs/
 ├── labs/
 │   ├── 01-vpc-networking/   ← main.tf, variables.tf, outputs.tf, exercise.sh, README.md
 │   ├── … (02–05, same shape)
-│   └── 06-ecs-fargate-cicd/ ← flagship: app/ (Dockerfile + tests), bootstrap/ (OIDC role,
-│                              ECR, state bucket, budget), app stack, exercise.sh, README.md
+│   ├── 06-ecs-fargate-cicd/ ← flagship: app/ (Dockerfile + tests), bootstrap/ (OIDC role,
+│   │                          ECR, state bucket, budget), app stack, exercise.sh, README.md
+│   └── 07-eks-observability/ ← EKS stack, bootstrap/ (adds EKS perms to lab 06's role),
+│                              helm/lab06-app (chart + dashboard), helm/monitoring (values),
+│                              exercise.sh, README.md
 ├── .github/workflows/
 │   ├── lab06.yml            ← lint → validate → build+push (OIDC) → plan → approve → apply → smoke
-│   └── lab06-destroy.yml    ← nightly terraform destroy so nothing is left running
+│   ├── lab06-destroy.yml    ← nightly terraform destroy so nothing is left running
+│   ├── lab07.yml            ← lint → validate → plan → approve → apply → helm → smoke (evidence)
+│   └── lab07-destroy.yml    ← nightly helm uninstall + terraform destroy + survivor check
 └── evidence/                ← per-run outputs, logs, assertions (git-ignored)
 ```
 

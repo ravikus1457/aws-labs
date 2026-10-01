@@ -1,0 +1,12 @@
+# Copy to backend.tf (git-ignored) to keep this stack's state in the bucket lab 06's
+# bootstrap created. Same bucket, DIFFERENT key: the two labs never share state.
+# CI writes the same file from the TF_STATE_BUCKET / AWS_REGION repo variables.
+terraform {
+  backend "s3" {
+    bucket       = "awslabs-lab06-tfstate-<ACCOUNT_ID>"
+    key          = "lab07/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true # S3-native lock (Terraform >= 1.10); no DynamoDB table
+  }
+}

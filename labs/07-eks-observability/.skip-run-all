@@ -1,0 +1,2 @@
+Lab 07 is deployed by GitHub Actions (needs lab 06's ECR image + the deploy role, and Helm after apply) — scripts/run-all.sh skips it.
+See labs/07-eks-observability/README.md "Bootstrap order" for the local path.

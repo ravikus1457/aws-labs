@@ -147,14 +147,18 @@ data "aws_iam_policy_document" "deploy_trust" {
     # 'sub' is the claim that pins the role to this repo. A job that runs inside
     # a GitHub *environment* presents `repo:<owner/repo>:environment:<name>`
     # instead of the branch form, so both shapes are listed. Nothing else
-    # (forks, PRs, other branches, other repos) matches.
+    # (forks, PRs, other branches, other repos) matches. Lab 07 reuses this
+    # role, so its approval environment is listed too (extra_github_environments).
     condition {
       test     = "StringEquals"
       variable = "${local.oidc_host}:sub"
-      values = [
-        "repo:${var.github_repo}:ref:refs/heads/${var.github_branch}",
-        "repo:${var.github_repo}:environment:${var.github_environment}",
-      ]
+      values = concat(
+        [
+          "repo:${var.github_repo}:ref:refs/heads/${var.github_branch}",
+          "repo:${var.github_repo}:environment:${var.github_environment}",
+        ],
+        [for e in var.extra_github_environments : "repo:${var.github_repo}:environment:${e}"],
+      )
     }
   }
 

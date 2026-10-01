@@ -1,0 +1,195 @@
+# kube-prometheus-stack values for lab 07, sized for 2 × t3.small (2 vCPU / 2 GiB each).
+#
+#   helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+#     --version 91.8.2 -n monitoring --create-namespace -f helm/monitoring/values.yaml
+#
+# Design: EPHEMERAL. 2 h retention, no PersistentVolumes (no EBS CSI driver, no
+# volumes to orphan on destroy), one replica of everything, small requests so
+# the whole stack + the app fit in ~1.2 GiB across the two nodes. Grafana is
+# reached by port-forward, never exposed. The release name "monitoring" is the
+# `release:` label the app chart's ServiceMonitor/PrometheusRule carry.
+
+fullnameOverride: monitoring # objects are "monitoring-<component>" rather than "monitoring-kube-prometheus-stack-<component>"
+
+crds:
+  enabled: true # installed on first install; Helm never upgrades CRDs (documented limitation)
+
+# ---------------------------------------------------------------------------
+# Control-plane components EKS does not expose (etcd, scheduler, controller-
+# manager) and kube-proxy (metrics bound to 127.0.0.1 on EKS): scrape OFF and
+# their bundled alert rules OFF, or Prometheus shows permanent "down" targets
+# and fires KubeSchedulerDown-style alerts about things we cannot see.
+# ---------------------------------------------------------------------------
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+defaultRules:
+  create: true
+  rules:
+    etcd: false
+    kubeControllerManager: false
+    kubeProxy: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+    windows: false
+
+windowsMonitoring:
+  enabled: false
+
+# ---------------------------------------------------------------------------
+# Prometheus — the only component with real memory. 2 h in-memory/emptyDir
+# retention; ~30-40k series from kubelet/cAdvisor/KSM/node-exporter on 2 nodes
+# is ~250-350 MiB RSS. The *NilUsesHelmValues=false flags make it pick up
+# ServiceMonitors/PrometheusRules from ANY namespace with ANY label, so the
+# app chart's objects are selected even if the release label ever changes.
+# ---------------------------------------------------------------------------
+prometheus:
+  enabled: true
+  service:
+    type: ClusterIP
+  prometheusSpec:
+    replicas: 1
+    retention: 2h
+    retentionSize: 1GiB
+    walCompression: true
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+    storageSpec: {} # emptyDir: dies with the pod, which is the point of an ephemeral lab
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    scrapeConfigSelectorNilUsesHelmValues: false
+    resources:
+      requests:
+        cpu: 100m
+        memory: 300Mi
+      limits:
+        memory: 768Mi
+
+# ---------------------------------------------------------------------------
+# Alertmanager — one replica, 2 h retention, default (null) receiver. Wiring a
+# real receiver (SNS via the sns_configs block, or a webhook) is optional and
+# described in the README; the lab proves the alert *fires* (Prometheus /alerts
+# + Alertmanager /api/v2/alerts), not that an email arrived.
+# ---------------------------------------------------------------------------
+alertmanager:
+  enabled: true
+  service:
+    type: ClusterIP
+  alertmanagerSpec:
+    replicas: 1
+    retention: 2h
+    storage: {}
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 96Mi
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ["alertname", "namespace"]
+      group_wait: 30s
+      group_interval: 2m
+      repeat_interval: 4h
+      receiver: "null"
+      routes:
+        - receiver: "null"
+          matchers:
+            - alertname = "Watchdog"
+    receivers:
+      - name: "null"
+      # SNS (optional): give the Alertmanager pod an IRSA role with sns:Publish on the
+      # topic, then add a receiver like the one below and route severity=critical to it.
+      # - name: sns
+      #   sns_configs:
+      #     - topic_arn: arn:aws:sns:us-east-1:123456789012:awslabs-lab06-alerts
+      #       sigv4:
+      #         region: us-east-1
+
+# ---------------------------------------------------------------------------
+# Grafana — ClusterIP (port-forward), no persistence, admin password passed at
+# install time (--set grafana.adminPassword=...; the workflow generates one
+# and the README shows how to read it back from the Secret). The dashboard
+# sidecar watches ALL namespaces for ConfigMaps labelled grafana_dashboard=1,
+# which is how the app chart's dashboard shows up.
+# ---------------------------------------------------------------------------
+grafana:
+  enabled: true
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: false
+  testFramework:
+    enabled: false # saves a test pod + a ConfigMap
+  defaultDashboardsEnabled: true
+  defaultDashboardsTimezone: utc
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+      folderAnnotation: grafana_folder
+      provider:
+        foldersFromFilesStructure: true
+    datasources:
+      enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+  grafana.ini:
+    analytics:
+      check_for_updates: false
+      reporting_enabled: false
+    news:
+      news_feed_enabled: false
+
+# ---------------------------------------------------------------------------
+# The operator, kube-state-metrics and node-exporter: small and bounded.
+# ---------------------------------------------------------------------------
+prometheusOperator:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 192Mi
+  admissionWebhooks:
+    enabled: true # validates PrometheusRule syntax at apply time (a typo fails `helm upgrade`, not silently at runtime)
+    patch:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 64Mi
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 96Mi
+
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 24Mi
+    limits:
+      memory: 64Mi

@@ -28,6 +28,15 @@ labs/06-ecs-fargate-cicd/evidence/*
 # CI runs' evidence IS committed (the portfolio's proof); gitignore has no trailing comments, hence this line
 !labs/06-ecs-fargate-cicd/evidence/run-*/
 
+# Lab 07: same pattern (backend.tf is git-ignored, committed evidence lives under evidence/run-*/)
+labs/07-eks-observability/backend.tf
+labs/07-eks-observability/bootstrap/backend.tf
+labs/07-eks-observability/evidence/*
+!labs/07-eks-observability/evidence/run-*/
+labs/07-eks-observability/evidence/run-*/kubeconfig
+labs/07-eks-observability/image-tag.txt
+labs/07-eks-observability/outputs.json
+
 # Python
 __pycache__/
 *.pyc

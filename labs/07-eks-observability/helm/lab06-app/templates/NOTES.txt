@@ -1,0 +1,26 @@
+{{ include "lab06-app.fullname" . }} deployed to namespace {{ .Release.Namespace }}
+image: {{ include "lab06-app.image" . }}
+
+Wait for the pods and the load balancer:
+  kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "lab06-app.fullname" . }}
+  kubectl -n {{ .Release.Namespace }} get svc {{ include "lab06-app.fullname" . }} -w     # EXTERNAL-IP appears in ~2 min
+
+Then:
+  NLB=$(kubectl -n {{ .Release.Namespace }} get svc {{ include "lab06-app.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+  curl http://$NLB/healthz      # {"status":"ok"}  (DNS for a new NLB can take another minute)
+  curl http://$NLB/version      # which build is live
+  curl http://$NLB/metrics      # what Prometheus scrapes
+  curl -i http://$NLB/boom      # 500 on purpose: feeds the 5xx alert
+{{- if .Values.autoscaling.enabled }}
+
+HPA (needs metrics-server; shows <unknown> for the first ~60 s):
+  kubectl -n {{ .Release.Namespace }} get hpa {{ include "lab06-app.fullname" . }}
+{{- end }}
+{{- if .Values.monitoring.enabled }}
+
+Monitoring objects created for kube-prometheus-stack (release label "{{ .Values.monitoring.releaseLabel }}"):
+  ServiceMonitor, PrometheusRule (Lab06AppPodRestarting, Lab06AppHigh5xxRate), Grafana dashboard ConfigMap.
+{{- end }}
+
+IMPORTANT before `terraform destroy`: `helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}` first.
+Kubernetes created the NLB (and security-group rules for it); Terraform does not know about them.

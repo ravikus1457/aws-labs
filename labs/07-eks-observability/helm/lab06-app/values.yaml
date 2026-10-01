@@ -1,0 +1,136 @@
+# Default values for lab06-app.
+#
+# The two values with no default are the image: pass them explicitly
+#   --set image.repository=<acct>.dkr.ecr.<region>.amazonaws.com/awslabs-lab06/app
+#   --set image.tag=<git sha lab 06 CI pushed>
+# so a chart install can never silently run "latest" (ECR tags are immutable
+# in lab 06; the tag IS the build).
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+replicaCount: 2 # only used when autoscaling.enabled=false; the HPA owns replicas otherwise
+
+containerPort: 8080
+
+# --- scheduling -------------------------------------------------------------
+# Requests are what the scheduler reserves and what the HPA's 70% is measured
+# against (utilization = usage / request). Limits are the ceiling the kubelet
+# enforces: CPU is throttled, memory is OOM-killed. For a stdlib server that
+# idles at ~20 MiB these are generous; they are small because the whole lab
+# shares 2 × t3.small.
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+# Spread the replicas over zones, then over nodes. ScheduleAnyway keeps the lab
+# alive if one AZ's node is draining; DoNotSchedule is the production value.
+topologySpread:
+  enabled: true
+  maxSkew: 1
+  whenUnsatisfiable: ScheduleAnyway
+
+# --- probes -------------------------------------------------------------------
+# readiness: gates traffic (Service endpoints). liveness: restarts the container.
+# Same path, different consequences — the liveness probe is deliberately laxer
+# so a slow readiness never cascades into restart loops.
+probes:
+  readiness:
+    path: /healthz
+    initialDelaySeconds: 2
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 3
+  liveness:
+    path: /healthz
+    initialDelaySeconds: 10
+    periodSeconds: 15
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# --- service ------------------------------------------------------------------
+# type LoadBalancer + the nlb annotation = the in-tree AWS cloud provider creates
+# a Network Load Balancer with the nodes as instance targets (NodePort). No
+# AWS Load Balancer Controller, no extra IAM/Helm release. The trade-off is in
+# the README (no L7: no path routing, no WAF, no ALB access logs).
+service:
+  type: LoadBalancer
+  port: 80
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    # Tags on the NLB so the destroy job's survivor check and guardrails.sh can see it.
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "project=awslabs,lab=07-eks-observability,stack=app,managed_by=kubernetes"
+  # Who may reach the NLB (becomes security-group rules on the nodes). Open for
+  # the demo; narrow it to your IP for anything that is not a 1-hour lab.
+  loadBalancerSourceRanges:
+    - 0.0.0.0/0
+
+# --- availability -------------------------------------------------------------
+# PDB: a voluntary disruption (node drain, cluster upgrade) may never take the
+# app below 1 ready pod. With 2 replicas that means "one at a time".
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# HPA: scale 2..4 on CPU utilization (needs metrics-server, installed by Terraform
+# as an EKS add-on). 70% of the 50m request = 35m per pod on average.
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+  scaleDownStabilizationSeconds: 60
+
+# --- identity -----------------------------------------------------------------
+# roleArn = the IRSA role Terraform created (output app_irsa_role_arn). The
+# annotation is all IRSA needs on the Kubernetes side: the EKS pod-identity
+# webhook sees it and injects AWS_ROLE_ARN + a projected token into the pod.
+serviceAccount:
+  create: true
+  name: lab06-app
+  roleArn: ""
+  automountServiceAccountToken: true
+
+# --- monitoring (kube-prometheus-stack) ---------------------------------------
+monitoring:
+  enabled: false
+  # Label the Prometheus operator selects on. kube-prometheus-stack's default
+  # selector is `release: <its helm release name>`; the monitoring values file
+  # also sets *NilUsesHelmValues=false so unlabeled objects are picked up too.
+  releaseLabel: monitoring
+  scrapeInterval: 15s
+  alerts:
+    restarts:
+      # fire when a container restarted more than this many times in the window
+      threshold: 2
+      window: 10m
+    http5xx:
+      # ratio of 5xx to all requests over `window`, held for `for`
+      ratio: 0.05
+      window: 5m
+      for: 2m
+  dashboard:
+    enabled: true
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+
+# Hard-coded in the Dockerfile too; repeated here so the pod spec stands on its own.
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault

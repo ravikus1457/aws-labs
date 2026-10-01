@@ -1,0 +1,14 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "lab06-app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lab06-app.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "lab06-app.selectorLabels" . | nindent 6 }}
+{{- end }}

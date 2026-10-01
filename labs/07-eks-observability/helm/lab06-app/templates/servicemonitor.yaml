@@ -1,0 +1,26 @@
+{{- if .Values.monitoring.enabled }}
+# Tells the Prometheus operator to scrape this Service's endpoints. Prometheus
+# PULLS /metrics on every pod behind the Service (discovered via Endpoints), so
+# a new replica is scraped the moment it is ready and a dead one disappears
+# from the target list; the app never needs to know where Prometheus is.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "lab06-app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lab06-app.labels" . | nindent 4 }}
+    release: {{ .Values.monitoring.releaseLabel }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "lab06-app.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.monitoring.scrapeInterval }}
+      scrapeTimeout: 5s
+{{- end }}

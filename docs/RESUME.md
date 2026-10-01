@@ -35,6 +35,12 @@ List a bullet only after you've (a) **run the lab**, (b) **read its README**, an
   authenticates to AWS with OIDC instead of access keys — lint, tests, image build
   + ECR scan, Terraform plan, manual approval gate, apply, smoke test — with
   CloudWatch alarms to SNS, a cost budget, and a scheduled nightly teardown.
+- **Kubernetes + observability (lab 07):** Provisioned an Amazon EKS cluster in
+  Terraform (managed node group, IRSA/OIDC, control-plane logs, access entries),
+  packaged the lab 06 service as a Helm chart (probes, requests/limits, HPA, PDB,
+  NLB Service) and monitored it with kube-prometheus-stack — ServiceMonitor,
+  two PrometheusRule alerts, a Grafana dashboard — deployed by the same OIDC
+  pipeline with a fault-injected smoke test and a scheduled teardown.
 
 ## Interview prep — be ready for these
 - Why do private subnets use a **NAT Gateway** instead of an Internet Gateway?
@@ -48,6 +54,12 @@ List a bullet only after you've (a) **run the lab**, (b) **read its README**, an
   policy check (`aud`, `sub`), and why does the `sub` differ for an environment job?
 - Why run tasks in **private subnets** behind an ALB? What does the NAT cost, and
   what are VPC endpoints an alternative to?
+- **EKS vs ECS** — when is Kubernetes worth the $0.10/h control plane and the
+  operational surface? **Managed node group vs Fargate profile**?
+- What **IRSA** does (OIDC provider, projected token, `AssumeRoleWithWebIdentity`)
+  and how it differs from the node's instance role.
+- **Requests vs limits**, what the HPA measures, and what a PDB protects against.
+- Why Prometheus **pulls** metrics and what a ServiceMonitor is.
 
 ## What NOT to claim
 - Don't imply production scale or real traffic — these are labs.

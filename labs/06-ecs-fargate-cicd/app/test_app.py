@@ -6,6 +6,7 @@ The Dockerfile's test stage runs exactly this, so a failing test fails the build
 from __future__ import annotations
 
 import json
+import re
 import threading
 import unittest
 import urllib.error
@@ -72,6 +73,43 @@ class ServiceTest(unittest.TestCase):
     def test_server_header_hides_python_version(self):
         _, headers, _ = self._get("/healthz")
         self.assertNotIn("Python", headers.get("Server", ""))
+
+    def _get_text(self, path: str):
+        url = f"http://127.0.0.1:{self.port}{path}"
+        with urllib.request.urlopen(url, timeout=3) as resp:
+            return resp.status, resp.headers, resp.read().decode()
+
+    def test_boom_is_500(self):
+        status, _, body = self._get("/boom")
+        self.assertEqual(status, 500)
+        self.assertEqual(body["error"], "intentional")
+
+    def test_metrics_counts_requests_and_status(self):
+        self._get("/healthz")
+        self._get("/boom")
+        status, headers, text = self._get_text("/metrics")
+        self.assertEqual(status, 200)
+        self.assertTrue(headers["Content-Type"].startswith("text/plain"))
+        self.assertIn("# TYPE http_requests_total counter", text)
+        self.assertIn("# TYPE http_request_duration_seconds histogram", text)
+        self.assertRegex(text, r'http_requests_total\{method="GET",path="/healthz",status="200"\} [1-9]\d*')
+        self.assertRegex(text, r'http_requests_total\{method="GET",path="/boom",status="500"\} [1-9]\d*')
+        self.assertRegex(text, r'http_request_duration_seconds_bucket\{le="\+Inf"\} [1-9]\d*')
+        self.assertIn(f'app_info{{app="{app.APP_NAME}"', text)
+
+    def test_metrics_bound_path_cardinality(self):
+        self._get("/wp-admin/anything")
+        _, _, text = self._get_text("/metrics")
+        self.assertIn('path="other",status="404"', text)
+        self.assertNotIn("wp-admin", text)
+
+    def test_histogram_buckets_are_cumulative(self):
+        _, _, text = self._get_text("/metrics")
+        counts = [int(m) for m in re.findall(r'http_request_duration_seconds_bucket\{le="[^"]+"\} (\d+)', text)]
+        self.assertGreater(len(counts), 2)
+        self.assertEqual(counts, sorted(counts))
+        total = int(re.search(r"http_request_duration_seconds_count (\d+)", text).group(1))
+        self.assertEqual(counts[-1], total)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,49 @@
+{{- if .Values.monitoring.enabled }}
+{{- $ns := .Release.Namespace }}
+{{- $app := include "lab06-app.fullname" . }}
+# Two alerts, each measuring the phenomenon itself (not a proxy of it):
+#   restarts : kube-state-metrics' restart COUNTER for this app's containers.
+#              Liveness-probe failures, OOM kills and crash loops all land here.
+#   5xx rate : the app's own http_requests_total, as a RATIO of 5xx to all
+#              requests. A ratio (not a count) so 3 errors in 10 requests pages
+#              and 3 errors in 10,000 does not. GET /boom on the app returns 500
+#              on purpose, so the alert can be shown firing (and recovering).
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $app }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "lab06-app.labels" . | nindent 4 }}
+    release: {{ .Values.monitoring.releaseLabel }}
+spec:
+  groups:
+    - name: {{ $app }}.rules
+      rules:
+        - alert: Lab06AppPodRestarting
+          expr: |
+            increase(kube_pod_container_status_restarts_total{namespace="{{ $ns }}", container="app", pod=~"{{ $app }}-.*"}[{{ .Values.monitoring.alerts.restarts.window }}]) > {{ .Values.monitoring.alerts.restarts.threshold }}
+          for: 1m
+          labels:
+            severity: warning
+            app: {{ $app }}
+          annotations:
+            summary: "{{ "{{" }} $labels.pod {{ "}}" }} restarted {{ "{{" }} $value | humanize {{ "}}" }} times in {{ .Values.monitoring.alerts.restarts.window }}"
+            description: "Container 'app' in pod {{ "{{" }} $labels.pod {{ "}}" }} ({{ $ns }}) is restarting. Check: kubectl -n {{ $ns }} describe pod {{ "{{" }} $labels.pod {{ "}}" }} (OOMKilled? liveness failing?)."
+            runbook: "kubectl -n {{ $ns }} logs {{ "{{" }} $labels.pod {{ "}}" }} --previous"
+        - alert: Lab06AppHigh5xxRate
+          expr: |
+            (
+              sum(rate(http_requests_total{namespace="{{ $ns }}", service="{{ $app }}", status=~"5.."}[{{ .Values.monitoring.alerts.http5xx.window }}]))
+              /
+              sum(rate(http_requests_total{namespace="{{ $ns }}", service="{{ $app }}"}[{{ .Values.monitoring.alerts.http5xx.window }}]))
+            ) > {{ .Values.monitoring.alerts.http5xx.ratio }}
+          for: {{ .Values.monitoring.alerts.http5xx.for }}
+          labels:
+            severity: critical
+            app: {{ $app }}
+          annotations:
+            summary: "{{ $app }}: {{ "{{" }} $value | humanizePercentage {{ "}}" }} of requests are 5xx (threshold {{ .Values.monitoring.alerts.http5xx.ratio }})"
+            description: "More than {{ .Values.monitoring.alerts.http5xx.ratio }} of requests to {{ $app }} in {{ $ns }} returned 5xx over the last {{ .Values.monitoring.alerts.http5xx.window }}. The ratio is per request, so this fires on real error pressure, not on one noisy client."
+            runbook: "kubectl -n {{ $ns }} logs deploy/{{ $app }} | grep '\"status\": 5'"
+{{- end }}

@@ -1,0 +1,20 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.dashboard.enabled }}
+# kube-prometheus-stack's Grafana runs a sidecar that watches ConfigMaps with the
+# label grafana_dashboard=1 (in every namespace, see helm/monitoring/values.yaml)
+# and provisions their JSON as dashboards. Ship the dashboard with the app chart
+# and it appears/disappears with the app. The JSON lives in dashboards/ as a
+# plain file (open it in Grafana locally); the two placeholders are filled here.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lab06-app.fullname" . }}-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lab06-app.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: awslabs
+data:
+  lab06-app.json: |-
+    {{- .Files.Get "dashboards/lab06-app.json" | replace "__NAMESPACE__" .Release.Namespace | replace "__APP__" (include "lab06-app.fullname" .) | nindent 4 }}
+{{- end }}
