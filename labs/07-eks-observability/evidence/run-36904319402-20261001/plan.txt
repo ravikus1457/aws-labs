@@ -1,0 +1,138 @@
+data.aws_ecr_repository.app: Reading...
+data.aws_iam_policy_document.ec2_assume: Reading...
+data.aws_partition.current: Reading...
+data.aws_caller_identity.current: Reading...
+data.aws_availability_zones.available: Reading...
+aws_cloudwatch_log_group.cluster: Refreshing state... [id=/aws/eks/awslabs-lab07-eks/cluster]
+aws_eip.nat: Refreshing state... [id=eipalloc-07f8f1b2e2221796e]
+aws_vpc.main: Refreshing state... [id=vpc-0d6282c808abd4533]
+data.aws_iam_policy_document.ec2_assume: Read complete after 0s [id=2851119427]
+data.aws_partition.current: Read complete after 0s [id=aws]
+aws_iam_role.node: Refreshing state... [id=awslabs-lab07-node]
+data.aws_caller_identity.current: Read complete after 0s [id=<account-id>]
+data.aws_iam_policy_document.eks_assume: Reading...
+data.aws_iam_policy_document.eks_assume: Read complete after 0s [id=2692932341]
+aws_iam_role.cluster: Refreshing state... [id=awslabs-lab07-cluster]
+data.aws_availability_zones.available: Read complete after 1s [id=us-east-1]
+data.aws_ecr_repository.app: Read complete after 1s [id=awslabs-lab06/app]
+data.aws_iam_policy_document.app_irsa: Reading...
+data.aws_iam_policy_document.app_irsa: Read complete after 0s [id=192122]
+aws_iam_role_policy_attachment.node_ecr_pull: Refreshing state... [id=awslabs-lab07-node-20261001173536039500000003]
+aws_iam_role_policy_attachment.node_cni: Refreshing state... [id=awslabs-lab07-node-20261001173535953600000001]
+aws_iam_role_policy_attachment.node_worker: Refreshing state... [id=awslabs-lab07-node-20261001173535988600000002]
+aws_iam_role_policy_attachment.cluster_policy: Refreshing state... [id=awslabs-lab07-cluster-20261001173536051600000004]
+aws_internet_gateway.igw: Refreshing state... [id=igw-03f1d6f7aa42a7297]
+aws_subnet.private[0]: Refreshing state... [id=subnet-09c9202f65543a41f]
+aws_subnet.public[0]: Refreshing state... [id=subnet-028e1826a93c8136f]
+aws_subnet.public[1]: Refreshing state... [id=subnet-0d307394301094287]
+aws_subnet.private[1]: Refreshing state... [id=subnet-06d8e327ef11c6e5b]
+aws_route_table.public: Refreshing state... [id=rtb-0457c8e5fccf9ec2b]
+aws_eks_cluster.main: Refreshing state... [id=awslabs-lab07-eks]
+aws_route_table_association.public[0]: Refreshing state... [id=rtbassoc-0dd8bfcb190d10de4]
+aws_route_table_association.public[1]: Refreshing state... [id=rtbassoc-0c3443603d5fdc793]
+aws_nat_gateway.nat: Refreshing state... [id=nat-020539d0f659b1ee1]
+aws_route_table.private: Refreshing state... [id=rtb-050592d9f690c62d3]
+aws_iam_openid_connect_provider.cluster: Refreshing state... [id=arn:aws:iam::<account-id>:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/16C91F5F27A0DA8731E8DF913C5553C3]
+data.aws_eks_addon_version.metrics_server[0]: Reading...
+aws_route_table_association.private[1]: Refreshing state... [id=rtbassoc-00f49ca4f8ec1c0c0]
+aws_route_table_association.private[0]: Refreshing state... [id=rtbassoc-07417d5ac91f9842d]
+data.aws_iam_policy_document.app_irsa_trust: Reading...
+data.aws_iam_policy_document.app_irsa_trust: Read complete after 0s [id=1348883068]
+aws_iam_role.app: Refreshing state... [id=awslabs-lab07-app-irsa]
+data.aws_eks_addon_version.metrics_server[0]: Read complete after 0s [id=metrics-server]
+aws_iam_role_policy.app: Refreshing state... [id=awslabs-lab07-app-irsa:awslabs-lab07-app-irsa]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_eks_addon.metrics_server[0] will be created
+  + resource "aws_eks_addon" "metrics_server" {
+      + addon_name                  = "metrics-server"
+      + addon_version               = "v0.9.0-eksbuild.11"
+      + arn                         = (known after apply)
+      + cluster_name                = "awslabs-lab07-eks"
+      + configuration_values        = (known after apply)
+      + created_at                  = (known after apply)
+      + id                          = (known after apply)
+      + modified_at                 = (known after apply)
+      + resolve_conflicts_on_create = "OVERWRITE"
+      + resolve_conflicts_on_update = "OVERWRITE"
+      + tags                        = {
+          + "Name" = "awslabs-lab07-eks-metrics-server"
+        }
+      + tags_all                    = {
+          + "Name"       = "awslabs-lab07-eks-metrics-server"
+          + "lab"        = "07-eks-observability"
+          + "managed_by" = "terraform"
+          + "project"    = "awslabs"
+          + "run_id"     = "lab07"
+          + "stack"      = "app"
+        }
+
+      + timeouts {
+          + create = "15m"
+          + delete = "10m"
+        }
+    }
+
+  # aws_eks_node_group.main will be created
+  + resource "aws_eks_node_group" "main" {
+      + ami_type               = "AL2023_x86_64_STANDARD"
+      + arn                    = (known after apply)
+      + capacity_type          = "ON_DEMAND"
+      + cluster_name           = "awslabs-lab07-eks"
+      + disk_size              = 20
+      + id                     = (known after apply)
+      + instance_types         = [
+          + "t3.small",
+        ]
+      + labels                 = {
+          + "awslabs/lab"  = "07"
+          + "awslabs/role" = "general"
+        }
+      + node_group_name        = "awslabs-lab07-ng"
+      + node_group_name_prefix = (known after apply)
+      + node_role_arn          = "arn:aws:iam::<account-id>:role/awslabs-lab07-node"
+      + release_version        = (known after apply)
+      + resources              = (known after apply)
+      + status                 = (known after apply)
+      + subnet_ids             = [
+          + "subnet-06d8e327ef11c6e5b",
+          + "subnet-09c9202f65543a41f",
+        ]
+      + tags                   = {
+          + "Name" = "awslabs-lab07-ng"
+        }
+      + tags_all               = {
+          + "Name"       = "awslabs-lab07-ng"
+          + "lab"        = "07-eks-observability"
+          + "managed_by" = "terraform"
+          + "project"    = "awslabs"
+          + "run_id"     = "lab07"
+          + "stack"      = "app"
+        }
+      + version                = "1.36"
+
+      + node_repair_config (known after apply)
+
+      + scaling_config {
+          + desired_size = 2
+          + max_size     = 3
+          + min_size     = 2
+        }
+
+      + timeouts {
+          + create = "20m"
+          + delete = "20m"
+          + update = "20m"
+        }
+
+      + update_config {
+          + max_unavailable = 1
+        }
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.

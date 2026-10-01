@@ -1,0 +1,108 @@
+{
+    "apiVersion": "autoscaling/v2",
+    "kind": "HorizontalPodAutoscaler",
+    "metadata": {
+        "annotations": {
+            "meta.helm.sh/release-name": "lab06-app",
+            "meta.helm.sh/release-namespace": "lab06"
+        },
+        "creationTimestamp": "2026-10-01T18:12:53Z",
+        "labels": {
+            "app.kubernetes.io/instance": "lab06-app",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "lab06-app",
+            "app.kubernetes.io/part-of": "awslabs-lab07",
+            "app.kubernetes.io/version": "de1d1461503f20fbc9487d29c341f17ed5d1e99c",
+            "helm.sh/chart": "lab06-app-0.1.0"
+        },
+        "name": "lab06-app",
+        "namespace": "lab06",
+        "resourceVersion": "6351",
+        "uid": "deef8384-0064-4f0c-8134-d9018f73a1d1"
+    },
+    "spec": {
+        "behavior": {
+            "scaleDown": {
+                "policies": [
+                    {
+                        "periodSeconds": 60,
+                        "type": "Pods",
+                        "value": 1
+                    }
+                ],
+                "selectPolicy": "Max",
+                "stabilizationWindowSeconds": 60
+            },
+            "scaleUp": {
+                "policies": [
+                    {
+                        "periodSeconds": 30,
+                        "type": "Pods",
+                        "value": 2
+                    }
+                ],
+                "selectPolicy": "Max",
+                "stabilizationWindowSeconds": 0
+            }
+        },
+        "maxReplicas": 4,
+        "metrics": [
+            {
+                "resource": {
+                    "name": "cpu",
+                    "target": {
+                        "averageUtilization": 70,
+                        "type": "Utilization"
+                    }
+                },
+                "type": "Resource"
+            }
+        ],
+        "minReplicas": 2,
+        "scaleTargetRef": {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "name": "lab06-app"
+        }
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-01T18:13:08Z",
+                "message": "recommended size matches current size",
+                "reason": "ReadyForNewScale",
+                "status": "True",
+                "type": "AbleToScale"
+            },
+            {
+                "lastTransitionTime": "2026-10-01T18:13:38Z",
+                "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+                "reason": "ValidMetricFound",
+                "status": "True",
+                "type": "ScalingActive"
+            },
+            {
+                "lastTransitionTime": "2026-10-01T18:13:38Z",
+                "message": "the desired replica count is less than the minimum replica count",
+                "reason": "TooFewReplicas",
+                "status": "True",
+                "type": "ScalingLimited"
+            }
+        ],
+        "currentMetrics": [
+            {
+                "resource": {
+                    "current": {
+                        "averageUtilization": 2,
+                        "averageValue": "1m"
+                    },
+                    "name": "cpu"
+                },
+                "type": "Resource"
+            }
+        ],
+        "currentReplicas": 2,
+        "desiredReplicas": 2,
+        "lastScaleTime": "2026-10-01T18:13:08Z"
+    }
+}

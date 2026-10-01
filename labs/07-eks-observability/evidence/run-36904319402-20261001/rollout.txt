@@ -1,0 +1,1 @@
+deployment "lab06-app" successfully rolled out

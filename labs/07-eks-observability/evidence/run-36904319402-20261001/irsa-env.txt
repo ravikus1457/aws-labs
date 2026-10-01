@@ -1,0 +1,5 @@
+AWS_REGION=us-east-1
+AWS_ROLE_ARN=arn:aws:iam::<account-id>:role/awslabs-lab07-app-irsa
+AWS_WEB_IDENTITY_TOKEN_FILE=/var/run/secrets/eks.amazonaws.com/serviceaccount/token
+AWS_STS_REGIONAL_ENDPOINTS=regional
+AWS_DEFAULT_REGION=us-east-1

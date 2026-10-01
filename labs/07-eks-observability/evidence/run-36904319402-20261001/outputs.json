@@ -1,0 +1,155 @@
+{
+  "admin_principal_arns": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": []
+  },
+  "app_irsa_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::<account-id>:role/awslabs-lab07-app-irsa"
+  },
+  "app_namespace": {
+    "sensitive": false,
+    "type": "string",
+    "value": "lab06"
+  },
+  "app_service_account": {
+    "sensitive": false,
+    "type": "string",
+    "value": "lab06-app"
+  },
+  "aws_region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1"
+  },
+  "cluster_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://16C91F5F27A0DA8731E8DF913C5553C3.yl4.us-east-1.eks.amazonaws.com"
+  },
+  "cluster_log_group_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "/aws/eks/awslabs-lab07-eks/cluster"
+  },
+  "cluster_log_types": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": [
+      "authenticator",
+      "controllerManager",
+      "scheduler"
+    ]
+  },
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-lab07-eks"
+  },
+  "cluster_platform_version": {
+    "sensitive": false,
+    "type": "string",
+    "value": "eks.14"
+  },
+  "cluster_security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-09b0e6e9a9eec4dcb"
+  },
+  "cluster_version": {
+    "sensitive": false,
+    "type": "string",
+    "value": "1.36"
+  },
+  "ecr_repository_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-lab06/app"
+  },
+  "ecr_repository_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "<account-id>.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app"
+  },
+  "kubeconfig_command": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws eks update-kubeconfig --region us-east-1 --name awslabs-lab07-eks"
+  },
+  "metrics_server_addon_version": {
+    "sensitive": false,
+    "type": "string",
+    "value": "v0.9.0-eksbuild.11"
+  },
+  "nat_gateway_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "nat-020539d0f659b1ee1"
+  },
+  "node_count": {
+    "sensitive": false,
+    "type": "number",
+    "value": 2
+  },
+  "node_group_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-lab07-ng"
+  },
+  "node_instance_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "t3.small"
+  },
+  "oidc_issuer": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://oidc.eks.us-east-1.amazonaws.com/id/16C91F5F27A0DA8731E8DF913C5553C3"
+  },
+  "oidc_provider_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::<account-id>:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/16C91F5F27A0DA8731E8DF913C5553C3"
+  },
+  "private_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-09c9202f65543a41f",
+      "subnet-06d8e327ef11c6e5b"
+    ]
+  },
+  "public_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-028e1826a93c8136f",
+      "subnet-0d307394301094287"
+    ]
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0d6282c808abd4533"
+  }
+}

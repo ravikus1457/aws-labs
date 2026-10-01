@@ -1,0 +1,86 @@
+Exercising lab 07: cluster awslabs-lab07-eks (us-east-1, Kubernetes 1.36)
+--- aws eks update-kubeconfig ---
+server: v1.36.4-eks-cfb47f5
+--- Nodes ---
+NAME                           STATUS   ROLES    AGE     VERSION               INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                        KERNEL-VERSION                            CONTAINER-RUNTIME
+ip-10-70-10-229.ec2.internal   Ready    <none>   4m27s   v1.36.4-eks-f4fc4f1   10.70.10.229   <none>        Amazon Linux 2023.12.20260918   6.18.48-109.150.amzn2023.x86_64 (amd64)   containerd://2.2.7+unknown
+ip-10-70-11-20.ec2.internal    Ready    <none>   4m26s   v1.36.4-eks-f4fc4f1   10.70.11.20    <none>        Amazon Linux 2023.12.20260918   6.18.48-109.150.amzn2023.x86_64 (amd64)   containerd://2.2.7+unknown
+lab06/lab06-app  lab06-app-0.1.0  deployed
+monitoring/monitoring  kube-prometheus-stack-91.8.2  deployed
+--- kubectl rollout status ---
+deployment "lab06-app" successfully rolled out
+NAME                         READY   STATUS    RESTARTS   AGE   IP             NODE                           NOMINATED NODE   READINESS GATES
+lab06-app-74ccbf6474-bkwrw   1/1     Running   0          38s   10.70.10.116   ip-10-70-10-229.ec2.internal   <none>           <none>
+lab06-app-74ccbf6474-q26t4   1/1     Running   0          23s   10.70.11.219   ip-10-70-11-20.ec2.internal    <none>           <none>
+running image(s): <account-id>.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:de1d1461503f20fbc9487d29c341f17ed5d1e99c
+--- NLB hostname ---
+nlb: af84bdb8b85ba40f4923fa35d1d07317-0e139ad6280fbc8a.elb.us-east-1.amazonaws.com
+--- Polling http://af84bdb8b85ba40f4923fa35d1d07317-0e139ad6280fbc8a.elb.us-east-1.amazonaws.com/healthz (up to ~6 min: NLB provisioning + DNS) ---
+attempt 1/72: HTTP 000000
+attempt 2/72: HTTP 000000
+attempt 3/72: HTTP 000000
+attempt 4/72: HTTP 000000
+attempt 5/72: HTTP 000000
+attempt 6/72: HTTP 000000
+attempt 7/72: HTTP 000000
+attempt 8/72: HTTP 000000
+attempt 9/72: HTTP 000000
+attempt 10/72: HTTP 000000
+attempt 11/72: HTTP 000000
+attempt 12/72: HTTP 000000
+attempt 13/72: HTTP 000000
+attempt 14/72: HTTP 000000
+attempt 15/72: HTTP 000000
+attempt 16/72: HTTP 000000
+attempt 17/72: HTTP 000000
+attempt 18/72: HTTP 000000
+attempt 19/72: HTTP 000000
+attempt 20/72: HTTP 000000
+attempt 21/72: HTTP 000000
+attempt 22/72: HTTP 000000
+attempt 23/72: HTTP 200
+version: {"app": "lab06-app", "version": "de1d1461503f20fbc9487d29c341f17ed5d1e99c", "git_sha": "de1d1461503f20fbc9487d29c341f17ed5d1e99c", "hostname": "lab06-app-74ccbf6474-bkwrw", "uptime_s": 177.0}
+healthz HTTP code: 200
+--- IRSA injection ---
+AWS_REGION=us-east-1
+AWS_ROLE_ARN=arn:aws:iam::<account-id>:role/awslabs-lab07-app-irsa
+AWS_WEB_IDENTITY_TOKEN_FILE=/var/run/secrets/eks.amazonaws.com/serviceaccount/token
+AWS_STS_REGIONAL_ENDPOINTS=regional
+AWS_DEFAULT_REGION=us-east-1
+token file: present
+--- HPA ---
+NAME        REFERENCE              TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+lab06-app   Deployment/lab06-app   cpu: 2%/70%   2         4         2          3m8s
+--- Prometheus (port-forward) ---
+attempt 1/24: 0 app targets up
+app targets up: 2
+lab06-app alert rules loaded: 2/2
+--- Grafana (port-forward) ---
+attempt 1/12: grafana /login HTTP 000000
+grafana /login HTTP code: 200
+lab07 dashboard provisioned: 1
+--- Fault injection: 120 × GET /boom, then watch Lab06AppHigh5xxRate ---
+attempt 1/30: Lab06AppHigh5xxRate = pending
+attempt 2/30: Lab06AppHigh5xxRate = pending
+attempt 3/30: Lab06AppHigh5xxRate = pending
+attempt 4/30: Lab06AppHigh5xxRate = pending
+attempt 5/30: Lab06AppHigh5xxRate = pending
+attempt 6/30: Lab06AppHigh5xxRate = pending
+attempt 7/30: Lab06AppHigh5xxRate = pending
+attempt 8/30: Lab06AppHigh5xxRate = pending
+attempt 9/30: Lab06AppHigh5xxRate = pending
+attempt 10/30: Lab06AppHigh5xxRate = firing
+5xx alert state after fault injection: firing
+--- Assertions ---
+PASS: 2 nodes Ready (expected 2)
+PASS: deployment lab06/lab06-app rolled out
+PASS: 2 ready app pods (>= 2)
+PASS: NLB /healthz returned 200 {"status":"ok"} via af84bdb8b85ba40f4923fa35d1d07317-0e139ad6280fbc8a.elb.us-east-1.amazonaws.com
+PASS: IRSA injected AWS_ROLE_ARN=arn:aws:iam::<account-id>:role/awslabs-lab07-app-irsa + token file into the pod
+PASS: HPA reports CPU utilization 2% (metrics-server is serving)
+PASS: Prometheus scrapes 2 lab06-app target(s), health=up
+PASS: both lab06-app alert rules loaded in Prometheus
+PASS: Grafana login page returned 200
+PASS: Grafana provisioned the lab 07 dashboard (uid awslabs-lab07-app)
+PASS: Lab06AppHigh5xxRate went firing after fault injection (the detector can fail)
+note: Grafana is NOT exposed; locally: kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80  (admin / kubectl -n monitoring get secret monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 -d)

@@ -1,0 +1,15 @@
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                                                                                    SELECTOR
+deployment.apps/lab06-app   2/2     2            2           39s   app          <account-id>.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:de1d1461503f20fbc9487d29c341f17ed5d1e99c   app.kubernetes.io/instance=lab06-app,app.kubernetes.io/name=lab06-app
+
+NAME                TYPE           CLUSTER-IP       EXTERNAL-IP                                                                     PORT(S)        AGE   SELECTOR
+service/lab06-app   LoadBalancer   172.20.178.230   af84bdb8b85ba40f4923fa35d1d07317-0e139ad6280fbc8a.elb.us-east-1.amazonaws.com   80:32413/TCP   39s   app.kubernetes.io/instance=lab06-app,app.kubernetes.io/name=lab06-app
+
+NAME                                            REFERENCE              TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/lab06-app   Deployment/lab06-app   cpu: <unknown>/70%   2         4         2          39s
+
+NAME                                   MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
+poddisruptionbudget.policy/lab06-app   1               N/A               1                     39s
+
+NAME                       AGE
+serviceaccount/default     40s
+serviceaccount/lab06-app   39s

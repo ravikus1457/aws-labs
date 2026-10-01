@@ -1,0 +1,1 @@
+[{"name":"lab06-app","namespace":"lab06","revision":"1","updated":"2026-10-01 18:12:51.608492302 +0000 UTC","status":"deployed","chart":"lab06-app-0.1.0","app_version":"lab06"},{"name":"monitoring","namespace":"monitoring","revision":"1","updated":"2026-10-01 18:10:58.855334825 +0000 UTC","status":"deployed","chart":"kube-prometheus-stack-91.8.2","app_version":"v0.94.1"}]

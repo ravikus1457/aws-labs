@@ -1,0 +1,69 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "meta.helm.sh/release-name": "lab06-app",
+            "meta.helm.sh/release-namespace": "lab06",
+            "service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags": "project=awslabs,lab=07-eks-observability,stack=app,managed_by=kubernetes",
+            "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true",
+            "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
+        },
+        "creationTimestamp": "2026-10-01T18:12:53Z",
+        "finalizers": [
+            "service.kubernetes.io/load-balancer-cleanup"
+        ],
+        "labels": {
+            "app.kubernetes.io/instance": "lab06-app",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "lab06-app",
+            "app.kubernetes.io/part-of": "awslabs-lab07",
+            "app.kubernetes.io/version": "de1d1461503f20fbc9487d29c341f17ed5d1e99c",
+            "helm.sh/chart": "lab06-app-0.1.0"
+        },
+        "name": "lab06-app",
+        "namespace": "lab06",
+        "resourceVersion": "6172",
+        "uid": "f84bdb8b-85ba-40f4-923f-a35d1d073179"
+    },
+    "spec": {
+        "allocateLoadBalancerNodePorts": true,
+        "clusterIP": "172.20.178.230",
+        "clusterIPs": [
+            "172.20.178.230"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "loadBalancerSourceRanges": [
+            "0.0.0.0/0"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "nodePort": 32413,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": "http"
+            }
+        ],
+        "selector": {
+            "app.kubernetes.io/instance": "lab06-app",
+            "app.kubernetes.io/name": "lab06-app"
+        },
+        "sessionAffinity": "None",
+        "type": "LoadBalancer"
+    },
+    "status": {
+        "loadBalancer": {
+            "ingress": [
+                {
+                    "hostname": "af84bdb8b85ba40f4923fa35d1d07317-0e139ad6280fbc8a.elb.us-east-1.amazonaws.com"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,2 @@
+NAME        REFERENCE              TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+lab06-app   Deployment/lab06-app   cpu: 2%/70%   2         4         2          3m8s
