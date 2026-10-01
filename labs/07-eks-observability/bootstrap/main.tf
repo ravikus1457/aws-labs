@@ -129,6 +129,16 @@ data "aws_iam_policy_document" "lab07" {
     }
   }
 
+  # CreateNodegroup first checks whether AWSServiceRoleForAmazonEKSNodegroup exists, which needs
+  # iam:GetRole on the service-linked role path. It cannot share the statement above: the
+  # iam:AWSServiceName condition is absent from a GetRole request, so StringEquals would deny it.
+  # (First real run, 2026-10-01: "Failed to validate if SLR ... missing permissions for 'iam:GetRole'".)
+  statement {
+    sid       = "ReadServiceLinkedRoles"
+    actions   = ["iam:GetRole"]
+    resources = ["arn:${local.partition}:iam::${local.account_id}:role/aws-service-role/*"]
+  }
+
   # ec2/elbv2/logs are already in lab 06's policy for this region; listed again
   # so this policy is complete on its own if lab 06's is ever tightened.
   # autoscaling: the managed node group owns an ASG that the destroy job
