@@ -20,9 +20,14 @@ captures evidence, and **tears it down automatically** so idle cost stays at ~$0
 | 03 | [IAM least-privilege + S3](labs/03-iam-s3-least-privilege) | IAM roles, scoped policies, policy simulator, S3 private buckets | ~$0 |
 | 04 | [ECS Fargate](labs/04-ecs-fargate) | Serverless containers, task defs vs services, CloudWatch logs | < $0.01 |
 | 05 | [CloudWatch monitoring](labs/05-cloudwatch-monitoring) | Metrics, alarms, SNS alerts, dashboards | ~$0 |
+| 06 | [ECS Fargate CI/CD (flagship)](labs/06-ecs-fargate-cicd) | Private Fargate service behind an ALB, ECR, GitHub OIDC deploy role, CloudWatch alarms to SNS, AWS Budget, GitHub Actions pipeline with manual approval, scheduled destroy | ~$0.11/hr while up; destroyed nightly by CI |
 
 Every "approx. cost" assumes the run completes and tears down (a few minutes). The
 runner destroys resources even if a step fails — see **Cost safety** below.
+
+Lab 06 is the exception to "the runner destroys it": it is deployed by **GitHub
+Actions** (no access keys — an OIDC role) and torn down by a **scheduled workflow**
+every night. See its README for the bootstrap order.
 
 ## Networking labs
 
@@ -53,7 +58,12 @@ aws-devops-labs/
 │   └── lib.sh               ← shared helpers / preflight
 ├── labs/
 │   ├── 01-vpc-networking/   ← main.tf, variables.tf, outputs.tf, exercise.sh, README.md
-│   └── … (02–05, same shape)
+│   ├── … (02–05, same shape)
+│   └── 06-ecs-fargate-cicd/ ← flagship: app/ (Dockerfile + tests), bootstrap/ (OIDC role,
+│                              ECR, state bucket, budget), app stack, exercise.sh, README.md
+├── .github/workflows/
+│   ├── lab06.yml            ← lint → validate → build+push (OIDC) → plan → approve → apply → smoke
+│   └── lab06-destroy.yml    ← nightly terraform destroy so nothing is left running
 └── evidence/                ← per-run outputs, logs, assertions (git-ignored)
 ```
 

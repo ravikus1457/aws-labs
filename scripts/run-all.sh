@@ -11,6 +11,10 @@ KEEP_GOING=0
 fail=0
 for lab in "$ROOT"/labs/*/; do
   name="$(basename "$lab")"
+  if [ -f "$lab/.skip-run-all" ]; then
+    echo "SKIPPING $name: $(head -n1 "$lab/.skip-run-all")"
+    continue
+  fi
   echo
   echo "############################################################"
   echo "# RUNNING LAB: $name"

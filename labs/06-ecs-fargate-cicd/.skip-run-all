@@ -1,0 +1,2 @@
+Lab 06 is deployed by GitHub Actions (needs an image in ECR first) — scripts/run-all.sh skips it.
+See labs/06-ecs-fargate-cicd/README.md "Bootstrap order" for the local path.

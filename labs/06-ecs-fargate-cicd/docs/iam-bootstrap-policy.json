@@ -1,0 +1,82 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "WhoAmI",
+      "Effect": "Allow",
+      "Action": ["sts:GetCallerIdentity"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "StateBucketLifecycle",
+      "Effect": "Allow",
+      "Action": ["s3:*"],
+      "Resource": [
+        "arn:aws:s3:::awslabs-lab06-tfstate-*",
+        "arn:aws:s3:::awslabs-lab06-tfstate-*/*"
+      ]
+    },
+    {
+      "Sid": "EcrRepositoryLifecycle",
+      "Effect": "Allow",
+      "Action": ["ecr:*"],
+      "Resource": "arn:aws:ecr:*:*:repository/awslabs-lab06/*"
+    },
+    {
+      "Sid": "EcrAuthTokenIsNotResourceScopable",
+      "Effect": "Allow",
+      "Action": ["ecr:GetAuthorizationToken"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "GitHubOidcProvider",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateOpenIDConnectProvider",
+        "iam:GetOpenIDConnectProvider",
+        "iam:DeleteOpenIDConnectProvider",
+        "iam:TagOpenIDConnectProvider",
+        "iam:UntagOpenIDConnectProvider",
+        "iam:ListOpenIDConnectProviderTags",
+        "iam:UpdateOpenIDConnectProviderThumbprint",
+        "iam:AddClientIDToOpenIDConnectProvider",
+        "iam:RemoveClientIDFromOpenIDConnectProvider"
+      ],
+      "Resource": "arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com"
+    },
+    {
+      "Sid": "DeployRoleLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:GetRole",
+        "iam:UpdateRole",
+        "iam:UpdateRoleDescription",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:ListRoleTags",
+        "iam:PutRolePolicy",
+        "iam:GetRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole"
+      ],
+      "Resource": "arn:aws:iam::*:role/awslabs-lab06-*"
+    },
+    {
+      "Sid": "AssumeTheSameRoleCiUses",
+      "Effect": "Allow",
+      "Action": ["sts:AssumeRole"],
+      "Resource": "arn:aws:iam::*:role/awslabs-lab06-github-deploy"
+    },
+    {
+      "Sid": "BudgetLifecycle",
+      "Effect": "Allow",
+      "Action": ["budgets:ViewBudget", "budgets:ModifyBudget"],
+      "Resource": "arn:aws:budgets::*:budget/awslabs-lab06-*"
+    }
+  ]
+}

@@ -15,7 +15,8 @@ List a bullet only after you've (a) **run the lab**, (b) **read its README**, an
 > provisions, validates against the live AWS API, captures evidence, and
 > auto-destroys each environment for repeatable, near-zero-cost practice. Covers
 > VPC networking, HA compute (ALB + Auto Scaling), IAM least-privilege, ECS Fargate,
-> and CloudWatch observability. *(Terraform, AWS, Bash, CI-style automation)*
+> CloudWatch observability, and a GitHub Actions → OIDC → ECR → Fargate pipeline with a
+> manual approval gate and scheduled teardown. *(Terraform, AWS, Bash, GitHub Actions)*
 
 ## Per-lab bullets (pick the ones you can defend)
 - **Networking:** Designed a multi-AZ VPC (public/private subnets, IGW, NAT, route
@@ -29,6 +30,11 @@ List a bullet only after you've (a) **run the lab**, (b) **read its README**, an
   execution roles, CloudWatch logging) with automated health verification.
 - **Observability:** Built CloudWatch metric alarms, dashboards, and SNS alerting
   with automated alarm-state testing.
+- **CI/CD (lab 06):** Shipped a containerised service to ECS Fargate (private
+  subnets, ALB, least-privilege task roles) through a GitHub Actions pipeline that
+  authenticates to AWS with OIDC instead of access keys — lint, tests, image build
+  + ECR scan, Terraform plan, manual approval gate, apply, smoke test — with
+  CloudWatch alarms to SNS, a cost budget, and a scheduled nightly teardown.
 
 ## Interview prep — be ready for these
 - Why do private subnets use a **NAT Gateway** instead of an Internet Gateway?
@@ -38,6 +44,10 @@ List a bullet only after you've (a) **run the lab**, (b) **read its README**, an
 - **Fargate vs EC2** launch type — when would you pick each?
 - What's an alarm **evaluation period**, and what are the three alarm states?
 - How does your runner keep **costs** down, and what happens if a destroy fails?
+- Why **OIDC** instead of access keys in CI? What exactly does the role's trust
+  policy check (`aud`, `sub`), and why does the `sub` differ for an environment job?
+- Why run tasks in **private subnets** behind an ALB? What does the NAT cost, and
+  what are VPC endpoints an alternative to?
 
 ## What NOT to claim
 - Don't imply production scale or real traffic — these are labs.

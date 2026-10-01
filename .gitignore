@@ -20,3 +20,11 @@ secrets*
 
 # OS
 .DS_Store
+
+# Lab 06: per-machine backend config (written by bootstrap output / CI)
+labs/06-ecs-fargate-cicd/backend.tf
+labs/06-ecs-fargate-cicd/evidence/
+
+# Python
+__pycache__/
+*.pyc
