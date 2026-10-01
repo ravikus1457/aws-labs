@@ -96,7 +96,11 @@ jobs:
           base="https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}"
           curl -sSL -o kubeconform.tar.gz "$base/kubeconform-linux-amd64.tar.gz"
           curl -sSL -o CHECKSUMS "$base/CHECKSUMS"
-          grep ' kubeconform-linux-amd64.tar.gz$' CHECKSUMS | sed 's# kubeconform-linux-amd64.tar.gz$#  kubeconform.tar.gz#' | sha256sum -c -
+          # CHECKSUMS lines are "<sha256>  <file>" (two spaces); build the check line explicitly rather than sed-ing the
+          # filename (the first run produced three spaces, and sha256sum then looked for a file with a leading space).
+          want="$(awk '$2 == "kubeconform-linux-amd64.tar.gz" {print $1}' CHECKSUMS)"
+          test -n "$want"
+          echo "$want  kubeconform.tar.gz" | sha256sum -c -
           tar -xzf kubeconform.tar.gz kubeconform && sudo install -m 0755 kubeconform /usr/local/bin/kubeconform
           kubeconform -v
 
