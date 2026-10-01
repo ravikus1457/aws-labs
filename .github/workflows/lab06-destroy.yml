@@ -82,10 +82,18 @@ jobs:
       - name: Verify nothing from the app stack survived
         run: |
           set -euo pipefail
-          aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
-            --tag-filters Key=project,Values=awslabs Key=lab,Values=06-ecs-fargate-cicd Key=stack,Values=app \
-            --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json
-          COUNT="$(jq 'length' leftovers.json)"
+          # The tagging API is eventually consistent: on 2026-10-01 it still listed a deleted NAT gateway, its EIP,
+          # security-group rules and alarms minutes after "Destroy complete! 34 destroyed", and this check cried wolf.
+          # Re-query for up to 10 minutes before calling anything a survivor.
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
+              --tag-filters Key=project,Values=awslabs Key=lab,Values=06-ecs-fargate-cicd Key=stack,Values=app \
+              --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json
+            COUNT="$(jq 'length' leftovers.json)"
+            [ "$COUNT" -eq 0 ] && break
+            echo "attempt $attempt: $COUNT still tagged; waiting 60s for the tagging index to settle"
+            sleep 60
+          done
           echo "resources still tagged stack=app: $COUNT"
           cat leftovers.json
           if [ "$COUNT" -ne 0 ]; then
