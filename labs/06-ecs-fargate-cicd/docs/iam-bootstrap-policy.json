@@ -4,13 +4,17 @@
     {
       "Sid": "WhoAmI",
       "Effect": "Allow",
-      "Action": ["sts:GetCallerIdentity"],
+      "Action": [
+        "sts:GetCallerIdentity"
+      ],
       "Resource": "*"
     },
     {
       "Sid": "StateBucketLifecycle",
       "Effect": "Allow",
-      "Action": ["s3:*"],
+      "Action": [
+        "s3:*"
+      ],
       "Resource": [
         "arn:aws:s3:::awslabs-lab06-tfstate-*",
         "arn:aws:s3:::awslabs-lab06-tfstate-*/*"
@@ -19,13 +23,17 @@
     {
       "Sid": "EcrRepositoryLifecycle",
       "Effect": "Allow",
-      "Action": ["ecr:*"],
+      "Action": [
+        "ecr:*"
+      ],
       "Resource": "arn:aws:ecr:*:*:repository/awslabs-lab06/*"
     },
     {
       "Sid": "EcrAuthTokenIsNotResourceScopable",
       "Effect": "Allow",
-      "Action": ["ecr:GetAuthorizationToken"],
+      "Action": [
+        "ecr:GetAuthorizationToken"
+      ],
       "Resource": "*"
     },
     {
@@ -69,13 +77,21 @@
     {
       "Sid": "AssumeTheSameRoleCiUses",
       "Effect": "Allow",
-      "Action": ["sts:AssumeRole"],
+      "Action": [
+        "sts:AssumeRole"
+      ],
       "Resource": "arn:aws:iam::*:role/awslabs-lab06-github-deploy"
     },
     {
       "Sid": "BudgetLifecycle",
       "Effect": "Allow",
-      "Action": ["budgets:ViewBudget", "budgets:ModifyBudget"],
+      "Action": [
+        "budgets:ViewBudget",
+        "budgets:ModifyBudget",
+        "budgets:TagResource",
+        "budgets:UntagResource",
+        "budgets:ListTagsForResource"
+      ],
       "Resource": "arn:aws:budgets::*:budget/awslabs-lab06-*"
     }
   ]

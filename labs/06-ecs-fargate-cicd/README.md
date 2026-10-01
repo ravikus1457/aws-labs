@@ -131,7 +131,9 @@ with human credentials.
 
 1. **Create the bootstrap IAM user** (root console, once) with *exactly* the
    policy in [`docs/iam-bootstrap-policy.json`](docs/iam-bootstrap-policy.json)
-   (everything is resource-scoped to `awslabs-lab06-*`). Create a CLI access key,
+   (everything is resource-scoped to `awslabs-lab06-*`; the budget needs `budgets:TagResource`
+   because every resource carries the project tags — the first bootstrap apply on 2026-10-01 failed
+   on exactly that and the policy was corrected). Create a CLI access key,
    `aws configure` it in **your** terminal — never paste it into a chat. Or reuse
    the `labs-admin` user from [docs/SETUP.md](../../docs/SETUP.md) if you already
    have one.
