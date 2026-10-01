@@ -5,7 +5,8 @@
 *.tfplan
 crash.log
 crash.*.log
-.terraform.lock.hcl
+# .terraform.lock.hcl is COMMITTED for lab 06 (2026-10-01: upload-artifact@v4 skips dotfiles, so the apply job's
+# read-only init saw 'provider dependency changes'); hashes recorded for linux_amd64 + linux_arm64.
 
 # Evidence runs (these can be large / account-specific). Keep the dir, ignore runs.
 evidence/*/

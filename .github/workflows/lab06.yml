@@ -212,6 +212,7 @@ jobs:
             ${{ env.LAB_DIR }}/tfplan
             ${{ env.LAB_DIR }}/plan.txt
             ${{ env.LAB_DIR }}/.terraform.lock.hcl
+          include-hidden-files: true   # the lock file is a dotfile; v4 drops dotfiles by default
           retention-days: 3
           if-no-files-found: error
 
