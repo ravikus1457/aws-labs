@@ -31,9 +31,19 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Latest Amazon Linux 2023 AMI, resolved at plan time from the public SSM parameter.
-data "aws_ssm_parameter" "al2023" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+# Latest Amazon Linux 2023 AMI. Resolved through DescribeImages (covered by EC2 permissions) instead of the public
+# SSM parameter: the first real run on 2026-10-01 failed on ssm:GetParameter, which none of the lab's EC2/VPC policies grant.
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*-kernel-*-x86_64"]
+  }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
 }
 
 # ---------------------------------------------------------------------------
@@ -184,7 +194,7 @@ locals {
 
 resource "aws_launch_template" "web" {
   name_prefix   = "${local.name}-lt-"
-  image_id      = data.aws_ssm_parameter.al2023.value
+  image_id      = data.aws_ami.al2023.id
   instance_type = var.instance_type
   user_data     = base64encode(local.user_data)
 
