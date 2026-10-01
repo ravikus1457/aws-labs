@@ -1,0 +1,14 @@
+[
+    {
+        "Target": "10.60.11.149",
+        "AZ": "us-east-1b",
+        "State": "healthy",
+        "Reason": null
+    },
+    {
+        "Target": "10.60.10.85",
+        "AZ": "us-east-1a",
+        "State": "healthy",
+        "Reason": null
+    }
+]

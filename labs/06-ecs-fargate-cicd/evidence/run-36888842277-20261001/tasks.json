@@ -1,0 +1,18 @@
+[
+    {
+        "Task": "arn:aws:ecs:us-east-1:610714124651:task/awslabs-lab06-cluster/7fe0512bff1644bcaf7aa62de7eb4df5",
+        "AZ": "us-east-1a",
+        "Image": "610714124651.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:bf99413aefce409d270e01391c1cbac0c72f4a90",
+        "Digest": "sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6",
+        "Health": "HEALTHY",
+        "Last": "RUNNING"
+    },
+    {
+        "Task": "arn:aws:ecs:us-east-1:610714124651:task/awslabs-lab06-cluster/8fe10089267e4fac99120d1fc2341881",
+        "AZ": "us-east-1b",
+        "Image": "610714124651.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:bf99413aefce409d270e01391c1cbac0c72f4a90",
+        "Digest": "sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6",
+        "Health": "HEALTHY",
+        "Last": "RUNNING"
+    }
+]

@@ -24,7 +24,9 @@ secrets*
 
 # Lab 06: per-machine backend config (written by bootstrap output / CI)
 labs/06-ecs-fargate-cicd/backend.tf
-labs/06-ecs-fargate-cicd/evidence/
+labs/06-ecs-fargate-cicd/evidence/*
+# CI runs' evidence IS committed (the portfolio's proof); gitignore has no trailing comments, hence this line
+!labs/06-ecs-fargate-cicd/evidence/run-*/
 
 # Python
 __pycache__/

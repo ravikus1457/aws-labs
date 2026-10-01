@@ -1,0 +1,9 @@
+{
+    "Service": "awslabs-lab06-svc",
+    "Status": "ACTIVE",
+    "Desired": 2,
+    "Running": 2,
+    "Pending": 0,
+    "TaskDef": "arn:aws:ecs:us-east-1:610714124651:task-definition/awslabs-lab06-app:2",
+    "Rollout": "COMPLETED"
+}

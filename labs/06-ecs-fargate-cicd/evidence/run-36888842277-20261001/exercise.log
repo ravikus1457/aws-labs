@@ -1,0 +1,62 @@
+Exercising lab 06: awslabs-lab06-svc on awslabs-lab06-cluster behind http://awslabs-lab06-alb-926435328.us-east-1.elb.amazonaws.com (us-east-1)
+Expected image: 610714124651.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:bf99413aefce409d270e01391c1cbac0c72f4a90
+--- Polling http://awslabs-lab06-alb-926435328.us-east-1.elb.amazonaws.com/healthz (up to ~3 min) ---
+attempt 1/36: HTTP 200
+healthz HTTP code: 200
+--- GET /version ---
+{"app": "lab06-app", "version": "bf99413aefce409d270e01391c1cbac0c72f4a90", "git_sha": "bf99413aefce409d270e01391c1cbac0c72f4a90", "hostname": "ip-10-60-10-85.ec2.internal", "uptime_s": 140.5}
+--- Target group health ---
+[
+    {
+        "Target": "10.60.11.149",
+        "AZ": "us-east-1b",
+        "State": "healthy",
+        "Reason": null
+    },
+    {
+        "Target": "10.60.10.85",
+        "AZ": "us-east-1a",
+        "State": "healthy",
+        "Reason": null
+    }
+]
+healthy targets: 2 / desired 2
+--- ECS service ---
+{
+    "Service": "awslabs-lab06-svc",
+    "Status": "ACTIVE",
+    "Desired": 2,
+    "Running": 2,
+    "Pending": 0,
+    "TaskDef": "arn:aws:ecs:us-east-1:610714124651:task-definition/awslabs-lab06-app:2",
+    "Rollout": "COMPLETED"
+}
+--- Image digest in ECR vs. digest running in the tasks ---
+ECR  bf99413aefce409d270e01391c1cbac0c72f4a90 -> sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6
+[
+    {
+        "Task": "arn:aws:ecs:us-east-1:610714124651:task/awslabs-lab06-cluster/7fe0512bff1644bcaf7aa62de7eb4df5",
+        "AZ": "us-east-1a",
+        "Image": "610714124651.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:bf99413aefce409d270e01391c1cbac0c72f4a90",
+        "Digest": "sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6",
+        "Health": "HEALTHY",
+        "Last": "RUNNING"
+    },
+    {
+        "Task": "arn:aws:ecs:us-east-1:610714124651:task/awslabs-lab06-cluster/8fe10089267e4fac99120d1fc2341881",
+        "AZ": "us-east-1b",
+        "Image": "610714124651.dkr.ecr.us-east-1.amazonaws.com/awslabs-lab06/app:bf99413aefce409d270e01391c1cbac0c72f4a90",
+        "Digest": "sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6",
+        "Health": "HEALTHY",
+        "Last": "RUNNING"
+    }
+]
+7fe0512bff1644bcaf7aa62de7eb4df5  us-east-1a  sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6
+8fe10089267e4fac99120d1fc2341881  us-east-1b  sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6
+scan severity counts: {}
+--- Assertions ---
+PASS: ALB /healthz returned 200 {"status":"ok"}
+PASS: 2 healthy targets (desired 2)
+PASS: service runningCount == desiredCount (2)
+PASS: every running task runs the ECR digest for tag bf99413aefce409d270e01391c1cbac0c72f4a90 (sha256:486cd195d9eacd001128e6f6fb7c58fddbe59e42d2dce1329045eab4ac900aa6)
+PASS: /version reports the deployed tag (bf99413aefce409d270e01391c1cbac0c72f4a90)
