@@ -82,20 +82,30 @@ jobs:
       - name: Verify nothing from the app stack survived
         run: |
           set -euo pipefail
-          # The tagging API is eventually consistent: on 2026-10-01 it still listed a deleted NAT gateway, its EIP,
-          # security-group rules and alarms minutes after "Destroy complete! 34 destroyed", and this check cried wolf.
-          # Re-query for up to 10 minutes before calling anything a survivor.
-          for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
-              --tag-filters Key=project,Values=awslabs Key=lab,Values=06-ecs-fargate-cicd Key=stack,Values=app \
-              --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json
-            COUNT="$(jq 'length' leftovers.json)"
-            [ "$COUNT" -eq 0 ] && break
-            echo "attempt $attempt: $COUNT still tagged; waiting 60s for the tagging index to settle"
-            sleep 60
+          # Survivors are counted from the OWNING services, not the tagging index: on 2026-10-01 the
+          # resourcegroupstaggingapi still listed 10 ARNs (deleted NAT, released EIP, deleted SG rules, deleted
+          # alarms) more than 10 minutes after a clean destroy, while every describe call said 0. The tagging
+          # listing is kept below for information only. Anything in the lists below is real and billable or
+          # holds billable things, and all of it carries project=awslabs + lab=06-ecs-fargate-cicd tags.
+          F="Name=tag:project,Values=awslabs Name=tag:lab,Values=06-ecs-fargate-cicd"
+          VPCS=$(aws ec2 describe-vpcs --region "$AWS_REGION" --filters $F --query 'Vpcs[].VpcId' --output text)
+          NATS=$(aws ec2 describe-nat-gateways --region "$AWS_REGION" --filter $F Name=state,Values=pending,available --query 'NatGateways[].NatGatewayId' --output text)
+          EIPS=$(aws ec2 describe-addresses --region "$AWS_REGION" --filters $F --query 'Addresses[].AllocationId' --output text)
+          LBS=$(aws elbv2 describe-load-balancers --region "$AWS_REGION" --query "LoadBalancers[?starts_with(LoadBalancerName, 'awslabs-lab06')].LoadBalancerArn" --output text)
+          CLUSTERS=$(aws ecs list-clusters --region "$AWS_REGION" --query "clusterArns[?contains(@, 'awslabs-lab06')]" --output text)
+          ALARMS=$(aws cloudwatch describe-alarms --region "$AWS_REGION" --alarm-name-prefix awslabs-lab06 --query 'MetricAlarms[].AlarmName' --output text)
+          LOGS=$(aws logs describe-log-groups --region "$AWS_REGION" --log-group-name-prefix /ecs/awslabs-lab06 --query 'logGroups[].logGroupName' --output text)
+          printf 'vpcs: %s\nnat gateways (pending/available): %s\neips: %s\nload balancers: %s\necs clusters: %s\nalarms: %s\nlog groups: %s\n' \
+            "${VPCS:-none}" "${NATS:-none}" "${EIPS:-none}" "${LBS:-none}" "${CLUSTERS:-none}" "${ALARMS:-none}" "${LOGS:-none}"
+          COUNT=0
+          for v in "$VPCS" "$NATS" "$EIPS" "$LBS" "$CLUSTERS" "$ALARMS" "$LOGS"; do
+            for item in $v; do COUNT=$((COUNT + 1)); done
           done
+          aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
+            --tag-filters Key=project,Values=awslabs Key=lab,Values=06-ecs-fargate-cicd Key=stack,Values=app \
+            --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json || echo '[]' > leftovers.json
+          echo "tagging index still lists $(jq 'length' leftovers.json) ARN(s) (informational; the index lags deletes by 10+ min)"
           echo "resources still tagged stack=app: $COUNT"
-          cat leftovers.json
           if [ "$COUNT" -ne 0 ]; then
             echo "::error::$COUNT lab 06 app-stack resources still exist after destroy (see above). Run: scripts/guardrails.sh orphans"
             exit 1
