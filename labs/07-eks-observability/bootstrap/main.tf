@@ -172,3 +172,13 @@ resource "aws_iam_role_policy" "lab07" {
   role   = data.aws_iam_role.deploy.id
   policy = data.aws_iam_policy_document.lab07.json
 }
+
+# EKS creates this service-linked role on the first CreateNodegroup, but first it checks whether the
+# role exists, and that check failed twice on 2026-10-01 ("Failed to validate if SLR ... missing
+# permissions for 'iam:GetRole'") even with GetRole allowed on the service-role path. Owning the role
+# here makes the first node group deterministic. It is account-wide, free, and import it if it exists:
+#   terraform import aws_iam_service_linked_role.eks_nodegroup \
+#     arn:aws:iam::<account>:role/aws-service-role/eks-nodegroup.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup
+resource "aws_iam_service_linked_role" "eks_nodegroup" {
+  aws_service_name = "eks-nodegroup.amazonaws.com"
+}
