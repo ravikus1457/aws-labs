@@ -1,0 +1,95 @@
+# Lab 06 — scheduled teardown. Runs every night so nothing is left billing,
+# whatever happened during the day. Also runnable by hand.
+#
+# Destroys ONLY the app stack (VPC, NAT, ALB, ECS, alarms...). The bootstrap
+# stack (state bucket, ECR, OIDC role, budget) is free and stays.
+# A failed run shows red in Actions and GitHub emails the repo owner - that is
+# the alert path; `scripts/guardrails.sh orphans` is the manual check.
+name: lab06-destroy
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # 07:00 UTC daily (00:00 PDT / 23:00 PST)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: lab06-destroy
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/06-ecs-fargate-cicd
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  destroy:
+    name: terraform destroy (app stack)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab06-destroy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab06/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: terraform destroy
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+          TF_VAR_ecr_repository_name: ${{ vars.ECR_REPOSITORY || 'awslabs-lab06/app' }}
+        run: |
+          terraform init
+          terraform destroy -auto-approve -no-color | tee destroy.txt
+          {
+            echo "### terraform destroy"
+            echo '```'
+            grep -E '^(Destroy complete|No changes)' destroy.txt || tail -n 5 destroy.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Ground truth, not Terraform's opinion: ask the tagging API whether
+      # anything tagged stack=app from this lab still exists.
+      - name: Verify nothing from the app stack survived
+        run: |
+          set -euo pipefail
+          aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
+            --tag-filters Key=project,Values=awslabs Key=lab,Values=06-ecs-fargate-cicd Key=stack,Values=app \
+            --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json
+          COUNT="$(jq 'length' leftovers.json)"
+          echo "resources still tagged stack=app: $COUNT"
+          cat leftovers.json
+          if [ "$COUNT" -ne 0 ]; then
+            echo "::error::$COUNT lab 06 app-stack resources still exist after destroy (see above). Run: scripts/guardrails.sh orphans"
+            exit 1
+          fi
+          echo "- leftovers: 0" >> "$GITHUB_STEP_SUMMARY"

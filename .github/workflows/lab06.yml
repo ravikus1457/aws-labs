@@ -1,0 +1,327 @@
+# Lab 06 — build, plan, approve, apply, smoke-test the ECS Fargate stack.
+#
+#   push to main (lab files)  ->  lint -> validate -> build+push (ECR, OIDC)
+#                                 -> plan -> [manual approval] -> apply -> smoke
+#   pull request              ->  lint -> validate only (no AWS credentials)
+#
+# No long-lived AWS keys anywhere: every AWS step assumes the bootstrap stack's
+# deploy role through GitHub's OIDC token. Until that role exists (README,
+# "Bootstrap order") the AWS jobs fail at "configure-aws-credentials" by design.
+name: lab06-ecs-fargate-cicd
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "labs/06-ecs-fargate-cicd/**"
+      - ".github/workflows/lab06.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "labs/06-ecs-fargate-cicd/**"
+      - ".github/workflows/lab06.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # required to request the OIDC token
+
+# One deploy at a time per branch; a second push queues behind the first.
+concurrency:
+  group: lab06-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/06-ecs-fargate-cicd
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'awslabs-lab06/app' }}
+
+jobs:
+  lint:
+    name: lint (fmt, tflint, hadolint, unit tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform fmt -check
+        working-directory: ${{ env.LAB_DIR }}
+        run: terraform fmt -check -recursive -diff
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: tflint
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          tflint --init --config "$PWD/.tflint.hcl"
+          tflint --recursive --config "$PWD/.tflint.hcl" --format compact
+
+      - name: hadolint (Dockerfile)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ${{ env.LAB_DIR }}/app/Dockerfile
+
+      - name: app unit tests
+        working-directory: ${{ env.LAB_DIR }}/app
+        run: python3 -m unittest -v test_app
+
+      - name: bash -n (scripts)
+        run: bash -n "$LAB_DIR/exercise.sh"
+
+  validate:
+    name: terraform validate
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+      - name: validate app stack
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -backend=false
+          terraform validate
+      - name: validate bootstrap stack
+        working-directory: ${{ env.LAB_DIR }}/bootstrap
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  build-push:
+    name: build + push image (ECR via OIDC)
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      image_digest: ${{ steps.push.outputs.image_digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assume deploy role (OIDC, no keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab06-build-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Image tag = git SHA
+        id: meta
+        run: echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      # Tags are immutable in ECR; a re-run of the same commit must not try to
+      # push the same tag again. If it exists, reuse it.
+      - name: Build + push (skip if this SHA is already in ECR)
+        id: push
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.meta.outputs.image_tag }}
+        run: |
+          set -euo pipefail
+          IMAGE="${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          if aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids imageTag="$IMAGE_TAG" >/dev/null 2>&1; then
+            echo "tag $IMAGE_TAG already in ECR (immutable) - reusing"
+          else
+            docker build \
+              --build-arg APP_VERSION="$IMAGE_TAG" \
+              --build-arg GIT_SHA="$IMAGE_TAG" \
+              -t "$IMAGE" "$LAB_DIR/app"
+            docker push "$IMAGE"
+          fi
+          DIGEST="$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids imageTag="$IMAGE_TAG" \
+                    --query 'imageDetails[0].imageDigest' --output text)"
+          echo "image_digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Image"
+            echo "- \`${IMAGE}\`"
+            echo "- digest \`${DIGEST}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  plan:
+    name: terraform plan
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab06-plan-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Write backend.tf (remote state from the bootstrap stack)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set (see README: Bootstrap order)"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab06/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: terraform init + plan
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_image_tag: ${{ needs.build-push.outputs.image_tag }}
+          TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+          TF_VAR_ecr_repository_name: ${{ env.ECR_REPOSITORY }}
+        run: |
+          terraform init
+          terraform plan -out=tfplan -no-color | tee plan.txt
+          {
+            echo "### terraform plan"
+            echo '```'
+            grep -E '^(Plan:|No changes)' plan.txt || tail -n 5 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The apply job re-inits in a fresh runner; shipping the lock file with
+      # the plan guarantees it resolves the identical provider build.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab06-plan-${{ github.run_id }}
+          path: |
+            ${{ env.LAB_DIR }}/tfplan
+            ${{ env.LAB_DIR }}/plan.txt
+            ${{ env.LAB_DIR }}/.terraform.lock.hcl
+          retention-days: 3
+          if-no-files-found: error
+
+  apply:
+    name: terraform apply (manual approval)
+    needs: [build-push, plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # The environment carries the "required reviewers" rule: the job pauses here
+    # until a reviewer approves in the Actions UI. Its OIDC 'sub' claim becomes
+    # repo:<owner/repo>:environment:lab06-production, which the deploy role trusts.
+    environment:
+      name: lab06-production
+      url: ${{ steps.out.outputs.alb_url }}
+    outputs:
+      alb_url: ${{ steps.out.outputs.alb_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab06-apply-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab06-plan-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab06/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      # Applies EXACTLY the reviewed plan. If the nightly destroy ran in between,
+      # Terraform refuses ("saved plan is stale") - re-run the workflow.
+      - name: terraform apply tfplan
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -lockfile=readonly
+          terraform apply -no-color tfplan
+          terraform output -json > outputs.json
+
+      - name: Outputs
+        id: out
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          echo "alb_url=$(jq -r '.alb_url.value' outputs.json)" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Deployed"
+            echo "- ALB: $(jq -r '.alb_url.value' outputs.json)"
+            echo "- image: \`$(jq -r '.image_uri.value' outputs.json)\`"
+            echo "- task definition: \`$(jq -r '.task_definition_arn.value' outputs.json)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab06-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/outputs.json
+          retention-days: 3
+
+  smoke:
+    name: smoke test (ALB /healthz, 2 healthy targets, digest match)
+    needs: apply
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab06-smoke-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab06-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: exercise.sh (same assertions the local runner uses)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          OUTPUTS_JSON: outputs.json
+        run: |
+          bash ./exercise.sh evidence 2>&1 | tee evidence/exercise.log
+          {
+            echo "### Smoke test"
+            echo '```'
+            grep -E '^(PASS|FAIL|WARN)' evidence/exercise.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          ! grep -q '^FAIL' evidence/exercise.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab06-evidence-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence
+          retention-days: 14
