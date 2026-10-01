@@ -1,0 +1,42 @@
+[
+    {
+        "RT": "rtb-0777523f0ea8dc2f1",
+        "Routes": [
+            {
+                "Dest": "10.20.0.0/16",
+                "GW": "local",
+                "NAT": null
+            },
+            {
+                "Dest": "0.0.0.0/0",
+                "GW": "igw-0f838f9b5deb740b9",
+                "NAT": null
+            }
+        ]
+    },
+    {
+        "RT": "rtb-0db46850d71ee6c93",
+        "Routes": [
+            {
+                "Dest": "10.20.0.0/16",
+                "GW": "local",
+                "NAT": null
+            }
+        ]
+    },
+    {
+        "RT": "rtb-0a44ffd733ead6c84",
+        "Routes": [
+            {
+                "Dest": "10.20.0.0/16",
+                "GW": "local",
+                "NAT": null
+            },
+            {
+                "Dest": "0.0.0.0/0",
+                "GW": null,
+                "NAT": "nat-0480f61cd633909d7"
+            }
+        ]
+    }
+]

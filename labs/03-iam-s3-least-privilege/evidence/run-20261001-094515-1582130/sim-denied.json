@@ -1,0 +1,18 @@
+{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "s3:DeleteBucket",
+            "EvalResourceName": "*",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": []
+        },
+        {
+            "EvalActionName": "ec2:RunInstances",
+            "EvalResourceName": "*",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": []
+        }
+    ]
+}

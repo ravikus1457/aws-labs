@@ -1,0 +1,22 @@
+{
+  "alarm_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-094135-1576915-cpu-high"
+  },
+  "dashboard_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-094135-1576915-dashboard"
+  },
+  "service_dimension": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-094135-1576915"
+  },
+  "sns_topic_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:sns:us-east-1:<account-id>:awslabs-r20261001-094135-1576915-alerts"
+  }
+}

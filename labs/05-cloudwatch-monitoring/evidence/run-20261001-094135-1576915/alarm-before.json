@@ -1,0 +1,6 @@
+{
+    "Name": "awslabs-r20261001-094135-1576915-cpu-high",
+    "State": "INSUFFICIENT_DATA",
+    "Threshold": 70.0,
+    "Metric": "DemoLoad"
+}

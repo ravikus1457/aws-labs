@@ -1,0 +1,5 @@
+{
+    "Name": "awslabs-r20261001-094135-1576915-cpu-high",
+    "State": "ALARM",
+    "Reason": "lab exercise: simulated high load"
+}

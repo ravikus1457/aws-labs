@@ -1,0 +1,86 @@
+{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "s3:GetObject",
+            "EvalResourceName": "arn:aws:s3:::awslabs-r20261001-094515-1582130-data/test.txt",
+            "EvalDecision": "allowed",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "awslabs-r20261001-094515-1582130-app-policy",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 1,
+                        "Column": 15
+                    },
+                    "EndPosition": {
+                        "Line": 1,
+                        "Column": 165
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:s3:::awslabs-r20261001-094515-1582130-data/test.txt",
+                    "EvalResourceDecision": "allowed",
+                    "MatchedStatements": [
+                        {
+                            "SourcePolicyId": "awslabs-r20261001-094515-1582130-app-policy",
+                            "SourcePolicyType": "IAM Policy",
+                            "StartPosition": {
+                                "Line": 1,
+                                "Column": 15
+                            },
+                            "EndPosition": {
+                                "Line": 1,
+                                "Column": 165
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "EvalActionName": "s3:PutObject",
+            "EvalResourceName": "arn:aws:s3:::awslabs-r20261001-094515-1582130-data/test.txt",
+            "EvalDecision": "allowed",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "awslabs-r20261001-094515-1582130-app-policy",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 1,
+                        "Column": 15
+                    },
+                    "EndPosition": {
+                        "Line": 1,
+                        "Column": 165
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:s3:::awslabs-r20261001-094515-1582130-data/test.txt",
+                    "EvalResourceDecision": "allowed",
+                    "MatchedStatements": [
+                        {
+                            "SourcePolicyId": "awslabs-r20261001-094515-1582130-app-policy",
+                            "SourcePolicyType": "IAM Policy",
+                            "StartPosition": {
+                                "Line": 1,
+                                "Column": 15
+                            },
+                            "EndPosition": {
+                                "Line": 1,
+                                "Column": 165
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

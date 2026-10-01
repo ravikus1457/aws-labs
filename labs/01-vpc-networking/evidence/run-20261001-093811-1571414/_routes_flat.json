@@ -1,0 +1,32 @@
+[
+    {
+        "DestinationCidrBlock": "10.20.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+    },
+    {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": "igw-0f838f9b5deb740b9",
+        "Origin": "CreateRoute",
+        "State": "active"
+    },
+    {
+        "DestinationCidrBlock": "10.20.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+    },
+    {
+        "DestinationCidrBlock": "10.20.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+    },
+    {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": "nat-0480f61cd633909d7",
+        "Origin": "CreateRoute",
+        "State": "active"
+    }
+]

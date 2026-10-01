@@ -31,3 +31,7 @@ labs/06-ecs-fargate-cicd/evidence/*
 # Python
 __pycache__/
 *.pyc
+
+# runner evidence from REAL runs is committed per lab (the portfolio's proof); scratch runs stay under evidence/
+labs/*/evidence/*
+!labs/*/evidence/run-*/

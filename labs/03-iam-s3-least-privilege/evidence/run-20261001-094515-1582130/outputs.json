@@ -1,0 +1,22 @@
+{
+  "bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::awslabs-r20261001-094515-1582130-data"
+  },
+  "bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-094515-1582130-data"
+  },
+  "policy_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::<account-id>:policy/awslabs-r20261001-094515-1582130-app-policy"
+  },
+  "role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::<account-id>:role/awslabs-r20261001-094515-1582130-app-role"
+  }
+}

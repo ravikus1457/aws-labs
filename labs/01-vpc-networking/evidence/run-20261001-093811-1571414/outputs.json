@@ -1,0 +1,45 @@
+{
+  "nat_gateway_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "nat-0480f61cd633909d7"
+  },
+  "private_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-038bfda35d7fc29f1",
+      "subnet-009864986caa4ca8b"
+    ]
+  },
+  "public_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-0245cd85ba9cf3096",
+      "subnet-006f9f63004f6a900"
+    ]
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0f98bc7a46b389422"
+  },
+  "web_security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-0e6e9b1af1fe18fa0"
+  }
+}
