@@ -31,7 +31,9 @@ for arg in "$@"; do
 done
 
 [ -n "$LAB" ] || { err "usage: run-lab.sh <lab-dir> [--keep|--plan-only]"; exit 2; }
-LAB_PATH="$(cd "$ROOT/$LAB" 2>/dev/null && pwd || cd "$LAB" 2>/dev/null && pwd || true)"
+# 2026-10-01: `cd A && pwd || cd B && pwd` parses as ((cd A && pwd) || cd B) && pwd, so a FOUND lab printed its
+# path twice (two lines) and the -d test below failed with "lab not found" on every run.
+LAB_PATH="$( { cd "$ROOT/$LAB" 2>/dev/null || cd "$LAB" 2>/dev/null; } && pwd || true)"
 [ -n "$LAB_PATH" ] && [ -d "$LAB_PATH" ] || { err "lab not found: $LAB"; exit 2; }
 LAB_NAME="$(basename "$LAB_PATH")"
 
