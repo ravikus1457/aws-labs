@@ -311,6 +311,7 @@ jobs:
         env:
           OUTPUTS_JSON: outputs.json
         run: |
+          mkdir -p evidence   # tee opens the log before exercise.sh creates the dir (first real run: 'No such file')
           bash ./exercise.sh evidence 2>&1 | tee evidence/exercise.log
           {
             echo "### Smoke test"
