@@ -1,0 +1,20 @@
+{
+    "Name": "awslabs-r20261001-095217-1593629-asg",
+    "Min": 2,
+    "Max": 2,
+    "Desired": 2,
+    "Instances": [
+        {
+            "Id": "i-05d9c74c35b2e87a7",
+            "AZ": "us-east-1b",
+            "Health": "Healthy",
+            "State": "InService"
+        },
+        {
+            "Id": "i-0781270b304bc5b8a",
+            "AZ": "us-east-1a",
+            "Health": "Healthy",
+            "State": "InService"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+  "alb_dns_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs--1593629-alb-1184158402.us-east-1.elb.amazonaws.com"
+  },
+  "asg_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-095217-1593629-asg"
+  },
+  "target_group_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:elasticloadbalancing:us-east-1:<account-id>:targetgroup/awslabs--1593629-tg/f0fdf2df062b2b64"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0a9bdf7d93df80456"
+  }
+}

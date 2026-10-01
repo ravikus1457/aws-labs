@@ -1,0 +1,1 @@
+arn:aws:ecs:us-east-1:<account-id>:task/awslabs-r20261001-095441-1597775-cluster/d896f6b2e2cb42558dabb0362f2ab7fd

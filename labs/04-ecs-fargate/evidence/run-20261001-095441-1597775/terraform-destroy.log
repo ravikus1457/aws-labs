@@ -1,0 +1,493 @@
+[0m[1mdata.aws_availability_zones.available: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.ecs_assume: Reading...[0m[0m
+[0m[1maws_ecs_cluster.main: Refreshing state... [id=arn:aws:ecs:us-east-1:<account-id>:cluster/awslabs-r20261001-095441-1597775-cluster][0m
+[0m[1maws_vpc.main: Refreshing state... [id=vpc-0181b8a855440c2ae][0m
+[0m[1maws_cloudwatch_log_group.web: Refreshing state... [id=/ecs/awslabs-r20261001-095441-1597775][0m
+[0m[1mdata.aws_iam_policy_document.ecs_assume: Read complete after 0s [id=1077804475][0m
+[0m[1maws_iam_role.execution: Refreshing state... [id=awslabs-r20261001-095441-1597775-ecs-exec][0m
+[0m[1mdata.aws_availability_zones.available: Read complete after 0s [id=us-east-1][0m
+[0m[1maws_iam_role_policy_attachment.execution: Refreshing state... [id=awslabs-r20261001-095441-1597775-ecs-exec-20261001165454511000000001][0m
+[0m[1maws_ecs_task_definition.web: Refreshing state... [id=awslabs-r20261001-095441-1597775-web][0m
+[0m[1maws_security_group.web: Refreshing state... [id=sg-047eb3e5418e020b0][0m
+[0m[1maws_internet_gateway.igw: Refreshing state... [id=igw-03fc632c02b027cdb][0m
+[0m[1maws_subnet.public[0]: Refreshing state... [id=subnet-09534b1ff414f0801][0m
+[0m[1maws_subnet.public[1]: Refreshing state... [id=subnet-0a8d16309f7fc1ba6][0m
+[0m[1maws_route_table.public: Refreshing state... [id=rtb-023788965dce85f8f][0m
+[0m[1maws_route_table_association.public[0]: Refreshing state... [id=rtbassoc-0e528c41f31ebb0ba][0m
+[0m[1maws_route_table_association.public[1]: Refreshing state... [id=rtbassoc-00abec44935271436][0m
+[0m[1maws_ecs_service.web: Refreshing state... [id=arn:aws:ecs:us-east-1:<account-id>:service/awslabs-r20261001-095441-1597775-cluster/awslabs-r20261001-095441-1597775-svc][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # aws_cloudwatch_log_group.web[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_cloudwatch_log_group" "web" {
+      [31m-[0m[0m arn               = "arn:aws:logs:us-east-1:<account-id>:log-group:/ecs/awslabs-r20261001-095441-1597775" [90m-> null[0m[0m
+      [31m-[0m[0m id                = "/ecs/awslabs-r20261001-095441-1597775" [90m-> null[0m[0m
+      [31m-[0m[0m log_group_class   = "STANDARD" [90m-> null[0m[0m
+      [31m-[0m[0m name              = "/ecs/awslabs-r20261001-095441-1597775" [90m-> null[0m[0m
+      [31m-[0m[0m retention_in_days = 1 [90m-> null[0m[0m
+      [31m-[0m[0m skip_destroy      = false [90m-> null[0m[0m
+      [31m-[0m[0m tags              = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-logs"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all          = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-logs"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_ecs_cluster.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_ecs_cluster" "main" {
+      [31m-[0m[0m arn      = "arn:aws:ecs:us-east-1:<account-id>:cluster/awslabs-r20261001-095441-1597775-cluster" [90m-> null[0m[0m
+      [31m-[0m[0m id       = "arn:aws:ecs:us-east-1:<account-id>:cluster/awslabs-r20261001-095441-1597775-cluster" [90m-> null[0m[0m
+      [31m-[0m[0m name     = "awslabs-r20261001-095441-1597775-cluster" [90m-> null[0m[0m
+      [31m-[0m[0m tags     = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-cluster"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-cluster"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+
+      [31m-[0m[0m setting {
+          [31m-[0m[0m name  = "containerInsights" [90m-> null[0m[0m
+          [31m-[0m[0m value = "disabled" [90m-> null[0m[0m
+        }
+    }
+
+[1m  # aws_ecs_service.web[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_ecs_service" "web" {
+      [31m-[0m[0m availability_zone_rebalancing      = "DISABLED" [90m-> null[0m[0m
+      [31m-[0m[0m cluster                            = "arn:aws:ecs:us-east-1:<account-id>:cluster/awslabs-r20261001-095441-1597775-cluster" [90m-> null[0m[0m
+      [31m-[0m[0m deployment_maximum_percent         = 200 [90m-> null[0m[0m
+      [31m-[0m[0m deployment_minimum_healthy_percent = 100 [90m-> null[0m[0m
+      [31m-[0m[0m desired_count                      = 1 [90m-> null[0m[0m
+      [31m-[0m[0m enable_ecs_managed_tags            = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_execute_command             = false [90m-> null[0m[0m
+      [31m-[0m[0m health_check_grace_period_seconds  = 0 [90m-> null[0m[0m
+      [31m-[0m[0m iam_role                           = "/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS" [90m-> null[0m[0m
+      [31m-[0m[0m id                                 = "arn:aws:ecs:us-east-1:<account-id>:service/awslabs-r20261001-095441-1597775-cluster/awslabs-r20261001-095441-1597775-svc" [90m-> null[0m[0m
+      [31m-[0m[0m launch_type                        = "FARGATE" [90m-> null[0m[0m
+      [31m-[0m[0m name                               = "awslabs-r20261001-095441-1597775-svc" [90m-> null[0m[0m
+      [31m-[0m[0m platform_version                   = "LATEST" [90m-> null[0m[0m
+      [31m-[0m[0m propagate_tags                     = "NONE" [90m-> null[0m[0m
+      [31m-[0m[0m scheduling_strategy                = "REPLICA" [90m-> null[0m[0m
+      [31m-[0m[0m tags                               = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-svc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                           = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-svc"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m task_definition                    = "arn:aws:ecs:us-east-1:<account-id>:task-definition/awslabs-r20261001-095441-1597775-web:1" [90m-> null[0m[0m
+      [31m-[0m[0m triggers                           = {} [90m-> null[0m[0m
+      [31m-[0m[0m wait_for_steady_state              = false [90m-> null[0m[0m
+
+      [31m-[0m[0m deployment_circuit_breaker {
+          [31m-[0m[0m enable   = false [90m-> null[0m[0m
+          [31m-[0m[0m rollback = false [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m deployment_controller {
+          [31m-[0m[0m type = "ECS" [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m network_configuration {
+          [31m-[0m[0m assign_public_ip = true [90m-> null[0m[0m
+          [31m-[0m[0m security_groups  = [
+              [31m-[0m[0m "sg-047eb3e5418e020b0",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m subnets          = [
+              [31m-[0m[0m "subnet-09534b1ff414f0801",
+              [31m-[0m[0m "subnet-0a8d16309f7fc1ba6",
+            ] [90m-> null[0m[0m
+        }
+    }
+
+[1m  # aws_ecs_task_definition.web[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_ecs_task_definition" "web" {
+      [31m-[0m[0m arn                      = "arn:aws:ecs:us-east-1:<account-id>:task-definition/awslabs-r20261001-095441-1597775-web:1" [90m-> null[0m[0m
+      [31m-[0m[0m arn_without_revision     = "arn:aws:ecs:us-east-1:<account-id>:task-definition/awslabs-r20261001-095441-1597775-web" [90m-> null[0m[0m
+      [31m-[0m[0m container_definitions    = jsonencode(
+            [
+              [31m-[0m[0m {
+                  [31m-[0m[0m environment      = []
+                  [31m-[0m[0m essential        = true
+                  [31m-[0m[0m image            = "public.ecr.aws/nginx/nginx:stable"
+                  [31m-[0m[0m logConfiguration = {
+                      [31m-[0m[0m logDriver = "awslogs"
+                      [31m-[0m[0m options   = {
+                          [31m-[0m[0m awslogs-group         = "/ecs/awslabs-r20261001-095441-1597775"
+                          [31m-[0m[0m awslogs-region        = "us-east-1"
+                          [31m-[0m[0m awslogs-stream-prefix = "web"
+                        }
+                    }
+                  [31m-[0m[0m mountPoints      = []
+                  [31m-[0m[0m name             = "web"
+                  [31m-[0m[0m portMappings     = [
+                      [31m-[0m[0m {
+                          [31m-[0m[0m containerPort = 80
+                          [31m-[0m[0m hostPort      = 80
+                          [31m-[0m[0m protocol      = "tcp"
+                        },
+                    ]
+                  [31m-[0m[0m systemControls   = []
+                  [31m-[0m[0m volumesFrom      = []
+                },
+            ]
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m cpu                      = "256" [90m-> null[0m[0m
+      [31m-[0m[0m enable_fault_injection   = false [90m-> null[0m[0m
+      [31m-[0m[0m execution_role_arn       = "arn:aws:iam::<account-id>:role/awslabs-r20261001-095441-1597775-ecs-exec" [90m-> null[0m[0m
+      [31m-[0m[0m family                   = "awslabs-r20261001-095441-1597775-web" [90m-> null[0m[0m
+      [31m-[0m[0m id                       = "awslabs-r20261001-095441-1597775-web" [90m-> null[0m[0m
+      [31m-[0m[0m memory                   = "512" [90m-> null[0m[0m
+      [31m-[0m[0m network_mode             = "awsvpc" [90m-> null[0m[0m
+      [31m-[0m[0m requires_compatibilities = [
+          [31m-[0m[0m "FARGATE",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m revision                 = 1 [90m-> null[0m[0m
+      [31m-[0m[0m skip_destroy             = false [90m-> null[0m[0m
+      [31m-[0m[0m tags                     = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-web"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                 = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-web"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m track_latest             = false [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_iam_role.execution[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role" "execution" {
+      [31m-[0m[0m arn                   = "arn:aws:iam::<account-id>:role/awslabs-r20261001-095441-1597775-ecs-exec" [90m-> null[0m[0m
+      [31m-[0m[0m assume_role_policy    = jsonencode(
+            {
+              [31m-[0m[0m Statement = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action    = "sts:AssumeRole"
+                      [31m-[0m[0m Effect    = "Allow"
+                      [31m-[0m[0m Principal = {
+                          [31m-[0m[0m Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              [31m-[0m[0m Version   = "2012-10-17"
+            }
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m create_date           = "2026-10-01T16:54:53Z" [90m-> null[0m[0m
+      [31m-[0m[0m force_detach_policies = false [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "awslabs-r20261001-095441-1597775-ecs-exec" [90m-> null[0m[0m
+      [31m-[0m[0m managed_policy_arns   = [
+          [31m-[0m[0m "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m max_session_duration  = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m name                  = "awslabs-r20261001-095441-1597775-ecs-exec" [90m-> null[0m[0m
+      [31m-[0m[0m path                  = "/" [90m-> null[0m[0m
+      [31m-[0m[0m tags                  = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-ecs-exec"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all              = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-ecs-exec"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m unique_id             = "AROAY4MLGAFVYRQMFEAOF" [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_iam_role_policy_attachment.execution[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "execution" {
+      [31m-[0m[0m id         = "awslabs-r20261001-095441-1597775-ecs-exec-20261001165454511000000001" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "awslabs-r20261001-095441-1597775-ecs-exec" [90m-> null[0m[0m
+    }
+
+[1m  # aws_internet_gateway.igw[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_internet_gateway" "igw" {
+      [31m-[0m[0m arn      = "arn:aws:ec2:us-east-1:<account-id>:internet-gateway/igw-03fc632c02b027cdb" [90m-> null[0m[0m
+      [31m-[0m[0m id       = "igw-03fc632c02b027cdb" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id = "<account-id>" [90m-> null[0m[0m
+      [31m-[0m[0m tags     = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-igw"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-igw"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id   = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+    }
+
+[1m  # aws_route_table.public[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table" "public" {
+      [31m-[0m[0m arn              = "arn:aws:ec2:us-east-1:<account-id>:route-table/rtb-023788965dce85f8f" [90m-> null[0m[0m
+      [31m-[0m[0m id               = "rtb-023788965dce85f8f" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id         = "<account-id>" [90m-> null[0m[0m
+      [31m-[0m[0m propagating_vgws = [] [90m-> null[0m[0m
+      [31m-[0m[0m route            = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_block                 = "0.0.0.0/0"
+              [31m-[0m[0m gateway_id                 = "igw-03fc632c02b027cdb"
+                [90m# (11 unchanged attributes hidden)[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m tags             = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-rt-public"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all         = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-rt-public"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id           = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+    }
+
+[1m  # aws_route_table_association.public[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table_association" "public" {
+      [31m-[0m[0m id             = "rtbassoc-0e528c41f31ebb0ba" [90m-> null[0m[0m
+      [31m-[0m[0m route_table_id = "rtb-023788965dce85f8f" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id      = "subnet-09534b1ff414f0801" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # aws_route_table_association.public[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table_association" "public" {
+      [31m-[0m[0m id             = "rtbassoc-00abec44935271436" [90m-> null[0m[0m
+      [31m-[0m[0m route_table_id = "rtb-023788965dce85f8f" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id      = "subnet-0a8d16309f7fc1ba6" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # aws_security_group.web[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_security_group" "web" {
+      [31m-[0m[0m arn                    = "arn:aws:ec2:us-east-1:<account-id>:security-group/sg-047eb3e5418e020b0" [90m-> null[0m[0m
+      [31m-[0m[0m description            = "Allow inbound HTTP, all outbound" [90m-> null[0m[0m
+      [31m-[0m[0m egress                 = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_blocks      = [
+                  [31m-[0m[0m "0.0.0.0/0",
+                ]
+              [31m-[0m[0m description      = "All outbound"
+              [31m-[0m[0m from_port        = 0
+              [31m-[0m[0m ipv6_cidr_blocks = []
+              [31m-[0m[0m prefix_list_ids  = []
+              [31m-[0m[0m protocol         = "-1"
+              [31m-[0m[0m security_groups  = []
+              [31m-[0m[0m self             = false
+              [31m-[0m[0m to_port          = 0
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m id                     = "sg-047eb3e5418e020b0" [90m-> null[0m[0m
+      [31m-[0m[0m ingress                = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_blocks      = [
+                  [31m-[0m[0m "0.0.0.0/0",
+                ]
+              [31m-[0m[0m description      = "HTTP from anywhere"
+              [31m-[0m[0m from_port        = 80
+              [31m-[0m[0m ipv6_cidr_blocks = []
+              [31m-[0m[0m prefix_list_ids  = []
+              [31m-[0m[0m protocol         = "tcp"
+              [31m-[0m[0m security_groups  = []
+              [31m-[0m[0m self             = false
+              [31m-[0m[0m to_port          = 80
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m name                   = "awslabs-r20261001-095441-1597775-web-20261001165506064100000002" [90m-> null[0m[0m
+      [31m-[0m[0m name_prefix            = "awslabs-r20261001-095441-1597775-web-" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id               = "<account-id>" [90m-> null[0m[0m
+      [31m-[0m[0m revoke_rules_on_delete = false [90m-> null[0m[0m
+      [31m-[0m[0m tags                   = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-web-sg"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all               = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-web-sg"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                 = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+    }
+
+[1m  # aws_subnet.public[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_subnet" "public" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:us-east-1:<account-id>:subnet/subnet-09534b1ff414f0801" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "us-east-1a" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "use1-az1" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "10.40.0.0/24" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-09534b1ff414f0801" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = true [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "<account-id>" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-public-0"
+          [31m-[0m[0m "tier" = "public"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-public-0"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+          [31m-[0m[0m "tier"       = "public"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_subnet.public[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_subnet" "public" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:us-east-1:<account-id>:subnet/subnet-0a8d16309f7fc1ba6" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "us-east-1b" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "use1-az2" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "10.40.1.0/24" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-0a8d16309f7fc1ba6" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = true [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "<account-id>" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-public-1"
+          [31m-[0m[0m "tier" = "public"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-public-1"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+          [31m-[0m[0m "tier"       = "public"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_vpc.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_vpc" "main" {
+      [31m-[0m[0m arn                                  = "arn:aws:ec2:us-east-1:<account-id>:vpc/vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+      [31m-[0m[0m assign_generated_ipv6_cidr_block     = false [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                           = "10.40.0.0/16" [90m-> null[0m[0m
+      [31m-[0m[0m default_network_acl_id               = "acl-01a5bfc24416f4121" [90m-> null[0m[0m
+      [31m-[0m[0m default_route_table_id               = "rtb-054028075c090007d" [90m-> null[0m[0m
+      [31m-[0m[0m default_security_group_id            = "sg-08dd18496a10a510b" [90m-> null[0m[0m
+      [31m-[0m[0m dhcp_options_id                      = "dopt-0d8c31e9d75418547" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns_hostnames                 = true [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns_support                   = true [90m-> null[0m[0m
+      [31m-[0m[0m enable_network_address_usage_metrics = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                   = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+      [31m-[0m[0m instance_tenancy                     = "default" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_netmask_length                  = 0 [90m-> null[0m[0m
+      [31m-[0m[0m main_route_table_id                  = "rtb-054028075c090007d" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                             = "<account-id>" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                 = {
+          [31m-[0m[0m "Name" = "awslabs-r20261001-095441-1597775-vpc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                             = {
+          [31m-[0m[0m "Name"       = "awslabs-r20261001-095441-1597775-vpc"
+          [31m-[0m[0m "lab"        = "04-ecs-fargate"
+          [31m-[0m[0m "managed_by" = "terraform"
+          [31m-[0m[0m "project"    = "awslabs"
+          [31m-[0m[0m "run_id"     = "r20261001-095441-1597775"
+        } [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 14 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m cluster_name      = "awslabs-r20261001-095441-1597775-cluster" [90m-> null[0m[0m
+  [31m-[0m[0m security_group_id = "sg-047eb3e5418e020b0" [90m-> null[0m[0m
+  [31m-[0m[0m service_name      = "awslabs-r20261001-095441-1597775-svc" [90m-> null[0m[0m
+  [31m-[0m[0m subnet_ids        = [
+      [31m-[0m[0m "subnet-09534b1ff414f0801",
+      [31m-[0m[0m "subnet-0a8d16309f7fc1ba6",
+    ] [90m-> null[0m[0m
+  [31m-[0m[0m task_family       = "awslabs-r20261001-095441-1597775-web" [90m-> null[0m[0m
+  [31m-[0m[0m vpc_id            = "vpc-0181b8a855440c2ae" [90m-> null[0m[0m
+[0m[1maws_route_table_association.public[0]: Destroying... [id=rtbassoc-0e528c41f31ebb0ba][0m[0m
+[0m[1maws_route_table_association.public[1]: Destroying... [id=rtbassoc-00abec44935271436][0m[0m
+[0m[1maws_ecs_service.web: Destroying... [id=arn:aws:ecs:us-east-1:<account-id>:service/awslabs-r20261001-095441-1597775-cluster/awslabs-r20261001-095441-1597775-svc][0m[0m
+[0m[1maws_route_table_association.public[0]: Destruction complete after 0s[0m
+[0m[1maws_route_table_association.public[1]: Destruction complete after 0s[0m
+[0m[1maws_route_table.public: Destroying... [id=rtb-023788965dce85f8f][0m[0m
+[0m[1maws_route_table.public: Destruction complete after 1s[0m
+[0m[1maws_internet_gateway.igw: Destroying... [id=igw-03fc632c02b027cdb][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 00m10s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 00m10s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 00m20s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 00m20s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 00m30s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 00m30s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 00m40s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 00m40s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 00m50s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 00m50s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 01m00s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 01m00s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 01m10s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Still destroying... [id=igw-03fc632c02b027cdb, 01m10s elapsed][0m[0m
+[0m[1maws_internet_gateway.igw: Destruction complete after 1m12s[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 01m20s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 01m30s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 01m40s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Still destroying... [id=arn:aws:ecs:us-east-1:<account-id>:serv...r/awslabs-r20261001-095441-1597775-svc, 01m50s elapsed][0m[0m
+[0m[1maws_ecs_service.web: Destruction complete after 1m51s[0m
+[0m[1maws_subnet.public[1]: Destroying... [id=subnet-0a8d16309f7fc1ba6][0m[0m
+[0m[1maws_ecs_cluster.main: Destroying... [id=arn:aws:ecs:us-east-1:<account-id>:cluster/awslabs-r20261001-095441-1597775-cluster][0m[0m
+[0m[1maws_iam_role_policy_attachment.execution: Destroying... [id=awslabs-r20261001-095441-1597775-ecs-exec-20261001165454511000000001][0m[0m
+[0m[1maws_security_group.web: Destroying... [id=sg-047eb3e5418e020b0][0m[0m
+[0m[1maws_subnet.public[0]: Destroying... [id=subnet-09534b1ff414f0801][0m[0m
+[0m[1maws_ecs_task_definition.web: Destroying... [id=awslabs-r20261001-095441-1597775-web][0m[0m
+[0m[1maws_ecs_task_definition.web: Destruction complete after 1s[0m
+[0m[1maws_cloudwatch_log_group.web: Destroying... [id=/ecs/awslabs-r20261001-095441-1597775][0m[0m
+[0m[1maws_ecs_cluster.main: Destruction complete after 1s[0m
+[0m[1maws_iam_role_policy_attachment.execution: Destruction complete after 1s[0m
+[0m[1maws_iam_role.execution: Destroying... [id=awslabs-r20261001-095441-1597775-ecs-exec][0m[0m
+[0m[1maws_cloudwatch_log_group.web: Destruction complete after 0s[0m
+[0m[1maws_iam_role.execution: Destruction complete after 0s[0m
+[0m[1maws_subnet.public[1]: Destruction complete after 1s[0m
+[0m[1maws_subnet.public[0]: Destruction complete after 1s[0m
+[0m[1maws_security_group.web: Destruction complete after 1s[0m
+[0m[1maws_vpc.main: Destroying... [id=vpc-0181b8a855440c2ae][0m[0m
+[0m[1maws_vpc.main: Destruction complete after 1s[0m
+[0m[1m[32m
+Destroy complete! Resources: 14 destroyed.[0m

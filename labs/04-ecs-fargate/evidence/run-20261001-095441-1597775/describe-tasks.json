@@ -1,0 +1,91 @@
+{
+    "tasks": [
+        {
+            "attachments": [
+                {
+                    "id": "80e95135-3cc5-4306-8181-b9249b369eb1",
+                    "type": "ElasticNetworkInterface",
+                    "status": "CREATED",
+                    "details": [
+                        {
+                            "name": "subnetId",
+                            "value": "subnet-0a8d16309f7fc1ba6"
+                        },
+                        {
+                            "name": "networkInterfaceId",
+                            "value": "eni-048c5249b553ca64c"
+                        },
+                        {
+                            "name": "macAddress",
+                            "value": "12:ff:cd:f4:97:19"
+                        },
+                        {
+                            "name": "privateDnsName",
+                            "value": "ip-10-40-1-100.ec2.internal"
+                        },
+                        {
+                            "name": "privateIPv4Address",
+                            "value": "10.40.1.100"
+                        }
+                    ]
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "ecs.cpu-architecture",
+                    "value": "x86_64"
+                }
+            ],
+            "availabilityZone": "us-east-1b",
+            "clusterArn": "arn:aws:ecs:us-east-1:<account-id>:cluster/awslabs-r20261001-095441-1597775-cluster",
+            "containers": [
+                {
+                    "containerArn": "arn:aws:ecs:us-east-1:<account-id>:container/awslabs-r20261001-095441-1597775-cluster/d896f6b2e2cb42558dabb0362f2ab7fd/8d9dffce-aca2-42f6-aa6f-f5d48fe6c22d",
+                    "taskArn": "arn:aws:ecs:us-east-1:<account-id>:task/awslabs-r20261001-095441-1597775-cluster/d896f6b2e2cb42558dabb0362f2ab7fd",
+                    "name": "web",
+                    "image": "public.ecr.aws/nginx/nginx:stable",
+                    "lastStatus": "PENDING",
+                    "networkInterfaces": [
+                        {
+                            "attachmentId": "80e95135-3cc5-4306-8181-b9249b369eb1",
+                            "privateIpv4Address": "10.40.1.100"
+                        }
+                    ],
+                    "healthStatus": "UNKNOWN",
+                    "cpu": "0"
+                }
+            ],
+            "cpu": "256",
+            "createdAt": "2026-10-01T09:55:30.120000-07:00",
+            "desiredStatus": "RUNNING",
+            "enableExecuteCommand": false,
+            "group": "service:awslabs-r20261001-095441-1597775-svc",
+            "healthStatus": "UNKNOWN",
+            "lastStatus": "PROVISIONING",
+            "launchType": "FARGATE",
+            "memory": "512",
+            "overrides": {
+                "containerOverrides": [
+                    {
+                        "name": "web"
+                    }
+                ],
+                "inferenceAcceleratorOverrides": []
+            },
+            "platformVersion": "1.4.0",
+            "platformFamily": "Linux",
+            "startedBy": "ecs-svc/7689425986183789963",
+            "tags": [],
+            "taskArn": "arn:aws:ecs:us-east-1:<account-id>:task/awslabs-r20261001-095441-1597775-cluster/d896f6b2e2cb42558dabb0362f2ab7fd",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:<account-id>:task-definition/awslabs-r20261001-095441-1597775-web:1",
+            "version": 1,
+            "ephemeralStorage": {
+                "sizeInGiB": 20
+            },
+            "fargateEphemeralStorage": {
+                "sizeInGiB": 20
+            }
+        }
+    ],
+    "failures": []
+}

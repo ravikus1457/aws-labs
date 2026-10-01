@@ -1,0 +1,41 @@
+{
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-095441-1597775-cluster"
+  },
+  "security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-047eb3e5418e020b0"
+  },
+  "service_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-095441-1597775-svc"
+  },
+  "subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-09534b1ff414f0801",
+      "subnet-0a8d16309f7fc1ba6"
+    ]
+  },
+  "task_family": {
+    "sensitive": false,
+    "type": "string",
+    "value": "awslabs-r20261001-095441-1597775-web"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0181b8a855440c2ae"
+  }
+}
