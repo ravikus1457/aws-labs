@@ -83,6 +83,7 @@ data "aws_iam_policy_document" "lab09" {
       "lambda:ListFunctions",
       "sqs:ListQueues",
       "states:ListStateMachines",
+      "states:ValidateStateMachineDefinition", # first real run 10-15: the provider validates before CreateStateMachine
       "dynamodb:ListTables",
       "logs:DescribeLogGroups",
       "logs:CreateLogDelivery",
@@ -138,6 +139,19 @@ data "aws_iam_policy_document" "lab09" {
       test     = "StringEquals"
       variable = "iam:PassedToService"
       values   = ["lambda.amazonaws.com", "states.amazonaws.com"]
+    }
+  }
+  # API Gateway creates its service-linked role on the first stage with logging/tracing
+  # (first real run 10-15: CreateStage 403 "Caller does not have permissions to create a
+  # Service Linked Role"). Only that one service's role.
+  statement {
+    sid       = "ApiGatewayServiceLinkedRoleOnly"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["${local.arn_prefix}:iam::${local.account_id}:role/aws-service-role/ops.apigateway.amazonaws.com/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values   = ["ops.apigateway.amazonaws.com"]
     }
   }
   statement {

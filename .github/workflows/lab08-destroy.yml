@@ -110,6 +110,15 @@ jobs:
             echo "deleting $lg"; aws logs delete-log-group --log-group-name "$lg"
           done
 
+      - name: Delete the canary's Lambda layers (Synthetics creates them; a failed CreateCanary orphans them)
+        run: |
+          set -euo pipefail
+          for ly in $(aws lambda list-layers --query "Layers[?starts_with(LayerName, 'cwsyn-${CANARY_NAME}')].LayerName" --output text); do
+            for v in $(aws lambda list-layer-versions --layer-name "$ly" --query 'LayerVersions[].Version' --output text); do
+              echo "deleting $ly:$v"; aws lambda delete-layer-version --layer-name "$ly" --version-number "$v"
+            done
+          done
+
       - name: Verify nothing from the app stack survived (owning services, not the tagging index)
         run: |
           set -euo pipefail

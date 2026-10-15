@@ -121,6 +121,15 @@ data "aws_iam_policy_document" "lab08" {
     ]
   }
 
+  # CreateCanary builds the canary's Lambda layer with the CALLER's credentials from AWS's
+  # own Synthetics library bucket (first real run 10-15: AccessDenied GetObjectVersion on
+  # aws-synthetics-library-us-east-1/v1-0/pythonSeleniumLibrary.zip).
+  statement {
+    sid       = "SyntheticsLibraryRead"
+    actions   = ["s3:GetObject", "s3:GetObjectVersion"]
+    resources = ["arn:aws:s3:::aws-synthetics-library-*/*"]
+  }
+
   # The five roles + one instance profile this lab creates.
   statement {
     sid = "Lab08RolesAndProfile"
