@@ -141,7 +141,15 @@ def main() -> int:
 
     # A new stage + usage-plan key can take a little while to propagate: wait until the key is honoured
     # (an empty body is rejected by the ingest Lambda with 400 and never reaches the queue).
-    warm = wait_until(lambda: post_json(url, {}, {"x-api-key": key})[0] == 400, timeout=180, interval=10)
+    # 10-15 first real run: one 400 then a 403 on the very next keyed call - the key propagates per edge
+    # node, so require three accepted calls in a row before testing.
+    streak = {"n": 0}
+
+    def key_honoured():
+        streak["n"] = streak["n"] + 1 if post_json(url, {}, {"x-api-key": key})[0] == 400 else 0
+        return streak["n"] >= 3
+
+    warm = wait_until(key_honoured, timeout=240, interval=5)
     ev.log("API key accepted" if warm else "API key still not accepted after 180 s")
 
     # ---- 2. edge rejections ---------------------------------------------------------------------
@@ -160,9 +168,16 @@ def main() -> int:
     ok_id = f"smoke-{run}-ok"
     trace_id = xray_trace_id()
     t0 = time.monotonic()
-    status, body, hdrs = post_json(
-        url, order, {"x-api-key": key, "Idempotency-Key": ok_id, "X-Amzn-Trace-Id": f"Root={trace_id};Sampled=1"}
-    )
+    # A 403 here is the edge refusing a not-yet-propagated key (it never reaches the ingest Lambda), so a
+    # retry with the SAME Idempotency-Key cannot create a duplicate order. Any other status is final.
+    for _attempt in range(12):
+        status, body, hdrs = post_json(
+            url, order, {"x-api-key": key, "Idempotency-Key": ok_id, "X-Amzn-Trace-Id": f"Root={trace_id};Sampled=1"}
+        )
+        if status != 403:
+            break
+        time.sleep(10)
+    ev.log(f"valid order: {_attempt + 1} attempt(s)")
     ev.check(
         status == 202 and isinstance(body, dict) and body.get("order_id") == ok_id,
         "valid order -> 202 ACCEPTED",
@@ -270,16 +285,26 @@ def main() -> int:
                 break
         return found
 
+    # A synchronous Express workflow emits no StepFunctions node of its own (10-15 first real run: 0 such
+    # nodes, while the workflow's task Lambdas sat inside the worker's trace). Continuity THROUGH the
+    # workflow is proven by the worker and both task Lambdas sharing one trace id.
+    def workflow_traced(traces):
+        want = {f"{out['name_prefix']}-{n}" for n in ("worker", "validate", "enrich")}
+        for t in traces:
+            names = {s.get("Name") for s in t.get("ServiceIds", [])}
+            types = {s.get("Type") for s in t.get("ServiceIds", [])}
+            if want <= names or "AWS::StepFunctions::StateMachine" in types:
+                return t.get("Id")
+        return None
+
     def types_seen(traces):
         return sorted({s.get("Type") for t in traces for s in t.get("ServiceIds", []) if s.get("Type")})
 
     traces = (
         wait_until(
-            lambda: (
-                lambda t: (
-                    t if {"AWS::ApiGateway::Stage", "AWS::StepFunctions::StateMachine"} <= set(types_seen(t)) else None
-                )
-            )(summaries()),
+            lambda: (lambda t: t if "AWS::ApiGateway::Stage" in types_seen(t) and workflow_traced(t) else None)(
+                summaries()
+            ),
             timeout=180,
             interval=15,
         )
@@ -291,7 +316,12 @@ def main() -> int:
         "X-Ray: traces from API Gateway -> ingest Lambda",
         f"{len(traces)} traces, types {seen}",
     )
-    ev.check("AWS::StepFunctions::StateMachine" in seen, "X-Ray: traces from the Step Functions workflow")
+    wf = workflow_traced(traces)
+    ev.check(
+        bool(wf),
+        "X-Ray: one trace runs worker -> Step Functions -> validate + enrich",
+        f"trace {wf}" if wf else "no trace held the worker and both task Lambdas",
+    )
     ours = [t for t in traces if t.get("Id") == trace_id]
     linked = any("AWS::StepFunctions::StateMachine" in {s.get("Type") for s in t.get("ServiceIds", [])} for t in ours)
     ev.check(
