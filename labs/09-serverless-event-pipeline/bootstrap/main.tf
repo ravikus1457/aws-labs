@@ -79,6 +79,7 @@ data "aws_iam_policy_document" "lab09" {
     actions = [
       "lambda:CreateEventSourceMapping",
       "lambda:ListEventSourceMappings",
+      "lambda:GetEventSourceMapping", # 10-15 first destroy: polling a DELETED mapping is authorized on "*"
       "lambda:GetAccountSettings",
       "lambda:ListFunctions",
       "sqs:ListQueues",
