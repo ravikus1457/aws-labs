@@ -22,6 +22,8 @@ captures evidence, and **tears it down automatically** so idle cost stays at ~$0
 | 05 | [CloudWatch monitoring](labs/05-cloudwatch-monitoring) | Metrics, alarms, SNS alerts, dashboards | ~$0 |
 | 06 | [ECS Fargate CI/CD (flagship)](labs/06-ecs-fargate-cicd) | Private Fargate service behind an ALB, ECR, GitHub OIDC deploy role, CloudWatch alarms to SNS, AWS Budget, GitHub Actions pipeline with manual approval, scheduled destroy | ~$0.11/hr while up; destroyed nightly by CI |
 | 07 | [EKS + observability](labs/07-eks-observability) | EKS cluster, managed node group, IRSA, Helm chart, HPA + PDB, Prometheus + Grafana, PrometheusRule alerts, NLB Service, control-plane logs, OIDC pipeline with manual approval, fault-injected smoke test, scheduled destroy | ~$0.22/hr while up (control plane $0.10); meant to live ~1 hr; destroyed nightly by CI |
+| 08 | [Self-healing chaos](labs/08-self-healing-chaos) | AWS FIS experiments (instance terminate, CPU stress, optional latency), CloudWatch Synthetics canary, EventBridge + SSM Automation auto-remediation, measured detect/recover times (MTTR), OIDC pipeline with manual approval, scheduled destroy | ~$0.66/run (~$0.16 infra + FIS action-minutes); destroyed after each run and nightly |
+| 09 | [Serverless event pipeline](labs/09-serverless-event-pipeline) | API Gateway (throttle + daily quota), Lambda, SQS + DLQ with redrive, Step Functions Express, DynamoDB, X-Ray tracing, 2,000-order load test with measured cost, OIDC pipeline with manual approval, scheduled destroy | ~$0.03/run (pay-per-request); destroyed nightly |
 
 Every "approx. cost" assumes the run completes and tears down (a few minutes). The
 runner destroys resources even if a step fails — see **Cost safety** below.
