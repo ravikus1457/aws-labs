@@ -65,6 +65,9 @@ resource "aws_cloudwatch_event_target" "scale_out" {
   arn       = local.runbook_target_arn
   role_arn  = aws_iam_role.events.arn
   input     = jsonencode(merge(local.runbook_common, { Direction = ["out"] }))
+  dead_letter_config {
+    arn = aws_sqs_queue.remediation_dlq.arn
+  }
 }
 
 resource "aws_cloudwatch_event_target" "scale_in" {
@@ -73,4 +76,39 @@ resource "aws_cloudwatch_event_target" "scale_in" {
   arn       = local.runbook_target_arn
   role_arn  = aws_iam_role.events.arn
   input     = jsonencode(merge(local.runbook_common, { Direction = ["in"] }))
+  dead_letter_config {
+    arn = aws_sqs_queue.remediation_dlq.arn
+  }
+}
+
+# --- failed-invocation capture ------------------------------------------------
+# The first real run (10-15) showed EventBridge MatchedEvents=1, FailedInvocations=1 and no
+# way to see WHY. A target DLQ receives the event with ERROR_CODE / ERROR_MESSAGE message
+# attributes, so a failed remediation states its own reason (exercise.sh prints it).
+resource "aws_sqs_queue" "remediation_dlq" {
+  name                      = "${local.name}-remediation-dlq"
+  message_retention_seconds = 86400
+  sqs_managed_sse_enabled   = true
+}
+
+data "aws_iam_policy_document" "remediation_dlq" {
+  statement {
+    sid       = "EventBridgeRulesOnly"
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.remediation_dlq.arn]
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.cpu_alarm.arn, aws_cloudwatch_event_rule.cpu_ok.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "remediation_dlq" {
+  queue_url = aws_sqs_queue.remediation_dlq.id
+  policy    = data.aws_iam_policy_document.remediation_dlq.json
 }

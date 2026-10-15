@@ -53,6 +53,12 @@ env:
   TF_INPUT: "0"
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
 
+# bash => GitHub runs every step with -eo pipefail, so `cmd | tee log` can no longer hide a
+# failed cmd (10-15: lab09's plan errored on a missing permission and the job still went green).
+defaults:
+  run:
+    shell: bash
+
 jobs:
   lint:
     name: lint (fmt, tflint, python, bash, measure.py selftest)

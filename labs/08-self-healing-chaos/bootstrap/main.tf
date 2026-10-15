@@ -121,6 +121,13 @@ data "aws_iam_policy_document" "lab08" {
     ]
   }
 
+  # The remediation DLQ (EventBridge target dead-letter queue): lab 08 names only.
+  statement {
+    sid       = "Lab08RemediationDlq"
+    actions   = ["sqs:*"]
+    resources = ["${local.arn_prefix}:sqs:${var.aws_region}:${local.account_id}:${local.name}-*"]
+  }
+
   # CreateCanary builds the canary's Lambda layer with the CALLER's credentials from AWS's
   # own Synthetics library bucket (first real run 10-15: AccessDenied GetObjectVersion on
   # aws-synthetics-library-us-east-1/v1-0/pythonSeleniumLibrary.zip).

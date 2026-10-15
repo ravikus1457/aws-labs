@@ -53,6 +53,11 @@ output "alarm_names" {
   }
 }
 
+output "remediation_dlq_url" {
+  description = "EventBridge target DLQ: a failed runbook start lands here with ERROR_CODE/ERROR_MESSAGE"
+  value       = aws_sqs_queue.remediation_dlq.url
+}
+
 output "runbook_name" {
   description = "SSM Automation document EventBridge starts on cpu-high state changes"
   value       = aws_ssm_document.scale.name

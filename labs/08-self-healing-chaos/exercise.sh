@@ -24,6 +24,7 @@ ASG="$(o '.asg_name.value')"
 BASELINE="$(o '.baseline_capacity.value')"
 CANARY="$(o '.canary_name.value')"
 RUNBOOK="$(o '.runbook_name.value')"
+DLQ="$(o '.remediation_dlq_url.value // empty')"
 IFACE="$(o '.fault_parameters.value.network_interface')"
 ALARM_CPU="$(o '.alarm_names.value.cpu_high')"
 ALARM_CANARY="$(o '.alarm_names.value.canary')"
@@ -166,7 +167,15 @@ if [ "$EXERCISE_WIRING" = "1" ]; then
   done
   NEXEC="$(jq '.AutomationExecutionMetadataList | length' "$EVID/wiring-automations.json" 2>/dev/null || echo 0)"
   NSUCC="$(jq '[.AutomationExecutionMetadataList[] | select(.AutomationExecutionStatus=="Success")] | length' "$EVID/wiring-automations.json" 2>/dev/null || echo 0)"
-  if [ "$OUT_OK" = "1" ]; then pass "forced ALARM -> EventBridge -> $RUNBOOK scaled the ASG out ($NSUCC/$NEXEC executions Success)"; else fail "forced ALARM did not scale the ASG out within 6 min ($NEXEC runbook executions)"; fi
+  if [ "$OUT_OK" = "1" ]; then pass "forced ALARM -> EventBridge -> $RUNBOOK scaled the ASG out ($NSUCC/$NEXEC executions Success)"; else
+    fail "forced ALARM did not scale the ASG out within 6 min ($NEXEC runbook executions)"
+    if [ -n "$DLQ" ]; then   # EventBridge parks a failed StartAutomationExecution here, with the reason
+      aws sqs receive-message --queue-url "$DLQ" --max-number-of-messages 5 --wait-time-seconds 5 \
+        --message-attribute-names All --output json > "$EVID/remediation-dlq.json" || true
+      jq -r '.Messages[]?.MessageAttributes | "EventBridge target error: \(.ERROR_CODE.StringValue // "?"): \(.ERROR_MESSAGE.StringValue // "?")"' \
+        "$EVID/remediation-dlq.json" 2>/dev/null || echo "remediation DLQ unreadable"
+    fi
+  fi
   if [ "$IN_OK" = "1" ]; then pass "alarm back to OK -> runbook scaled in to $BASELINE"; else warn "scale-in back to $BASELINE not observed within 6 min (desired=$(asg_desired)); chaos.sh waits for steady state anyway"; fi
 else
   warn "remediation wiring test skipped (EXERCISE_WIRING=0)"
