@@ -1,0 +1,377 @@
+# Lab 09 — lint + unit-test the Lambdas, plan, approve, apply the serverless order
+# pipeline, then smoke-test it (including the poison-message -> DLQ -> alarm -> fix ->
+# redrive path) and load-test it (N orders, measured latency/concurrency/cost).
+#
+#   push to main (lab files)  ->  lint + test -> validate -> plan -> [manual approval]
+#                                 -> apply -> smoke -> load
+#   pull request              ->  lint + test -> validate only (no AWS credentials)
+#
+# No long-lived AWS keys: every AWS step assumes lab 06's deploy role through GitHub's
+# OIDC token (its trust policy must list environment lab09-production - lab 06 bootstrap
+# variable extra_github_environments; ./bootstrap adds the lab 09 permissions).
+#
+# COST: nothing here bills by the hour except the dashboard + 5 alarms (~$0.005/h
+# prorated). A run (smoke + 2,000-order load test) is estimated at ~$0.025 at list price
+# (~$0.011 after always-free allowances); the load job measures and prints the real figure. The
+# 03:00 UTC lab09-destroy removes everything regardless.
+name: lab09-serverless-event-pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "labs/09-serverless-event-pipeline/**"
+      - ".github/workflows/lab09.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "labs/09-serverless-event-pipeline/**"
+      - ".github/workflows/lab09.yml"
+  workflow_dispatch:
+    inputs:
+      requests:
+        description: "Load test: number of orders to send"
+        required: false
+        default: "2000"
+      concurrency:
+        description: "Load test: client concurrency. Empty = 25, or 8 when the account's Lambda concurrency limit is < 100"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write # required to request the OIDC token
+
+# One deploy at a time; a second push queues behind the first.
+concurrency:
+  group: lab09-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/09-serverless-event-pipeline
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  PYTHON_VERSION: "3.12" # same as the Lambda runtime
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  lint:
+    name: lint (terraform fmt, tflint, ruff, ASL JSON)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform fmt -check
+        working-directory: ${{ env.LAB_DIR }}
+        run: terraform fmt -check -recursive -diff
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: tflint (app + bootstrap stacks)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          tflint --init --config "$PWD/.tflint.hcl"
+          tflint --recursive --config "$PWD/.tflint.hcl" --format compact
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: ruff check + ruff format --check (Lambdas, tools, tests)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          pip install --quiet "$(grep '^ruff==' requirements-dev.txt)"
+          ruff check --output-format github .
+          ruff format --check .
+
+      - name: state machine definition is valid JSON
+        working-directory: ${{ env.LAB_DIR }}
+        run: python3 -c "import json; d=json.load(open('statemachine/order-workflow.asl.json')); print(d['StartAt'], '->', ', '.join(d['States']))"
+
+  test:
+    name: pytest (Lambdas + tools against moto, no AWS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: pytest
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          pip install --quiet -r requirements-dev.txt
+          python -m pytest -v
+
+  validate:
+    name: terraform validate
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+      - name: validate app stack
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -backend=false
+          terraform validate
+      - name: validate bootstrap stack
+        working-directory: ${{ env.LAB_DIR }}/bootstrap
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  plan:
+    name: terraform plan
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      load_concurrency: ${{ steps.resolve.outputs.load_concurrency }}
+      evidence_dir: ${{ steps.resolve.outputs.evidence_dir }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab09-plan-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      # New accounts can have an account-wide Lambda concurrency limit as low as 10. Sized
+      # for 1,000, the pipeline would throttle itself on such an account; sized for 10 it
+      # would under-use a normal one. So the plan reads the limit and sizes the back-pressure
+      # settings + the load generator to it (the settings travel with the reviewed plan).
+      - name: Resolve sizing from the account's Lambda concurrency limit
+        id: resolve
+        env:
+          INPUT_CONCURRENCY: ${{ github.event.inputs.concurrency }}
+        run: |
+          set -euo pipefail
+          LIMIT="$(aws lambda get-account-settings --query 'AccountLimit.ConcurrentExecutions' --output text)"
+          if [ "$LIMIT" -lt 100 ]; then WMC=2; PAR=1; LOADC=8; else WMC=5; PAR=4; LOADC=25; fi
+          LOADC="${INPUT_CONCURRENCY:-$LOADC}"
+          echo "TF_VAR_worker_max_concurrency=$WMC" >> "$GITHUB_ENV"
+          echo "TF_VAR_worker_batch_parallelism=$PAR" >> "$GITHUB_ENV"
+          echo "load_concurrency=$LOADC" >> "$GITHUB_OUTPUT"
+          echo "evidence_dir=evidence/run-${GITHUB_RUN_ID}-$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Sizing"
+            echo "- account Lambda concurrency limit: **$LIMIT**"
+            echo "- worker max concurrency $WMC, batch parallelism $PAR, load-test client concurrency $LOADC"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write backend.tf (lab 06's state bucket, lab09/ key)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set (see README: Bootstrap order)"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab09/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: terraform init + plan
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+        run: |
+          terraform init -lockfile=readonly
+          terraform plan -out=tfplan -no-color | tee plan.txt
+          {
+            echo "### terraform plan"
+            echo '```'
+            grep -E '^(Plan:|No changes)' plan.txt || tail -n 5 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The apply job runs on a fresh runner: ship the lock file (identical provider
+      # build) AND the Lambda zip the plan hashed (a saved plan does not re-read data
+      # sources, so the apply must upload exactly these bytes).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab09-plan-${{ github.run_id }}
+          path: |
+            ${{ env.LAB_DIR }}/tfplan
+            ${{ env.LAB_DIR }}/plan.txt
+            ${{ env.LAB_DIR }}/.terraform.lock.hcl
+            ${{ env.LAB_DIR }}/build/lambda.zip
+          include-hidden-files: true # the lock file is a dotfile; v4 drops dotfiles by default
+          retention-days: 3
+          if-no-files-found: error
+
+  apply:
+    name: terraform apply (manual approval)
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # The environment carries the "required reviewers" rule: the job pauses here until
+    # a reviewer approves. Its OIDC 'sub' becomes repo:<owner/repo>:environment:lab09-production,
+    # which the deploy role must trust.
+    environment:
+      name: lab09-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab09-apply-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab09-plan-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab09/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      # Applies EXACTLY the reviewed plan. If the nightly destroy ran in between,
+      # Terraform refuses ("saved plan is stale") - re-run the workflow.
+      - name: terraform apply tfplan
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -lockfile=readonly
+          terraform apply -no-color tfplan
+          terraform output -json > outputs.json
+          {
+            echo "### Deployed"
+            echo "- API: \`$(jq -r '.api_url.value' outputs.json)\` (x-api-key required; key id \`$(jq -r '.api_key_id.value' outputs.json)\`)"
+            echo "- state machine: \`$(jq -r '.state_machine_arn.value' outputs.json | sed 's/:[0-9]\{12\}:/:<acct>:/')\`"
+            echo "- dashboard: $(jq -r '.dashboard_url.value' outputs.json)"
+            echo "- worker settings: \`$(jq -c '.worker_settings.value' outputs.json)\`"
+            echo "- deployed at $(date -u '+%Y-%m-%dT%H:%M:%SZ') — lab09-destroy removes it (cron 03:00 UTC)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # outputs.json holds no secrets (the API key VALUE is not a Terraform output).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab09-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/outputs.json
+          retention-days: 3
+
+  smoke:
+    name: smoke (config, 403/400, happy path, idempotency, poison -> DLQ -> alarm -> fix -> redrive, X-Ray)
+    needs: [plan, apply]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab09-smoke-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab09-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: tools/smoke.py
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          EVIDENCE: ${{ needs.plan.outputs.evidence_dir }}/smoke
+        run: |
+          pip install --quiet -r requirements-tools.txt
+          set +e
+          python tools/smoke.py --outputs outputs.json --evidence "$EVIDENCE"
+          rc=$?
+          {
+            echo "### Smoke test"
+            echo '```'
+            grep -E '^(PASS|FAIL|WARN)' "$EVIDENCE/smoke.log" || echo "(no smoke.log)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab09-evidence-smoke-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence
+          retention-days: 14
+
+  load:
+    name: load test (N orders; latency, success, concurrency, cost)
+    needs: [plan, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab09-load-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab09-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: tools/loadtest.py
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          EVIDENCE: ${{ needs.plan.outputs.evidence_dir }}/load
+          REQUESTS: ${{ github.event.inputs.requests || '2000' }}
+          CONCURRENCY: ${{ needs.plan.outputs.load_concurrency }}
+        run: |
+          pip install --quiet -r requirements-tools.txt
+          set +e
+          python tools/loadtest.py --outputs outputs.json --evidence "$EVIDENCE" \
+            --requests "$REQUESTS" --concurrency "$CONCURRENCY"
+          rc=$?
+          cat "$EVIDENCE/summary.md" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo "(no summary.md)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Stack is UP (idle cost ~\$0.005/h). Tear down: Actions -> lab09-destroy -> Run workflow (cron 03:00 UTC regardless)." >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab09-evidence-load-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence
+          retention-days: 14

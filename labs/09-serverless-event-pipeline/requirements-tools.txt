@@ -1,0 +1,2 @@
+# What tools/smoke.py, tools/loadtest.py and tools/redrive.py need on the runner.
+boto3==1.43.114

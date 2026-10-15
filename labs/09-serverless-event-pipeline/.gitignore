@@ -1,0 +1,11 @@
+# Lab 09 local/CI artifacts (the repo-wide .gitignore covers *.tfstate, .terraform/, evidence/*)
+backend.tf
+bootstrap/backend.tf
+build/
+outputs.json
+tfplan
+plan.txt
+destroy.txt
+.venv/
+.pytest_cache/
+.ruff_cache/

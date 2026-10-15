@@ -1,0 +1,16 @@
+# Tooling config only (nothing here is packaged). CI: ruff check + pytest, see .github/workflows/lab09.yml.
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tools"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, isort, bugbear, pyupgrade, simplify
+select = ["E", "W", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["orders", "common", "cost", "stats", "redrive"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"

@@ -1,0 +1,6 @@
+# Local + CI test/lint tooling (pinned). The Lambdas themselves need NOTHING beyond the
+# python3.12 runtime (boto3 is provided by Lambda), so the deployment package is just src/.
+pytest==9.1.1
+ruff==0.17.1
+boto3==1.43.114
+moto[dynamodb,sqs,stepfunctions,xray,logs]==5.2.4

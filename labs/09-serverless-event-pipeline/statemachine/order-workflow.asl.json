@@ -1,0 +1,132 @@
+{
+  "Comment": "Lab 09 order workflow (EXPRESS, started synchronously by the worker Lambda): Validate -> Enrich -> Persist. Rendered by Terraform templatefile(); the three placeholders are validate_arn, enrich_arn, table_name.",
+  "StartAt": "Validate",
+  "States": {
+    "Validate": {
+      "Type": "Task",
+      "Comment": "Shape + range checks again (anything with sqs:SendMessage could have written the message). A ValidationError fails the execution.",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${validate_arn}",
+        "Payload.$": "$"
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Enrich"
+    },
+    "Enrich": {
+      "Type": "Task",
+      "Comment": "Prices every line from the catalog (DynamoDB keys SKU#...). An unknown SKU raises UnknownSkuError: the execution fails, the worker reports the message as failed, SQS retries it and finally moves it to the DLQ.",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${enrich_arn}",
+        "Payload.$": "$"
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Persist"
+    },
+    "Persist": {
+      "Type": "Task",
+      "Comment": "Direct DynamoDB integration (no Lambda). The conditional write makes redelivery idempotent: a second copy of the same order_id is caught and treated as success.",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "${table_name}",
+        "Item": {
+          "pk": {
+            "S.$": "States.Format('ORDER#{}', $.order_id)"
+          },
+          "order_id": {
+            "S.$": "$.order_id"
+          },
+          "customer_id": {
+            "S.$": "$.customer_id"
+          },
+          "status": {
+            "S": "PERSISTED"
+          },
+          "items": {
+            "S.$": "$.items_json"
+          },
+          "item_count": {
+            "N.$": "$.item_count"
+          },
+          "total_cents": {
+            "N.$": "$.total_cents"
+          },
+          "accepted_at": {
+            "S.$": "$.accepted_at"
+          },
+          "persisted_at": {
+            "S.$": "$$.State.EnteredTime"
+          },
+          "receive_count": {
+            "N.$": "$.receive_count"
+          },
+          "execution_id": {
+            "S.$": "$$.Execution.Id"
+          },
+          "expires_at": {
+            "N.$": "$.expires_at"
+          }
+        },
+        "ConditionExpression": "attribute_not_exists(pk)"
+      },
+      "ResultPath": null,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "DynamoDB.ProvisionedThroughputExceededException",
+            "DynamoDB.ThrottlingException",
+            "DynamoDB.RequestLimitExceeded",
+            "DynamoDB.InternalServerErrorException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "DynamoDB.ConditionalCheckFailedException"
+          ],
+          "ResultPath": "$.duplicate",
+          "Next": "AlreadyPersisted"
+        }
+      ],
+      "End": true
+    },
+    "AlreadyPersisted": {
+      "Type": "Succeed",
+      "Comment": "At-least-once delivery means duplicates are normal; the first write wins and later copies succeed without changing it."
+    }
+  }
+}

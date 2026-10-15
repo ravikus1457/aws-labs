@@ -1,0 +1,2 @@
+Lab 09 is deployed by GitHub Actions (OIDC deploy role, approval gate, smoke + load test jobs) — scripts/run-all.sh skips it.
+See labs/09-serverless-event-pipeline/README.md "Bootstrap order" and "Running it locally".

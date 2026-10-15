@@ -1,0 +1,128 @@
+# Lab 09 — scheduled teardown. Runs every night so nothing from the pipeline is left
+# behind, whatever happened during the day. Also runnable by hand.
+#
+#   1. terraform destroy (every resource of the app stack is in Terraform state: no
+#      out-of-band objects like lab 07's Kubernetes-made NLB)
+#   2. count survivors from the OWNING services (lambda, sqs, states, dynamodb,
+#      apigateway, logs, cloudwatch, iam) by the awslabs-lab09- name prefix. The
+#      tagging index is listed for information only (it lags deletes by 10+ min).
+#
+# A failed run shows red in Actions and GitHub emails the repo owner - that is the
+# alert path; `scripts/guardrails.sh orphans` is the manual check.
+name: lab09-destroy
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC daily (20:00 PDT / 19:00 PST the evening before)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: lab09-destroy
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/09-serverless-event-pipeline
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  PREFIX: awslabs-lab09-
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  destroy:
+    name: terraform destroy (app stack) + survivor check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab09-destroy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab09/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      # Stop the queue -> worker mapping first so no invocation is mid-flight while its
+      # role and log group are being deleted (the roles cannot recreate log groups, but a
+      # clean stop makes the destroy order irrelevant).
+      - name: Disable the SQS -> worker mapping (if it exists)
+        run: |
+          set -euo pipefail
+          for uuid in $(aws lambda list-event-source-mappings --function-name "${PREFIX}worker" --query 'EventSourceMappings[].UUID' --output text 2>/dev/null || true); do
+            echo "disabling event source mapping $uuid"
+            aws lambda update-event-source-mapping --uuid "$uuid" --no-enabled >/dev/null || true
+          done
+
+      - name: terraform destroy
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+        run: |
+          terraform init -lockfile=readonly
+          terraform destroy -auto-approve -no-color | tee destroy.txt
+          {
+            echo "### terraform destroy"
+            echo '```'
+            grep -E '^(Destroy complete|No changes)' destroy.txt || tail -n 5 destroy.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify nothing from the app stack survived (owning services, not the tagging index)
+        run: |
+          set -euo pipefail
+          q() { "$@" 2>/dev/null | tr '\t' '\n' | grep -v -e '^None$' -e '^$' || true; }
+          FUNCS=$(q aws lambda list-functions --query "Functions[?starts_with(FunctionName, '${PREFIX}')].FunctionName" --output text)
+          ESMS=$(q aws lambda list-event-source-mappings --query "EventSourceMappings[?contains(FunctionArn, ':function:${PREFIX}')].UUID" --output text)
+          QUEUES=$(q aws sqs list-queues --queue-name-prefix "$PREFIX" --query 'QueueUrls' --output text)
+          SFNS=$(q aws stepfunctions list-state-machines --query "stateMachines[?starts_with(name, '${PREFIX}')].name" --output text)
+          TABLES=$(q aws dynamodb list-tables --query "TableNames[?starts_with(@, '${PREFIX}')]" --output text)
+          APIS=$(q aws apigateway get-rest-apis --query "items[?starts_with(name, '${PREFIX}')].id" --output text)
+          KEYS=$(q aws apigateway get-api-keys --name-query "$PREFIX" --query 'items[].id' --output text)
+          PLANS=$(q aws apigateway get-usage-plans --query "items[?starts_with(name, '${PREFIX}')].id" --output text)
+          LOGS=$(q aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/${PREFIX}" --query 'logGroups[].logGroupName' --output text)
+          SFNLOGS=$(q aws logs describe-log-groups --log-group-name-prefix "/aws/vendedlogs/states/${PREFIX}" --query 'logGroups[].logGroupName' --output text)
+          ALARMS=$(q aws cloudwatch describe-alarms --alarm-name-prefix "$PREFIX" --query 'MetricAlarms[].AlarmName' --output text)
+          DASHES=$(q aws cloudwatch list-dashboards --dashboard-name-prefix "$PREFIX" --query 'DashboardEntries[].DashboardName' --output text)
+          ROLES=$(q aws iam list-roles --query "Roles[?starts_with(RoleName, '${PREFIX}')].RoleName" --output text)
+          printf 'lambda functions: %s\nevent source mappings: %s\nsqs queues: %s\nstate machines: %s\ndynamodb tables: %s\nrest apis: %s\napi keys: %s\nusage plans: %s\nlog groups (lambda): %s\nlog groups (states): %s\nalarms: %s\ndashboards: %s\niam roles: %s\n' \
+            "${FUNCS:-none}" "${ESMS:-none}" "${QUEUES:-none}" "${SFNS:-none}" "${TABLES:-none}" "${APIS:-none}" "${KEYS:-none}" \
+            "${PLANS:-none}" "${LOGS:-none}" "${SFNLOGS:-none}" "${ALARMS:-none}" "${DASHES:-none}" "${ROLES:-none}"
+          COUNT=0
+          for v in "$FUNCS" "$ESMS" "$QUEUES" "$SFNS" "$TABLES" "$APIS" "$KEYS" "$PLANS" "$LOGS" "$SFNLOGS" "$ALARMS" "$DASHES" "$ROLES"; do
+            for item in $v; do COUNT=$((COUNT + 1)); done
+          done
+          aws resourcegroupstaggingapi get-resources --region "$AWS_REGION" \
+            --tag-filters Key=project,Values=awslabs Key=lab,Values=09-serverless-event-pipeline Key=stack,Values=app \
+            --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json || echo '[]' > leftovers.json
+          echo "tagging index still lists $(jq 'length' leftovers.json) ARN(s) (informational; the index lags deletes by 10+ min)"
+          echo "lab 09 app-stack resources still alive: $COUNT"
+          if [ "$COUNT" -ne 0 ]; then
+            echo "::error::$COUNT lab 09 app-stack resources still exist after destroy (see above). Run: scripts/guardrails.sh orphans"
+            exit 1
+          fi
+          echo "- leftovers: 0" >> "$GITHUB_STEP_SUMMARY"
