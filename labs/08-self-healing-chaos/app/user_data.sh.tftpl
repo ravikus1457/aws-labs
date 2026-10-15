@@ -1,0 +1,35 @@
+#!/bin/bash
+# Lab 08 instance bootstrap (rendered by Terraform templatefile()).
+set -euxo pipefail
+
+# Fault-injection tooling the FIS SSM documents call. They can install it themselves
+# (InstallDependencies=True), but doing it at boot keeps the first experiment from
+# spending its billed minutes in dnf. exercise.sh verifies both binaries over SSM.
+dnf install -y stress-ng iproute-tc || echo "WARN: could not pre-install stress-ng/iproute-tc; FIS documents will try"
+
+install -d -m 0755 /opt/lab08
+cat > /opt/lab08/app.py <<'APP'
+${app_py}
+APP
+
+cat > /etc/systemd/system/lab08-app.service <<'UNIT'
+[Unit]
+Description=Lab 08 web app (/ and /healthz)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Environment=APP_PORT=${app_port}
+ExecStart=/usr/bin/python3 /opt/lab08/app.py
+DynamicUser=yes
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable --now lab08-app.service
+# The SSM agent ships with AL2023; make sure it is running so FIS can reach this host.
+systemctl enable --now amazon-ssm-agent || true

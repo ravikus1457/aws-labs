@@ -1,0 +1,2 @@
+Lab 08 is deployed by GitHub Actions (OIDC role from lab 06's bootstrap + lab 08's bootstrap policy) and its chaos
+experiments are billed per FIS action-minute, so scripts/run-all.sh skips it. See labs/08-self-healing-chaos/README.md.

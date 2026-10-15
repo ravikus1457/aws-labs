@@ -1,0 +1,65 @@
+schemaVersion: '0.3'
+description: |-
+  Lab 08 remediation runbook. Started by EventBridge when the cpu-high alarm changes state.
+  Direction=out : add ONE instance to the ASG, never above MaxCapacity (idempotent under repeats).
+  Direction=in  : return the ASG to BaselineCapacity (only ever lowers; never below the baseline).
+  The step output records what it saw and what it did; chaos.sh reads it as evidence.
+assumeRole: '{{ AutomationAssumeRole }}'
+parameters:
+  AutomationAssumeRole:
+    type: String
+    description: Role the runbook runs as (awslabs-lab08-remediation).
+  AutoScalingGroupName:
+    type: String
+  Direction:
+    type: String
+    allowedValues:
+      - out
+      - in
+  BaselineCapacity:
+    type: String
+    description: Steady-state desired capacity (the ASG minimum).
+  MaxCapacity:
+    type: String
+    description: Upper bound for scale-out.
+mainSteps:
+  - name: Scale
+    action: aws:executeScript
+    timeoutSeconds: 120
+    isEnd: true
+    inputs:
+      Runtime: python3.11
+      Handler: handler
+      InputPayload:
+        asg: '{{ AutoScalingGroupName }}'
+        direction: '{{ Direction }}'
+        baseline: '{{ BaselineCapacity }}'
+        max: '{{ MaxCapacity }}'
+      Script: |-
+        import boto3
+
+        def handler(events, context):
+            asg_name = events["asg"]
+            direction = events["direction"]
+            baseline = int(events["baseline"])
+            cap = int(events["max"])
+            client = boto3.client("autoscaling")
+            groups = client.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])["AutoScalingGroups"]
+            if not groups:
+                raise Exception("ASG not found: " + asg_name)
+            current = groups[0]["DesiredCapacity"]
+            cap = min(cap, groups[0]["MaxSize"])
+            if direction == "out":
+                target = max(current, min(current + 1, cap))  # "out" never lowers capacity
+            else:
+                target = max(baseline, groups[0]["MinSize"]) if current > baseline else current
+            if target == current:
+                return {"direction": direction, "previous": str(current), "desired": str(target), "action": "none"}
+            client.set_desired_capacity(AutoScalingGroupName=asg_name, DesiredCapacity=target, HonorCooldown=False)
+            return {"direction": direction, "previous": str(current), "desired": str(target), "action": "set_desired_capacity"}
+    outputs:
+      - Name: Result
+        Selector: $.Payload
+        Type: StringMap
+outputs:
+  - Scale.Result

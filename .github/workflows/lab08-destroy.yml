@@ -1,0 +1,148 @@
+# Lab 08 — teardown. Runs nightly at 03:00 UTC so nothing is left billing
+# (ALB, instances, a canary at $0.0012/run, and above all no FIS experiment left
+# running), and at the end of every lab08 pipeline run (workflow_call).
+#
+# Order:
+#   1. stop any running FIS experiment started from a lab 08 template
+#   2. terraform destroy (stops + deletes the canary and, with delete_lambda, the
+#      Lambda function and layer Synthetics created)
+#   3. delete what Terraform never owned: the canary's Lambda log group (Lambda
+#      creates /aws/lambda/cwsyn-lab08-alb-probe-<uuid> on first run)
+#   4. count survivors from the OWNING services. The tagging index is listed for
+#      information only: it lagged clean destroys by >10 min in labs 06/07.
+#
+# A failed run shows red in Actions and GitHub emails the repo owner - that is
+# the alert path; `scripts/guardrails.sh orphans` is the manual check.
+name: lab08-destroy
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC daily (20:00 PDT / 19:00 PST the evening before)
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  LAB_DIR: labs/08-self-healing-chaos
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  NAME_PREFIX: awslabs-lab08
+  CANARY_NAME: lab08-alb-probe
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  destroy:
+    name: stop experiments + terraform destroy + survivor check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Job-level (not workflow-level) concurrency: when lab08.yml calls this workflow, a
+    # workflow-level group would be evaluated against the caller's run as well.
+    concurrency:
+      group: lab08-destroy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab08-destroy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab08/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: Stop running FIS experiments from lab 08 templates
+        run: |
+          set -euo pipefail
+          TEMPLATES="$(aws fis list-experiment-templates --output json \
+            | jq -c '[.experimentTemplates[] | select(.tags.lab == "08-self-healing-chaos") | .id]')"
+          RUNNING="$(aws fis list-experiments --output json | jq -r --argjson t "$TEMPLATES" \
+            '.experiments[] | select(.state.status == "running" or .state.status == "initiating" or .state.status == "pending")
+             | select(.experimentTemplateId as $id | $t | index($id)) | .id')"
+          STOPPED=0
+          for exp in $RUNNING; do
+            echo "stopping FIS experiment $exp"; aws fis stop-experiment --id "$exp" >/dev/null; STOPPED=$((STOPPED + 1))
+          done
+          echo "stopped $STOPPED running lab 08 experiment(s)"
+          [ "$STOPPED" = "0" ] || sleep 30 # let stress-ng / tc rollbacks finish before instances go
+
+      - name: terraform destroy
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+        run: |
+          terraform init
+          terraform destroy -auto-approve -no-color | tee destroy.txt
+          {
+            echo "### terraform destroy"
+            echo '```'
+            grep -E '^(Destroy complete|No changes)' destroy.txt || tail -n 5 destroy.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete the canary's Lambda log group (created by Lambda, not Terraform)
+        run: |
+          set -euo pipefail
+          for lg in $(aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/cwsyn-${CANARY_NAME}" --query 'logGroups[].logGroupName' --output text); do
+            echo "deleting $lg"; aws logs delete-log-group --log-group-name "$lg"
+          done
+
+      - name: Verify nothing from the app stack survived (owning services, not the tagging index)
+        run: |
+          set -euo pipefail
+          F=("Name=tag:project,Values=awslabs" "Name=tag:lab,Values=08-self-healing-chaos")
+          VPCS=$(aws ec2 describe-vpcs --filters "${F[@]}" --query 'Vpcs[].VpcId' --output text)
+          INSTANCES=$(aws ec2 describe-instances --filters "${F[@]}" Name=instance-state-name,Values=pending,running,stopping,stopped --query 'Reservations[].Instances[].InstanceId' --output text)
+          ASGS=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?starts_with(AutoScalingGroupName, '${NAME_PREFIX}')].AutoScalingGroupName" --output text)
+          LTS=$(aws ec2 describe-launch-templates --query "LaunchTemplates[?starts_with(LaunchTemplateName, '${NAME_PREFIX}')].LaunchTemplateName" --output text)
+          LBS=$(aws elbv2 describe-load-balancers --query "LoadBalancers[?starts_with(LoadBalancerName, '${NAME_PREFIX}')].LoadBalancerName" --output text)
+          TGS=$(aws elbv2 describe-target-groups --query "TargetGroups[?starts_with(TargetGroupName, '${NAME_PREFIX}')].TargetGroupName" --output text)
+          CANARIES=$(aws synthetics describe-canaries --output json | jq -r --arg n "$CANARY_NAME" '.Canaries[] | select(.Name == $n) | .Name')
+          FUNCS=$(aws lambda list-functions --query "Functions[?starts_with(FunctionName, 'cwsyn-${CANARY_NAME}')].FunctionName" --output text)
+          LAYERS=$(aws lambda list-layers --query "Layers[?starts_with(LayerName, 'cwsyn-${CANARY_NAME}')].LayerName" --output text)
+          LOGS=$(aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/cwsyn-${CANARY_NAME}" --query 'logGroups[].logGroupName' --output text)
+          ALARMS=$(aws cloudwatch describe-alarms --alarm-name-prefix "${NAME_PREFIX}-" --query 'MetricAlarms[].AlarmName' --output text)
+          RULES=$(aws events list-rules --name-prefix "${NAME_PREFIX}-" --query 'Rules[].Name' --output text)
+          DOCS=$(aws ssm list-documents --filters "Key=Owner,Values=Self" --output json | jq -r --arg p "${NAME_PREFIX}-" '.DocumentIdentifiers[] | select(.Name | startswith($p)) | .Name')
+          TEMPLATES=$(aws fis list-experiment-templates --output json | jq -r '.experimentTemplates[] | select(.tags.lab == "08-self-healing-chaos") | .id')
+          BUCKETS=$(aws s3api list-buckets --query "Buckets[?starts_with(Name, '${NAME_PREFIX}-canary-')].Name" --output text)
+          ROLES=$(aws iam list-roles --query "Roles[?starts_with(RoleName, '${NAME_PREFIX}-')].RoleName" --output text)
+          PROFILES=$(aws iam list-instance-profiles --query "InstanceProfiles[?starts_with(InstanceProfileName, '${NAME_PREFIX}-')].InstanceProfileName" --output text)
+          printf 'vpcs: %s\ninstances: %s\nasgs: %s\nlaunch templates: %s\nload balancers: %s\ntarget groups: %s\ncanaries: %s\nlambda functions: %s\nlambda layers: %s\nlog groups: %s\nalarms: %s\nevent rules: %s\nssm documents: %s\nfis templates: %s\ns3 buckets: %s\niam roles: %s\ninstance profiles: %s\n' \
+            "${VPCS:-none}" "${INSTANCES:-none}" "${ASGS:-none}" "${LTS:-none}" "${LBS:-none}" "${TGS:-none}" "${CANARIES:-none}" "${FUNCS:-none}" \
+            "${LAYERS:-none}" "${LOGS:-none}" "${ALARMS:-none}" "${RULES:-none}" "${DOCS:-none}" "${TEMPLATES:-none}" "${BUCKETS:-none}" "${ROLES:-none}" "${PROFILES:-none}"
+          COUNT="$(printf '%s\n' "$VPCS" "$INSTANCES" "$ASGS" "$LTS" "$LBS" "$TGS" "$CANARIES" "$FUNCS" "$LAYERS" "$LOGS" \
+                     "$ALARMS" "$RULES" "$DOCS" "$TEMPLATES" "$BUCKETS" "$ROLES" "$PROFILES" | wc -w | tr -d ' ')"
+          aws resourcegroupstaggingapi get-resources \
+            --tag-filters Key=project,Values=awslabs Key=lab,Values=08-self-healing-chaos Key=stack,Values=app \
+            --query 'ResourceTagMappingList[].ResourceARN' --output json > leftovers.json || echo '[]' > leftovers.json
+          echo "tagging index still lists $(jq 'length' leftovers.json) ARN(s) (informational; the index lags deletes by 10+ min)"
+          echo "lab 08 app-stack resources still alive: $COUNT"
+          if [ "$COUNT" -ne 0 ]; then
+            echo "::error::$COUNT lab 08 app-stack resources still exist after destroy (see above). Run: scripts/guardrails.sh orphans"
+            exit 1
+          fi
+          echo "- leftovers: 0" >> "$GITHUB_STEP_SUMMARY"

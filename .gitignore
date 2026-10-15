@@ -37,6 +37,12 @@ labs/07-eks-observability/evidence/run-*/kubeconfig
 labs/07-eks-observability/image-tag.txt
 labs/07-eks-observability/outputs.json
 
+# Lab 08: same pattern; .build/ holds the canary zip Terraform builds at plan time
+labs/08-self-healing-chaos/backend.tf
+labs/08-self-healing-chaos/bootstrap/backend.tf
+labs/08-self-healing-chaos/outputs.json
+labs/08-self-healing-chaos/.build/
+
 # Python
 __pycache__/
 *.pyc

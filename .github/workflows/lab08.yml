@@ -1,0 +1,360 @@
+# Lab 08 — self-healing chaos: lint, plan, approve, apply, smoke-test the wiring,
+# run the FIS experiments, measure detect/recover times, then tear down.
+#
+#   push to main (lab files)  ->  lint -> validate -> plan -> [manual approval]
+#                                 -> apply -> smoke -> chaos (measured) -> teardown
+#   pull request              ->  lint -> validate only (no AWS credentials)
+#
+# No long-lived AWS keys: every AWS step assumes lab 06's deploy role through
+# GitHub's OIDC token (its trust policy must list environment lab08-production;
+# ./bootstrap adds the lab 08 permissions).
+#
+# COST: ~$0.15/h while up (ALB, 2 x t3.micro, public IPv4, canary at $0.0012/run)
+# plus FIS at $0.10 per action-minute (terminate ~1, cpu_stress ~4, latency ~3).
+# The teardown job destroys the stack at the end of the run unless keep_stack is
+# set; lab08-destroy also runs at 03:00 UTC regardless.
+name: lab08-self-healing-chaos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "labs/08-self-healing-chaos/**"
+      - ".github/workflows/lab08.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "labs/08-self-healing-chaos/**"
+      - ".github/workflows/lab08.yml"
+  workflow_dispatch:
+    inputs:
+      run_latency:
+        description: "Also run the optional network-latency experiment (+~$0.30 of FIS time)"
+        type: boolean
+        default: false
+      keep_stack:
+        description: "Leave the stack up after the chaos run (the 03:00 UTC destroy still runs)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write # required to request the OIDC token
+
+# One deploy at a time; a second push queues behind the first.
+concurrency:
+  group: lab08-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: labs/08-self-healing-chaos
+  TF_VERSION: "1.16.4"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  lint:
+    name: lint (fmt, tflint, python, bash, measure.py selftest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform fmt -check
+        working-directory: ${{ env.LAB_DIR }}
+        run: terraform fmt -check -recursive -diff
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: tflint (app + bootstrap stacks)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          tflint --init --config "$PWD/.tflint.hcl"
+          tflint --recursive --config "$PWD/.tflint.hcl" --format compact
+
+      - name: python compiles (app, canary, measure.py) + runbook script + YAML parses
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          python3 -m py_compile app/app.py canary/canary.py measure.py
+          python3 -c "import yaml" 2>/dev/null || sudo apt-get install -y -qq python3-yaml
+          python3 -c "import yaml; d = yaml.safe_load(open('runbooks/scale.yaml')); compile(d['mainSteps'][0]['inputs']['Script'], 'scale.yaml', 'exec'); print('runbook ok:', d['schemaVersion'], [s['name'] for s in d['mainSteps']])"
+
+      # The measurement must be able to say FAIL: the selftest feeds it records of a system
+      # that never recovers, a blind alarm, a pre-fault alarm, broken EventBridge wiring and
+      # a stop-condition halt, and asserts each one is reported as a failure.
+      - name: measure.py selftest (including the fixtures that must FAIL)
+        working-directory: ${{ env.LAB_DIR }}
+        run: python3 measure.py selftest
+
+      - name: bash -n + shellcheck (scripts)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          bash -n exercise.sh
+          bash -n chaos.sh
+          shellcheck -S warning exercise.sh chaos.sh
+
+  validate:
+    name: terraform validate
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+      - name: validate app stack
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -backend=false
+          terraform validate
+      - name: validate bootstrap stack
+        working-directory: ${{ env.LAB_DIR }}/bootstrap
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  plan:
+    name: terraform plan
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      canary_runtime: ${{ steps.resolve.outputs.canary_runtime }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab08-plan-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      # Synthetics runtimes are deprecated on AWS's schedule; a canary cannot be CREATED on a
+      # deprecated one. Resolve the newest non-deprecated Python runtime at plan time.
+      - name: Resolve the Synthetics runtime
+        id: resolve
+        run: |
+          set -euo pipefail
+          RT="$(aws synthetics describe-runtime-versions --output json \
+                | jq -r --arg now "$(date -u +%Y-%m-%dT%H:%M:%S)" '.RuntimeVersions[]
+                    | select(.VersionName | test("^syn-python-selenium-[0-9]+\\.[0-9]+$"))
+                    | select((.DeprecationDate // "9999") > $now) | .VersionName' \
+                | sort -V | tail -n 1 || true)"
+          if [ -z "$RT" ]; then
+            RT="$(grep -A12 'variable "canary_runtime_version"' "$LAB_DIR/variables.tf" | sed -n 's/.*default *= *"\(syn-[^"]*\)".*/\1/p')"
+            echo "::warning::could not resolve the Synthetics runtime list; using the variable default $RT"
+          fi
+          echo "canary_runtime=$RT" >> "$GITHUB_OUTPUT"
+          echo "### Resolved" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Synthetics runtime: \`$RT\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write backend.tf (lab 06's state bucket, lab08/ key)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          test -n "$TF_STATE_BUCKET" || { echo "repo variable TF_STATE_BUCKET is not set (see README: Bootstrap order)"; exit 1; }
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab08/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      - name: terraform init + plan
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+          TF_VAR_canary_runtime_version: ${{ steps.resolve.outputs.canary_runtime }}
+        run: |
+          terraform init
+          terraform plan -out=tfplan -no-color | tee plan.txt
+          {
+            echo "### terraform plan"
+            echo '```'
+            grep -E '^(Plan:|No changes)' plan.txt || tail -n 5 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The apply job re-inits in a fresh runner; the plan embeds the canary zip by PATH,
+      # so the zip travels with the plan and the lock file guarantees the same providers.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab08-plan-${{ github.run_id }}
+          path: |
+            ${{ env.LAB_DIR }}/tfplan
+            ${{ env.LAB_DIR }}/plan.txt
+            ${{ env.LAB_DIR }}/.terraform.lock.hcl
+            ${{ env.LAB_DIR }}/.build/canary.zip
+          include-hidden-files: true # the lock file and .build/ are dot-paths; v4 drops them by default
+          retention-days: 3
+          if-no-files-found: error
+
+  apply:
+    name: terraform apply (manual approval)
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # The environment carries the "required reviewers" rule: the job pauses here
+    # until a reviewer approves in the Actions UI. Its OIDC 'sub' claim becomes
+    # repo:<owner/repo>:environment:lab08-production, which the deploy role must trust.
+    environment:
+      name: lab08-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab08-apply-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab08-plan-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: Write backend.tf
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket       = "${TF_STATE_BUCKET}"
+              key          = "lab08/terraform.tfstate"
+              region       = "${AWS_REGION}"
+              encrypt      = true
+              use_lockfile = true
+            }
+          }
+          EOF
+
+      # Applies EXACTLY the reviewed plan. If the nightly destroy ran in between,
+      # Terraform refuses ("saved plan is stale") - re-run the workflow.
+      - name: terraform apply tfplan
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          terraform init -lockfile=readonly
+          terraform apply -no-color tfplan
+          terraform output -json > outputs.json
+          {
+            echo "### Stack"
+            echo "- app: $(jq -r '.alb_url.value' outputs.json)/"
+            echo "- ASG \`$(jq -r '.asg_name.value' outputs.json)\`: $(jq -r '.baseline_capacity.value' outputs.json) instances (max $(jq -r '.max_capacity.value' outputs.json))"
+            echo "- canary \`$(jq -r '.canary_name.value' outputs.json)\` on \`$(jq -r '.canary_runtime_version.value' outputs.json)\`"
+            echo "- billing started: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab08-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/outputs.json
+          retention-days: 3
+
+  smoke:
+    name: smoke test (ALB, ASG, SSM preflight, FIS templates, canary, alarm -> runbook wiring)
+    needs: apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab08-smoke-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab08-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: exercise.sh (same assertions the local runner uses)
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          OUTPUTS_JSON: outputs.json
+          EXERCISE_WIRING: "1"
+        run: |
+          mkdir -p evidence/smoke
+          bash ./exercise.sh evidence/smoke 2>&1 | tee evidence/smoke/exercise.log
+          {
+            echo "### Smoke test"
+            echo '```'
+            grep -E '^(PASS|FAIL|WARN)' evidence/smoke/exercise.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          ! grep -q '^FAIL' evidence/smoke/exercise.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab08-smoke-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence/smoke
+          retention-days: 14
+
+  chaos:
+    name: chaos (FIS experiments, measured time-to-detect / time-to-recover)
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: gha-lab08-chaos-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 3600 # the role's max_session_duration; three experiments fit well inside it
+      - uses: actions/download-artifact@v4
+        with:
+          name: lab08-outputs-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}
+
+      - name: chaos.sh -> evidence/lab08/*.json + chaos-report.md
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          OUTPUTS_JSON: outputs.json
+          CHAOS_LATENCY: ${{ github.event.inputs.run_latency == 'true' && '1' || '0' }}
+          RUN_LABEL: gha-${{ github.run_id }}
+        run: |
+          set -o pipefail
+          mkdir -p evidence/lab08
+          rc=0
+          bash ./chaos.sh evidence/lab08 2>&1 | tee evidence/lab08/chaos.log || rc=$?
+          cat evidence/lab08/chaos-report.md >> "$GITHUB_STEP_SUMMARY" || echo "no report produced" >> "$GITHUB_STEP_SUMMARY"
+          exit "$rc"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab08-evidence-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence/lab08
+          retention-days: 14
+
+  # Destroy at the end of every run that applied anything, pass or fail, unless the
+  # dispatcher asked to keep it. Same workflow the 03:00 UTC cron runs.
+  teardown:
+    name: teardown
+    needs: [apply, smoke, chaos]
+    if: always() && needs.apply.result != 'skipped' && github.event.inputs.keep_stack != 'true'
+    uses: ./.github/workflows/lab08-destroy.yml
