@@ -236,6 +236,9 @@ data "aws_iam_policy_document" "events" {
       # 10-15 runs 3+4 (from the DLQ): SSM authorizes StartAutomationExecution against the DOCUMENT arn.
       # Built from the name, not the provider's arn attribute (run 4 still denied with that).
       "arn:${local.partition}:ssm:${var.aws_region}:${local.account_id}:document/${aws_ssm_document.scale.name}",
+      # run 5 (DLQ again, with the deployed policy dumped): the third resource SSM checks is the
+      # execution being created. Its id does not exist yet, so it can only be a wildcard.
+      "arn:${local.partition}:ssm:${var.aws_region}:${local.account_id}:automation-execution/*",
     ]
   }
   statement {
