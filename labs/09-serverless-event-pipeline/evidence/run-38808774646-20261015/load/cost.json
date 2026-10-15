@@ -1,0 +1,144 @@
+{
+  "lines": [
+    {
+      "arithmetic": "2000 x $3.5/1M",
+      "cost_usd": 0.007,
+      "item": "API Gateway REST requests",
+      "price_source": "https://aws.amazon.com/api-gateway/pricing/ (REST API, first 333M/month)",
+      "quantity": 2000,
+      "unit": "requests",
+      "unit_price_usd": 3.5
+    },
+    {
+      "arithmetic": "6205 x $0.2/1M",
+      "cost_usd": 0.001241,
+      "item": "Lambda requests (all 4 functions)",
+      "price_source": "https://aws.amazon.com/lambda/pricing/",
+      "quantity": 6205,
+      "unit": "invocations",
+      "unit_price_usd": 0.2
+    },
+    {
+      "arithmetic": "(enrich 62786 ms (billed) x 128 MB; ingest 87501 ms (billed) x 128 MB; validate 5447 ms (billed) x 128 MB; worker 178542 ms (billed) x 128 MB) = 41.7845 GB-s x $1.33334e-05",
+      "cost_usd": 0.0005571294523,
+      "item": "Lambda duration (arm64)",
+      "price_source": "https://aws.amazon.com/lambda/pricing/ (Arm, first 7.5B GB-s/month)",
+      "quantity": 41.7845,
+      "unit": "GB-seconds",
+      "unit_price_usd": 1.33334e-05
+    },
+    {
+      "arithmetic": "2001 x $1.0/1M",
+      "cost_usd": 0.002001,
+      "item": "Step Functions Express requests",
+      "price_source": "https://aws.amazon.com/step-functions/pricing/ (Express)",
+      "quantity": 2001,
+      "unit": "executions",
+      "unit_price_usd": 1.0
+    },
+    {
+      "arithmetic": "2001 x ceil(146.1 ms -> 100 ms) x 64 MB = 25.0125 GB-s x $1.667e-05",
+      "cost_usd": 0.00041695837500000006,
+      "item": "Step Functions Express duration (estimate)",
+      "price_source": "https://aws.amazon.com/step-functions/pricing/ (Express, first 1,000 GB-hours)",
+      "quantity": 25.0125,
+      "unit": "GB-seconds",
+      "unit_price_usd": 1.667e-05
+    },
+    {
+      "arithmetic": "2003 x $0.625/1M",
+      "cost_usd": 0.001251875,
+      "item": "DynamoDB write request units",
+      "price_source": "https://aws.amazon.com/dynamodb/pricing/on-demand/",
+      "quantity": 2003.0,
+      "unit": "WRU",
+      "unit_price_usd": 0.625
+    },
+    {
+      "arithmetic": "5744.5 x $0.125/1M",
+      "cost_usd": 0.0007180625,
+      "item": "DynamoDB read request units",
+      "price_source": "https://aws.amazon.com/dynamodb/pricing/on-demand/",
+      "quantity": 5744.5,
+      "unit": "RRU",
+      "unit_price_usd": 0.125
+    },
+    {
+      "arithmetic": "6066 x $0.4/1M",
+      "cost_usd": 0.0024264,
+      "item": "SQS requests (upper bound)",
+      "price_source": "https://aws.amazon.com/sqs/pricing/ (standard queue, after free 1M)",
+      "quantity": 6066,
+      "unit": "requests",
+      "unit_price_usd": 0.4
+    },
+    {
+      "arithmetic": "949 x $5.0/1M",
+      "cost_usd": 0.004745,
+      "item": "X-Ray traces recorded",
+      "price_source": "https://aws.amazon.com/xray/pricing/",
+      "quantity": 949,
+      "unit": "traces",
+      "unit_price_usd": 5.0
+    },
+    {
+      "arithmetic": "949 x $0.5/1M",
+      "cost_usd": 0.0004745,
+      "item": "X-Ray traces retrieved/scanned",
+      "price_source": "https://aws.amazon.com/xray/pricing/",
+      "quantity": 949,
+      "unit": "traces",
+      "unit_price_usd": 0.5
+    },
+    {
+      "arithmetic": "6301290 B = 0.005869 GB x $0.5",
+      "cost_usd": 0.0029342668130993843,
+      "item": "CloudWatch Logs ingestion",
+      "price_source": "https://aws.amazon.com/cloudwatch/pricing/ (Logs, standard ingestion)",
+      "quantity": 6301290,
+      "unit": "bytes",
+      "unit_price_usd": 0.5
+    },
+    {
+      "arithmetic": "5 x $0.1/month x 1 h / 730 h",
+      "cost_usd": 0.0006849315068493151,
+      "item": "CloudWatch alarms (prorated)",
+      "price_source": "https://aws.amazon.com/cloudwatch/pricing/ (standard-resolution alarm metric)",
+      "quantity": 5,
+      "unit": "alarms",
+      "unit_price_usd": 0.1
+    },
+    {
+      "arithmetic": "1 x $3.0/month x 1 h / 730 h",
+      "cost_usd": 0.00410958904109589,
+      "item": "CloudWatch dashboard (prorated)",
+      "price_source": "https://aws.amazon.com/cloudwatch/pricing/ (per dashboard)",
+      "quantity": 1,
+      "unit": "dashboards",
+      "unit_price_usd": 3.0
+    },
+    {
+      "arithmetic": "39 x $0.01/1000",
+      "cost_usd": 0.00039,
+      "item": "CloudWatch GetMetricData (this report)",
+      "price_source": "https://aws.amazon.com/cloudwatch/pricing/",
+      "quantity": 39,
+      "unit": "metrics",
+      "unit_price_usd": 0.01
+    },
+    {
+      "arithmetic": "6.32201e+06 B / 1024^3 x $0.005",
+      "cost_usd": 2.9439162462949754e-05,
+      "item": "CloudWatch Logs Insights (this report)",
+      "price_source": "https://aws.amazon.com/cloudwatch/pricing/ (Logs Insights)",
+      "quantity": 6322012.0,
+      "unit": "bytes scanned",
+      "unit_price_usd": 0.005
+    }
+  ],
+  "note": "List price before the AWS free tier. Linear extrapolation per 1,000 orders includes the fixed (prorated alarm/dashboard) lines, so it overstates the marginal cost at scale.",
+  "orders_persisted": 2000,
+  "prices_as_of": "2026-10-15 (us-east-1 list prices as recorded here; verify on the linked pages)",
+  "total_usd": 0.028980151850807538,
+  "usd_per_1000_orders": 0.014490075925403769
+}

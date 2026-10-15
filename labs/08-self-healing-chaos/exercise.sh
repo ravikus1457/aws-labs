@@ -175,6 +175,11 @@ if [ "$EXERCISE_WIRING" = "1" ]; then
       jq -r '.Messages[]?.MessageAttributes | "EventBridge target error: \(.ERROR_CODE.StringValue // "?"): \(.ERROR_MESSAGE.StringValue // "?")"' \
         "$EVID/remediation-dlq.json" 2>/dev/null || echo "remediation DLQ unreadable"
     fi
+    # What IAM actually evaluated: the events role's DEPLOYED policy (not the source).
+    aws iam get-role-policy --role-name "$(o '.name_prefix.value // "awslabs-lab08"')-events" \
+      --policy-name "$(o '.name_prefix.value // "awslabs-lab08"')-events" --query PolicyDocument --output json \
+      > "$EVID/events-role-policy.json" 2>&1 || true
+    echo "deployed events role policy:"; jq -c '.Statement[]? | {Sid, Resource}' "$EVID/events-role-policy.json" 2>/dev/null || cat "$EVID/events-role-policy.json"
   fi
   if [ "$IN_OK" = "1" ]; then pass "alarm back to OK -> runbook scaled in to $BASELINE"; else warn "scale-in back to $BASELINE not observed within 6 min (desired=$(asg_desired)); chaos.sh waits for steady state anyway"; fi
 else

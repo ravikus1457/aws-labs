@@ -233,8 +233,9 @@ data "aws_iam_policy_document" "events" {
     actions = ["ssm:StartAutomationExecution"]
     resources = [
       "arn:${local.partition}:ssm:${var.aws_region}:${local.account_id}:automation-definition/${aws_ssm_document.scale.name}:*",
-      # 10-15 run 3 (from the DLQ): SSM authorizes StartAutomationExecution against the DOCUMENT arn.
-      aws_ssm_document.scale.arn,
+      # 10-15 runs 3+4 (from the DLQ): SSM authorizes StartAutomationExecution against the DOCUMENT arn.
+      # Built from the name, not the provider's arn attribute (run 4 still denied with that).
+      "arn:${local.partition}:ssm:${var.aws_region}:${local.account_id}:document/${aws_ssm_document.scale.name}",
     ]
   }
   statement {

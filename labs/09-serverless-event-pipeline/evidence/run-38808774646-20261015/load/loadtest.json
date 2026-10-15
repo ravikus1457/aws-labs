@@ -1,0 +1,133 @@
+{
+  "accepted": 2000,
+  "api_gateway": {
+    "count": 2000,
+    "latency_ms_p50_per_minute": [
+      34.08308742423268,
+      34.70054574742092
+    ],
+    "latency_ms_p99_per_minute": [
+      210.15685675356826,
+      223.44614085414534
+    ]
+  },
+  "client_latency_ms_202": {
+    "count": 2000,
+    "max": 2972.488156000054,
+    "mean": 216.8347406359998,
+    "min": 172.7188649999789,
+    "p50": 201.23223299998472,
+    "p90": 221.29365199998574,
+    "p99": 385.67965699996876
+  },
+  "client_latency_ms_all": {
+    "count": 2000,
+    "max": 2972.488156000054,
+    "mean": 216.8347406359998,
+    "min": 172.7188649999789,
+    "p50": 201.23223299998472,
+    "p90": 221.29365199998574,
+    "p99": 385.67965699996876
+  },
+  "cloudwatch_usage_complete": true,
+  "cold_starts_seen": 8,
+  "concurrency_setting": 8,
+  "drain_seconds_after_send": 110.73058986663818,
+  "dynamodb": {
+    "rcu": 5744.5,
+    "wcu": 2003.0
+  },
+  "end_to_end_ms": {
+    "count": 2000,
+    "max": 110070.0,
+    "mean": 57234.309,
+    "min": 998.0,
+    "p50": 57120.0,
+    "p90": 98913.0,
+    "p99": 108269.0
+  },
+  "first_accepted_at": "2026-10-15T21:28:16.520Z",
+  "lambda": {
+    "enrich": {
+      "billed_ms_sum": 62786.0,
+      "duration_ms_sum": 61403.44999950002,
+      "errors": 0,
+      "init_ms_sum": 361.407,
+      "invocations": 2001,
+      "memory_mb": 128,
+      "reports": 2001,
+      "throttles": 0
+    },
+    "ingest": {
+      "billed_ms_sum": 87501.0,
+      "duration_ms_sum": 84300.6599761,
+      "errors": 0,
+      "init_ms_sum": 2180.063,
+      "invocations": 2000,
+      "memory_mb": 128,
+      "reports": 2000,
+      "throttles": 0
+    },
+    "validate": {
+      "billed_ms_sum": 5447.0,
+      "duration_ms_sum": 4491.099999839998,
+      "errors": 0,
+      "init_ms_sum": 256.84,
+      "invocations": 2001,
+      "memory_mb": 128,
+      "reports": 1895,
+      "throttles": 0
+    },
+    "worker": {
+      "billed_ms_sum": 178542.0,
+      "duration_ms_sum": 172485.03948,
+      "errors": 0,
+      "init_ms_sum": 262.084,
+      "invocations": 203,
+      "memory_mb": 128,
+      "reports": 211,
+      "throttles": 0
+    }
+  },
+  "last_persisted_at": "2026-10-15T21:30:59.732Z",
+  "log_bytes": 6301290,
+  "max_concurrency": {
+    "account_concurrency_limit": 10,
+    "client_peak_in_flight": 9,
+    "cloudwatch_concurrent_executions_max": {
+      "account_wide": 9.0,
+      "enrich": 3.0,
+      "ingest": 8.0,
+      "validate": 2.0,
+      "worker": 2.0
+    },
+    "distinct_ingest_environments": 8
+  },
+  "missing": 0,
+  "persisted": 2000,
+  "persisted_after_retry": 0,
+  "requests": 2000,
+  "send_seconds": 54.47914791107178,
+  "sqs": {
+    "NumberOfEmptyReceives": 63,
+    "NumberOfMessagesDeleted": 2001,
+    "NumberOfMessagesReceived": 2001,
+    "NumberOfMessagesSent": 2001
+  },
+  "status_codes": {
+    "202": 2000
+  },
+  "step_functions": {
+    "avg_execution_ms": 146.0619916586271,
+    "failed": 0,
+    "started": 2001
+  },
+  "success_rate": 1.0,
+  "throughput_rps": 36.71129370937795,
+  "window": {
+    "end": "2026-10-15T21:34:01.451698+00:00",
+    "start": "2026-10-15T21:27:15.975798+00:00"
+  },
+  "xray_error": null,
+  "xray_traces": 949
+}

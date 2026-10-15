@@ -1,0 +1,1524 @@
+{
+  "service_types_seen": [
+    "AWS::ApiGateway::Stage",
+    "AWS::Lambda",
+    "AWS::Lambda::Function",
+    "client"
+  ],
+  "trace_id_sent": "1-6ad143b7-3b7e2aa77edd22cecaf1168c",
+  "traces": [
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.052
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.994
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 14.87
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.368,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": true,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 400,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143ac-1000021e796e2c5766b0d306",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 0.354,
+      "ResponseTimeRootCauses": [],
+      "Revision": 1,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:20:44+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.062
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 52.05
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.492
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.077,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 202,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143e9-6939f920323305b9547e46b8",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 0.077,
+      "ResponseTimeRootCauses": [],
+      "Revision": 4,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:21:45+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.051
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.924
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.351
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.041,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": true,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 400,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143b7-7f91909a136186a16b583403",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 0.041,
+      "ResponseTimeRootCauses": [],
+      "Revision": 2,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:20:55+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.057
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.054
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.056
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 115.329
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.77
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 8.249
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.374
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 19.233
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 5.882
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.13,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-worker",
+        "Names": [
+          "awslabs-lab09-worker"
+        ],
+        "Type": "AWS::Lambda"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "HttpStatus": 200
+      },
+      "Id": "1-6ad143e8-76df6da7891595e695bb8eb8",
+      "InstanceIds": [],
+      "IsPartial": true,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-enrich"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-worker"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-validate"
+        }
+      ],
+      "ResponseTime": 0.124,
+      "ResponseTimeRootCauses": [
+        {
+          "ClientImpacting": true,
+          "Services": [
+            {
+              "EntityPath": [
+                {
+                  "Coverage": 1.0,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda"
+            },
+            {
+              "AccountId": "<ACCOUNT_ID>",
+              "EntityPath": [
+                {
+                  "Coverage": 0.981,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda::Function"
+            }
+          ]
+        }
+      ],
+      "Revision": 2,
+      "ServiceIds": [
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:21:44+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.042
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.807
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.31
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.02,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": true,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 400,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143b7-052e1ac875917929555ebcb7",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 0.02,
+      "ResponseTimeRootCauses": [],
+      "Revision": 2,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:20:55+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.08
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.063
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.071
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 1992.587
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.939
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 4875.043
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 4.095
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 18.53
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.383
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 5.303,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-worker",
+        "Names": [
+          "awslabs-lab09-worker"
+        ],
+        "Type": "AWS::Lambda"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "HttpStatus": 200
+      },
+      "Id": "1-6ad143cd-689b5737dd4f615227bc256a",
+      "InstanceIds": [],
+      "IsPartial": true,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-enrich"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-worker"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-validate"
+        }
+      ],
+      "ResponseTime": 5.299,
+      "ResponseTimeRootCauses": [
+        {
+          "ClientImpacting": true,
+          "Services": [
+            {
+              "EntityPath": [
+                {
+                  "Coverage": 1.0,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda"
+            },
+            {
+              "AccountId": "<ACCOUNT_ID>",
+              "EntityPath": [
+                {
+                  "Coverage": 0.921,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda::Function"
+            }
+          ]
+        }
+      ],
+      "Revision": 4,
+      "ServiceIds": [
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:21:17+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.06
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.049
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 104.839
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.734
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.952
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.417
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.128,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-worker",
+        "Names": [
+          "awslabs-lab09-worker"
+        ],
+        "Type": "AWS::Lambda"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "HttpStatus": 200
+      },
+      "Id": "1-6ad143fe-6b2a5c5b2ed61fa78b7fd97b",
+      "InstanceIds": [],
+      "IsPartial": true,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-enrich"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-worker"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-validate"
+        }
+      ],
+      "ResponseTime": 0.116,
+      "ResponseTimeRootCauses": [
+        {
+          "ClientImpacting": true,
+          "Services": [
+            {
+              "EntityPath": [
+                {
+                  "Coverage": 1.0,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda"
+            },
+            {
+              "AccountId": "<ACCOUNT_ID>",
+              "EntityPath": [
+                {
+                  "Coverage": 0.916,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda::Function"
+            }
+          ]
+        }
+      ],
+      "Revision": 2,
+      "ServiceIds": [
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:22:06+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.048
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 1481.19
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 18.895
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 1.515,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 202,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143b7-3b7e2aa77edd22cecaf1168c",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 1.497,
+      "ResponseTimeRootCauses": [
+        {
+          "ClientImpacting": true,
+          "Services": [
+            {
+              "EntityPath": [
+                {
+                  "Coverage": 1.0,
+                  "Name": "awslabs-lab09-orders-api/v1",
+                  "Remote": false
+                },
+                {
+                  "Coverage": 0.668,
+                  "Name": "Lambda",
+                  "Remote": true
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-orders-api/v1",
+              "Names": [
+                "awslabs-lab09-orders-api/v1"
+              ],
+              "Type": "AWS::ApiGateway::Stage"
+            }
+          ]
+        }
+      ],
+      "Revision": 3,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:20:55+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.004,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": true,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 403,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143b7-4c9fb89b5fa321730d83951e",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        }
+      ],
+      "ResponseTime": 0.004,
+      "ResponseTimeRootCauses": [],
+      "Revision": 1,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        }
+      ],
+      "StartTime": "2026-10-15 21:20:55+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.04
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.907
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.387
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.039,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": true,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 400,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143b2-1bdc92617fed95ac5377debb",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 0.039,
+      "ResponseTimeRootCauses": [],
+      "Revision": 2,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:20:50+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.057
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.061
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 1.295
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 221.637
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 39.432
+            }
+          },
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.49
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.229,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-worker",
+        "Names": [
+          "awslabs-lab09-worker"
+        ],
+        "Type": "AWS::Lambda"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "HttpStatus": 200
+      },
+      "Id": "1-6ad14457-de7707850918b84b655f9f52",
+      "InstanceIds": [],
+      "IsPartial": true,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-enrich"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-worker"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-validate"
+        }
+      ],
+      "ResponseTime": 0.229,
+      "ResponseTimeRootCauses": [
+        {
+          "ClientImpacting": true,
+          "Services": [
+            {
+              "EntityPath": [
+                {
+                  "Coverage": 1.0,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda"
+            },
+            {
+              "AccountId": "<ACCOUNT_ID>",
+              "EntityPath": [
+                {
+                  "Coverage": 0.972,
+                  "Name": "awslabs-lab09-worker",
+                  "Remote": false
+                }
+              ],
+              "Inferred": false,
+              "Name": "awslabs-lab09-worker",
+              "Names": [
+                "awslabs-lab09-worker"
+              ],
+              "Type": "AWS::Lambda::Function"
+            }
+          ]
+        }
+      ],
+      "Revision": 2,
+      "ServiceIds": [
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-enrich",
+          "Names": [
+            "awslabs-lab09-enrich"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-validate",
+          "Names": [
+            "awslabs-lab09-validate"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-worker",
+          "Names": [
+            "awslabs-lab09-worker"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:23:35+00:00",
+      "Users": []
+    },
+    {
+      "Annotations": {
+        "aws:api_id": [
+          {
+            "AnnotationValue": {
+              "StringValue": "78b818brf2"
+            }
+          }
+        ],
+        "aws:api_stage": [
+          {
+            "AnnotationValue": {
+              "StringValue": "v1"
+            }
+          }
+        ],
+        "aws:responseDuration": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.083
+            }
+          }
+        ],
+        "aws:responseLatency": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 38.225
+            }
+          }
+        ],
+        "aws:runtimeOverhead": [
+          {
+            "AnnotationValue": {
+              "NumberValue": 0.5
+            }
+          }
+        ]
+      },
+      "AvailabilityZones": [],
+      "Duration": 0.061,
+      "EntryPoint": {
+        "Name": "awslabs-lab09-orders-api/v1",
+        "Names": [
+          "awslabs-lab09-orders-api/v1"
+        ],
+        "Type": "AWS::ApiGateway::Stage"
+      },
+      "ErrorRootCauses": [],
+      "FaultRootCauses": [],
+      "HasError": false,
+      "HasFault": false,
+      "HasThrottle": false,
+      "Http": {
+        "ClientIp": "132.196.19.234",
+        "HttpMethod": "POST",
+        "HttpStatus": 202,
+        "HttpURL": "https://78b818brf2.execute-api.us-east-1.amazonaws.com/v1/orders",
+        "UserAgent": "Python-urllib/3.12"
+      },
+      "Id": "1-6ad143d4-20bb7d527ee4fe995318aa66",
+      "InstanceIds": [],
+      "IsPartial": false,
+      "ResourceARNs": [
+        {
+          "ARN": "arn:aws:apigateway:us-east-1::/restapis/78b818brf2/stages/v1"
+        },
+        {
+          "ARN": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-ingest"
+        }
+      ],
+      "ResponseTime": 0.061,
+      "ResponseTimeRootCauses": [],
+      "Revision": 3,
+      "ServiceIds": [
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "client"
+        },
+        {
+          "Name": "awslabs-lab09-orders-api/v1",
+          "Names": [
+            "awslabs-lab09-orders-api/v1"
+          ],
+          "Type": "AWS::ApiGateway::Stage"
+        },
+        {
+          "AccountId": "<ACCOUNT_ID>",
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda::Function"
+        },
+        {
+          "Name": "awslabs-lab09-ingest",
+          "Names": [
+            "awslabs-lab09-ingest"
+          ],
+          "Type": "AWS::Lambda"
+        }
+      ],
+      "StartTime": "2026-10-15 21:21:24+00:00",
+      "Users": []
+    }
+  ]
+}

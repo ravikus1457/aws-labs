@@ -1,0 +1,30 @@
+{
+  "fail": 0,
+  "pass": 21,
+  "results": [
+    "PASS lambda enrich: X-Ray tracing Active - python3.12 ['arm64'] 128 MB",
+    "PASS lambda ingest: X-Ray tracing Active - python3.12 ['arm64'] 128 MB",
+    "PASS lambda validate: X-Ray tracing Active - python3.12 ['arm64'] 128 MB",
+    "PASS lambda worker: X-Ray tracing Active - python3.12 ['arm64'] 128 MB",
+    "PASS API Gateway stage: X-Ray tracing enabled",
+    "PASS state machine: EXPRESS with X-Ray tracing",
+    "PASS SQS -> worker mapping: enabled with ReportBatchItemFailures - batch 10, max concurrency 2",
+    "PASS orders queue: DLQ wired - maxReceiveCount 2, visibility 90 s",
+    "PASS POST without x-api-key -> 403 (usage plan enforced) - got 403",
+    "PASS malformed order -> 400 with details - got 400: {\"error\": \"invalid order\", \"details\": [\"items[0].sku must match ^SKU-[A-Z0-9][A-Z0-9-]{0,31}$\", \"items[0].quantity must be an integer 1-100\"]}",
+    "PASS valid order -> 202 ACCEPTED - got 202: {'order_id': 'smoke-38808774646-1-ok', 'status': 'ACCEPTED', 'env': '51704f36571f', 'cold': False}",
+    "PASS order persisted by the workflow with the catalog total - 29.1 s, total_cents 10497 (expected 10497)",
+    "PASS same Idempotency-Key again -> queue drains, stored order unchanged (conditional write) - status 202, drained True",
+    "PASS poison order (unknown SKU-LAUNCH-47038A) accepted at the edge -> 202 - got 202",
+    "PASS poison message failed every attempt and landed in the DLQ (not persisted) - 181 s, maxReceiveCount 2",
+    "PASS CloudWatch alarm awslabs-lab09-dlq-not-empty -> ALARM after the fault - 183 s after the message reached the DLQ",
+    "PASS DLQ redrive (StartMessageMoveTask) completed - moved 1",
+    "PASS redriven order persisted after the fix - 5 s, receive_count 1",
+    "PASS DLQ empty after redrive",
+    "PASS X-Ray: traces from API Gateway -> ingest Lambda - 12 traces, types ['AWS::ApiGateway::Stage', 'AWS::Lambda', 'AWS::Lambda::Function', 'client']",
+    "PASS X-Ray: one trace runs worker -> Step Functions -> validate + enrich - trace 1-6ad143e8-76df6da7891595e695bb8eb8",
+    "WARN X-Ray: the client's trace id continued through SQS into Step Functions - not observed in this trace (recorded, not asserted)"
+  ],
+  "run": "38808774646-1",
+  "warn": 1
+}

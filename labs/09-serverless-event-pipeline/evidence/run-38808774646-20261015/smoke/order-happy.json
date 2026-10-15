@@ -1,0 +1,14 @@
+{
+  "accepted_at": "2026-10-15T21:20:55.789Z",
+  "customer_id": "smoke-customer",
+  "execution_id": "arn:aws:states:us-east-1:<ACCOUNT_ID>:express:awslabs-lab09-order-workflow:d730858b-118d-4310-b622-cad121536362:39deb953-c67d-464d-ade4-c51683926c7d",
+  "expires_at": "1792704055",
+  "item_count": "3",
+  "items": "[{\"sku\":\"SKU-HOODIE\",\"quantity\":2,\"unit_price_cents\":4599,\"line_total_cents\":9198},{\"sku\":\"SKU-MUG\",\"quantity\":1,\"unit_price_cents\":1299,\"line_total_cents\":1299}]",
+  "order_id": "smoke-38808774646-1-ok",
+  "persisted_at": "2026-10-15T21:21:22.599Z",
+  "pk": "ORDER#smoke-38808774646-1-ok",
+  "receive_count": "1",
+  "status": "PERSISTED",
+  "total_cents": "10497"
+}

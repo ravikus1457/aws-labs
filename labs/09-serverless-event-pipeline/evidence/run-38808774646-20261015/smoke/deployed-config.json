@@ -1,0 +1,89 @@
+{
+  "event_source_mapping": {
+    "BatchSize": 10,
+    "EventSourceArn": "arn:aws:sqs:us-east-1:<ACCOUNT_ID>:awslabs-lab09-orders",
+    "EventSourceMappingArn": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:event-source-mapping:903e0d90-5662-4cf6-bdcb-6809dfa0821e",
+    "FunctionArn": "arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:awslabs-lab09-worker",
+    "FunctionResponseTypes": [
+      "ReportBatchItemFailures"
+    ],
+    "LastModified": "2026-10-15 21:00:10.344000+00:00",
+    "MaximumBatchingWindowInSeconds": 1,
+    "ScalingConfig": {
+      "MaximumConcurrency": 2
+    },
+    "State": "Enabled",
+    "StateTransitionReason": "USER_INITIATED",
+    "UUID": "903e0d90-5662-4cf6-bdcb-6809dfa0821e"
+  },
+  "lambda": {
+    "enrich": {
+      "Architectures": [
+        "arm64"
+      ],
+      "MemorySize": 128,
+      "Runtime": "python3.12",
+      "Timeout": 5,
+      "TracingConfig": {
+        "Mode": "Active"
+      }
+    },
+    "ingest": {
+      "Architectures": [
+        "arm64"
+      ],
+      "MemorySize": 128,
+      "Runtime": "python3.12",
+      "Timeout": 5,
+      "TracingConfig": {
+        "Mode": "Active"
+      }
+    },
+    "validate": {
+      "Architectures": [
+        "arm64"
+      ],
+      "MemorySize": 128,
+      "Runtime": "python3.12",
+      "Timeout": 5,
+      "TracingConfig": {
+        "Mode": "Active"
+      }
+    },
+    "worker": {
+      "Architectures": [
+        "arm64"
+      ],
+      "MemorySize": 128,
+      "Runtime": "python3.12",
+      "Timeout": 15,
+      "TracingConfig": {
+        "Mode": "Active"
+      }
+    }
+  },
+  "queue_attributes": {
+    "ApproximateNumberOfMessages": "0",
+    "ApproximateNumberOfMessagesDelayed": "0",
+    "ApproximateNumberOfMessagesNotVisible": "0",
+    "CreatedTimestamp": "1792095897",
+    "DelaySeconds": "0",
+    "LastModifiedTimestamp": "1792095897",
+    "MaximumMessageSize": "262144",
+    "MessageRetentionPeriod": "345600",
+    "QueueArn": "arn:aws:sqs:us-east-1:<ACCOUNT_ID>:awslabs-lab09-orders",
+    "ReceiveMessageWaitTimeSeconds": "20",
+    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:<ACCOUNT_ID>:awslabs-lab09-orders-dlq\",\"maxReceiveCount\":2}",
+    "SqsManagedSseEnabled": "true",
+    "VisibilityTimeout": "90"
+  },
+  "stage": {
+    "tracingEnabled": true
+  },
+  "state_machine": {
+    "tracing": {
+      "enabled": true
+    },
+    "type": "EXPRESS"
+  }
+}

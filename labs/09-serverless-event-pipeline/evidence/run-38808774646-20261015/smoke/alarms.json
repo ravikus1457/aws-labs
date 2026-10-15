@@ -1,0 +1,32 @@
+[
+  {
+    "AlarmName": "awslabs-lab09-api-5xx-rate",
+    "StateReason": "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",
+    "StateUpdatedTimestamp": "2026-10-15 21:01:19.417000+00:00",
+    "StateValue": "OK"
+  },
+  {
+    "AlarmName": "awslabs-lab09-dlq-not-empty",
+    "StateReason": "Threshold Crossed: 1 datapoint [1.0 (15/10/26 21:25:00)] was greater than the threshold (0.0).",
+    "StateUpdatedTimestamp": "2026-10-15 21:27:46.421000+00:00",
+    "StateValue": "ALARM"
+  },
+  {
+    "AlarmName": "awslabs-lab09-lambda-errors",
+    "StateReason": "Threshold Crossed: 1 datapoint [1.0 (15/10/26 21:22:00)] was greater than the threshold (0.0).",
+    "StateUpdatedTimestamp": "2026-10-15 21:23:09.797000+00:00",
+    "StateValue": "ALARM"
+  },
+  {
+    "AlarmName": "awslabs-lab09-queue-backlog-age",
+    "StateReason": "Threshold Crossed: no datapoints were received for 3 periods and 3 missing datapoints were treated as [NonBreaching].",
+    "StateUpdatedTimestamp": "2026-10-15 20:26:15.161000+00:00",
+    "StateValue": "OK"
+  },
+  {
+    "AlarmName": "awslabs-lab09-workflow-failed",
+    "StateReason": "Threshold Crossed: 1 datapoint [1.0 (15/10/26 21:22:00)] was greater than the threshold (0.0).",
+    "StateUpdatedTimestamp": "2026-10-15 21:23:57.556000+00:00",
+    "StateValue": "ALARM"
+  }
+]

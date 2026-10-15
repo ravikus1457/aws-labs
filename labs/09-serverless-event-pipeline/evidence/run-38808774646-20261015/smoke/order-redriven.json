@@ -1,0 +1,14 @@
+{
+  "accepted_at": "2026-10-15T21:21:45.337Z",
+  "customer_id": "smoke-customer",
+  "execution_id": "arn:aws:states:us-east-1:<ACCOUNT_ID>:express:awslabs-lab09-order-workflow:e5525078-5779-42f4-b5bd-d8ecf5abc8db:054ef5ec-c97c-41d4-ac42-7639b9b47757",
+  "expires_at": "1792704105",
+  "item_count": "1",
+  "items": "[{\"sku\":\"SKU-LAUNCH-47038A\",\"quantity\":1,\"unit_price_cents\":4999,\"line_total_cents\":4999}]",
+  "order_id": "smoke-38808774646-1-poison",
+  "persisted_at": "2026-10-15T21:27:58.014Z",
+  "pk": "ORDER#smoke-38808774646-1-poison",
+  "receive_count": "1",
+  "status": "PERSISTED",
+  "total_cents": "4999"
+}
