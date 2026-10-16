@@ -1,0 +1,4 @@
+# rendered for a deploy (the reviewed copy lives in rendered/), containerlab state, local runs
+build/
+evidence/
+__pycache__/

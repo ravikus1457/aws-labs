@@ -1,0 +1,29 @@
+# Simulated pull request #42: the same branch, but the author copied branch 1's block and
+# typed 10.20.10.0/25 for the new user LAN. That overlaps br1-users (10.20.10.0/24), so
+# traffic to 10.20.10.0-127 would have two homes. It must be REJECTED before anything is
+# rendered or deployed, and rejected for the right reason (SUBNET_OVERLAP).
+title: "PR #42 add branch 3 - overlapping user LAN"
+expect:
+  verdict: REJECT
+  codes: [SUBNET_OVERLAP]
+merge:
+  sites:
+    br3: {asn: 65030, role: spoke, block: 10.40.0.0/16, description: "Branch 3"}
+  subnets:
+    br3-users:  {prefix: 10.20.10.0/25, kind: lan, site: br3}
+    wan-hq-br3: {prefix: 172.16.0.8/30, kind: p2p}
+  routers:
+    hq-r2:
+      interfaces:
+        eth4: {subnet: wan-hq-br3, ip: 172.16.0.9}
+    br3-r1:
+      site: br3
+      loopback: 10.255.0.31
+      interfaces:
+        eth1: {subnet: wan-hq-br3, ip: 172.16.0.10}
+        eth2: {subnet: br3-users, ip: 10.20.10.65}
+  hosts:
+    br3-pc1: {subnet: br3-users, ip: 10.20.10.70}
+append:
+  bgp_sessions:
+    - [hq-r2, br3-r1]

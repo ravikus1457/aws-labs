@@ -1,0 +1,39 @@
+{
+  "ipv4Unicast": {
+    "routerId": "10.255.0.11",
+    "as": 65010,
+    "vrfId": 0,
+    "vrfName": "default",
+    "tableVersion": 6,
+    "ribCount": 7,
+    "peerCount": 1,
+    "peers": {
+      "172.16.0.1": {
+        "hostname": "hq-r2",
+        "remoteAs": 65000,
+        "localAs": 65010,
+        "version": 4,
+        "msgRcvd": 14,
+        "msgSent": 13,
+        "tableVersion": 0,
+        "outq": 0,
+        "inq": 0,
+        "peerUptime": "00:00:31",
+        "peerUptimeMsec": 31000,
+        "pfxRcd": 3,
+        "pfxSnt": 1,
+        "state": "Established",
+        "peerState": "OK",
+        "connectionsEstablished": 1,
+        "connectionsDropped": 0,
+        "desc": "hq-r2",
+        "idType": "ipv4"
+      }
+    },
+    "failedPeers": 0,
+    "displayedPeers": 1,
+    "totalPeers": 1,
+    "dynamicPeers": 0,
+    "bestPath": {"multiPathRelax": "false"}
+  }
+}

@@ -1,0 +1,27 @@
+# Simulated pull request #41: "Add branch 3 (new office)". The CONTROL case: a correct
+# change that validation must ACCEPT. Without it, a validator that rejects everything would
+# "pass" the bad-change demo below.
+title: "PR #41 add branch 3 - correct addressing"
+expect:
+  verdict: ACCEPT
+merge:
+  sites:
+    br3: {asn: 65030, role: spoke, block: 10.40.0.0/16, description: "Branch 3"}
+  subnets:
+    br3-users:  {prefix: 10.40.10.0/24, kind: lan, site: br3}
+    wan-hq-br3: {prefix: 172.16.0.8/30, kind: p2p}
+  routers:
+    hq-r2:
+      interfaces:
+        eth4: {subnet: wan-hq-br3, ip: 172.16.0.9}
+    br3-r1:
+      site: br3
+      loopback: 10.255.0.31
+      interfaces:
+        eth1: {subnet: wan-hq-br3, ip: 172.16.0.10}
+        eth2: {subnet: br3-users, ip: 10.40.10.1}
+  hosts:
+    br3-pc1: {subnet: br3-users, ip: 10.40.10.10}
+append:
+  bgp_sessions:
+    - [hq-r2, br3-r1]

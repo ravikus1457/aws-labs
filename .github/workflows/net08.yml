@@ -1,0 +1,186 @@
+# Lab N8 - network as code ("GitOps for the network").
+#
+#   offline job (every push/PR touching the lab): ruff + pytest (no Docker), validate the
+#     source of truth, the PR-style change demo (an overlapping subnet must be REJECTED and
+#     never rendered), and a check that the committed rendered/ snapshot equals generator output.
+#   lab job (push to main / manual run): containerlab deploys FRR routers + Linux hosts on the
+#     runner, then convergence -> post-deploy tests -> drift demo (inject, detect, heal) ->
+#     tests again -> evidence artifact + job summary -> destroy (always).
+#
+# COST: $0. Everything runs on the GitHub-hosted runner; no cloud account, no secrets.
+name: net08-network-as-code
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "networking/net-08-network-as-code/**"
+      - ".github/workflows/net08.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "networking/net-08-network-as-code/**"
+      - ".github/workflows/net08.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: net08-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"
+  CLAB_VERSION: "0.79.0"
+  # sha256 of containerlab_0.79.0_linux_amd64.deb as published on the GitHub release
+  CLAB_DEB_SHA256: "a399d92a622b4664d8d1231bc9b7f53a1d210255a0306fa091c3f63779f65f13"
+
+# bash => every step runs with -eo pipefail
+defaults:
+  run:
+    shell: bash
+    working-directory: networking/net-08-network-as-code
+
+jobs:
+  offline:
+    name: offline gate (pytest, validate, bad-change demo, rendered snapshot)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EVIDENCE: evidence/offline
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install pinned tooling
+        run: pip install --quiet -r requirements-dev.txt
+
+      - name: ruff check + ruff format --check
+        run: |
+          ruff check --output-format github .
+          ruff format --check .
+
+      - name: pytest (generator, validator, drift, checks, live logic vs a simulated lab)
+        run: python -m pytest -v
+
+      - name: Validate the source of truth
+        run: python -m netaac validate --evidence "$EVIDENCE"
+
+      - name: Bad-change demo (PR copy with an overlapping subnet must be REJECTED)
+        run: python -m netaac change-demo --evidence "$EVIDENCE"
+
+      - name: Committed rendered/ snapshot equals generator output
+        run: python -m netaac check-rendered --evidence "$EVIDENCE"
+
+      - name: Report + job summary
+        if: always()
+        run: |
+          rc=0
+          python -m netaac report --evidence "$EVIDENCE" --require validate,change-demo,generate || rc=$?
+          cat "$EVIDENCE/SUMMARY.md" >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$rc"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: net08-offline-evidence-${{ github.run_id }}
+          path: networking/net-08-network-as-code/evidence/offline
+          if-no-files-found: warn
+          retention-days: 30
+
+  lab:
+    name: deploy + test + drift demo (containerlab on the runner)
+    needs: offline
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EVIDENCE: evidence/run-${{ github.run_id }}
+      REQUIRED_PHASES: validate,change-demo,generate,post-deploy,converge,test-initial,drift-demo,converge-post-heal,test-post-heal
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install pinned Python deps
+        run: pip install --quiet -r requirements.txt
+
+      - name: Install containerlab ${{ env.CLAB_VERSION }} (pinned .deb, sha256 verified)
+        run: |
+          deb="containerlab_${CLAB_VERSION}_linux_amd64.deb"
+          curl -fsSL --retry 3 -o "/tmp/$deb" "https://github.com/srl-labs/containerlab/releases/download/v${CLAB_VERSION}/$deb"
+          echo "${CLAB_DEB_SHA256}  /tmp/$deb" | sha256sum -c -
+          sudo dpkg -i "/tmp/$deb"
+          containerlab version
+
+      - name: Pull pinned images (digests recorded as evidence)
+        run: |
+          mkdir -p "$EVIDENCE"
+          images="$(python -c "import yaml; d = yaml.safe_load(open('intent/network.yaml')); print(' '.join(d['lab']['images'].values()))")"
+          for img in $images; do
+            docker pull --quiet "$img" >/dev/null
+            echo "$img -> $(docker image inspect --format '{{index .RepoDigests 0}}' "$img")" | tee -a "$EVIDENCE/images.txt"
+          done
+
+      - name: Validate + bad-change demo + snapshot (this run's evidence)
+        run: |
+          rc=0
+          python -m netaac validate --evidence "$EVIDENCE" || rc=1
+          python -m netaac change-demo --evidence "$EVIDENCE" || rc=1
+          python -m netaac check-rendered --evidence "$EVIDENCE" || rc=1
+          exit "$rc"
+
+      - name: Deploy (render -> containerlab deploy -> forwarding, ACLs, host addressing, listeners)
+        id: deploy
+        run: scripts/deploy.sh
+
+      - name: Wait for the control plane to converge to intent (measured)
+        if: ${{ !cancelled() && steps.deploy.outcome == 'success' }}
+        run: python -m netaac wait-converged --timeout 180 --evidence "$EVIDENCE"
+
+      - name: Post-deploy tests (ACLs installed, BGP/OSPF/RIB vs intent, reachability matrix)
+        if: ${{ !cancelled() && steps.deploy.outcome == 'success' }}
+        run: python -m netaac test --phase test-initial --evidence "$EVIDENCE"
+
+      - name: Drift demo (baseline clean -> out-of-band changes -> detected -> re-apply heals)
+        if: ${{ !cancelled() && steps.deploy.outcome == 'success' }}
+        run: python -m netaac drift-demo --evidence "$EVIDENCE"
+
+      - name: Re-converge + tests after the heal
+        if: ${{ !cancelled() && steps.deploy.outcome == 'success' }}
+        run: |
+          rc=0
+          python -m netaac wait-converged --timeout 120 --phase converge-post-heal --evidence "$EVIDENCE" || rc=1
+          python -m netaac test --phase test-post-heal --evidence "$EVIDENCE" || rc=1
+          exit "$rc"
+
+      - name: Diagnostics (on failure)
+        if: failure()
+        run: scripts/collect-diag.sh "$EVIDENCE/diag" || true
+
+      - name: Report + job summary
+        if: always()
+        run: |
+          rc=0
+          python -m netaac report --evidence "$EVIDENCE" --require "$REQUIRED_PHASES" || rc=$?
+          cp -r build/configs build/acl build/plan.json build/topology.clab.yml "$EVIDENCE/" 2>/dev/null || true
+          cat "$EVIDENCE/SUMMARY.md" >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$rc"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: net08-evidence-${{ github.run_id }}
+          path: networking/net-08-network-as-code/evidence/run-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Destroy (always) + survivor check
+        if: always()
+        run: scripts/destroy.sh

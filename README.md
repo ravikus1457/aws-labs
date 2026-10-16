@@ -45,6 +45,7 @@ with objectives, topology, key steps, and an honest "be ready to explain" list.
 | N3 | [DNS & DHCP services](networking/net-03-dns-dhcp) | Authoritative DNS, DHCP scopes, name resolution | dnsmasq, BIND, Linux |
 | N4 | [Stateful firewall & least-privilege ACLs](networking/net-04-firewall-acls) | nftables rules, AWS SG/NACL, default-deny | nftables, iptables, AWS SG |
 | N5 | [Packet capture & traffic analysis](networking/net-05-packet-analysis) | TCP handshake, DNS/TLS dissection, latency | tcpdump, Wireshark |
+| N8 | [Network as code (GitOps for the network)](networking/net-08-network-as-code) | YAML source of truth → validated (overlaps, duplicate IPs, ACL intent) → Jinja2-rendered FRR configs → containerlab deploy in CI → BGP/OSPF/route + reachability/deny tests → drift detect & heal; overlapping-subnet PR rejected pre-deploy | Python, Jinja2, FRRouting, containerlab, GitHub Actions |
 
 ## Repo layout
 ```

@@ -1,0 +1,52 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 10.4.5_git
+frr defaults traditional
+hostname br1-r1
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+ip prefix-list PL-HQ-R2-IN seq 5 permit 10.10.10.0/24
+ip prefix-list PL-HQ-R2-IN seq 10 permit 10.30.10.0/24
+ip prefix-list PL-HQ-R2-IN seq 15 permit 10.30.99.0/24
+ip prefix-list PL-HQ-R2-OUT seq 5 permit 10.20.10.0/24
+!
+interface eth1
+ description to hq-r2 eth2 (wan-hq-br1)
+ ip address 172.16.0.2/30
+exit
+!
+interface eth2
+ description LAN br1-users
+ ip address 10.20.10.1/24
+exit
+!
+interface lo
+ ip address 10.255.0.11/32
+exit
+!
+router bgp 65010
+ bgp router-id 10.255.0.11
+ neighbor 172.16.0.1 remote-as 65000
+ neighbor 172.16.0.1 description hq-r2
+ neighbor 172.16.0.1 timers 3 9
+ neighbor 172.16.0.1 timers connect 5
+ !
+ address-family ipv4 unicast
+  network 10.20.10.0/24
+  neighbor 172.16.0.1 route-map RM-HQ-R2-IN in
+  neighbor 172.16.0.1 route-map RM-HQ-R2-OUT out
+ exit-address-family
+exit
+!
+route-map RM-HQ-R2-IN permit 10
+ match ip address prefix-list PL-HQ-R2-IN
+exit
+!
+route-map RM-HQ-R2-OUT permit 10
+ match ip address prefix-list PL-HQ-R2-OUT
+exit
+!
+end

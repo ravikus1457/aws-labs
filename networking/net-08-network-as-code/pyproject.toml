@@ -1,0 +1,14 @@
+# Tooling config only (nothing is packaged). CI: ruff + pytest, see .github/workflows/net08.yml.
+[tool.ruff]
+line-length = 150
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["netaac", "fakenet"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
