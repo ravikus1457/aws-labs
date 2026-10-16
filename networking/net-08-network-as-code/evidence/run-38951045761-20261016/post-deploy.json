@@ -1,0 +1,118 @@
+{
+  "checks": [
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "ip_forward=1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "iptables-restore acl/br1-r1.rules",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "ip_forward=1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "iptables-restore acl/br2-r1.rules",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "ip_forward=1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "iptables-restore acl/hq-r1.rules",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "ip_forward=1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "hq-r2"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "iptables-restore acl/hq-r2.rules",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "hq-r2"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "10.20.10.10/24 gw 10.20.10.1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br1-pc1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "10.30.99.10/24 gw 10.30.99.1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br2-guest1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "10.30.10.10/24 gw 10.30.10.1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "br2-pc1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "10.10.10.10/24 gw 10.10.10.1",
+      "observed": "ok",
+      "status": "PASS",
+      "subject": "hq-srv1"
+    },
+    {
+      "category": "setup",
+      "detail": "",
+      "expect": "listening tcp/22,80",
+      "observed": "tcp/22,80",
+      "status": "PASS",
+      "subject": "hq-srv1"
+    }
+  ],
+  "counts": {
+    "FAIL": 0,
+    "PASS": 13,
+    "SKIP": 0
+  },
+  "generated_at": "2026-10-16T18:57:07Z",
+  "metrics": {},
+  "phase": "post-deploy",
+  "status": "PASS",
+  "title": "Post-deploy setup (forwarding, ACLs, host addressing, listeners)"
+}

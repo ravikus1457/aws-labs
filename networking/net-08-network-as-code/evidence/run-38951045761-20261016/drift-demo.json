@@ -1,0 +1,199 @@
+{
+  "checks": [
+    {
+      "category": "drift-baseline",
+      "detail": "",
+      "expect": "running == intent",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "drift-baseline",
+      "detail": "",
+      "expect": "running == intent",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "drift-baseline",
+      "detail": "",
+      "expect": "running == intent",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "drift-baseline",
+      "detail": "",
+      "expect": "running == intent",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "hq-r2"
+    },
+    {
+      "category": "drift-inject",
+      "detail": "",
+      "expect": "undocumented static route added by hand",
+      "observed": "ip route 203.0.113.0/24 blackhole",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "drift-inject",
+      "detail": "",
+      "expect": "OSPF cost tuned on the box during an incident",
+      "observed": "interface eth1 / ip ospf cost 444",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "drift-inject",
+      "detail": "",
+      "expect": "a configured line removed on the box",
+      "observed": "router bgp 65010 / no neighbor 172.16.0.1 description",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "drift-detect",
+      "detail": "",
+      "expect": "extra: ip route 203.0.113.0/24 blackhole",
+      "observed": "reported",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "drift-detect",
+      "detail": "",
+      "expect": "extra: interface eth1 > ip ospf cost 444",
+      "observed": "reported",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "drift-detect",
+      "detail": "",
+      "expect": "missing: router bgp 65010 > neighbor 172.16.0.1 description hq-r2",
+      "observed": "reported",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "drift-precision",
+      "detail": "",
+      "expect": "no drift beyond what was injected",
+      "observed": "0 unexplained",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "drift-precision",
+      "detail": "",
+      "expect": "no drift beyond what was injected",
+      "observed": "0 unexplained",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "drift-precision",
+      "detail": "",
+      "expect": "no drift beyond what was injected",
+      "observed": "0 unexplained",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "drift-precision",
+      "detail": "",
+      "expect": "no drift beyond what was injected",
+      "observed": "0 unexplained",
+      "status": "PASS",
+      "subject": "hq-r2"
+    },
+    {
+      "category": "drift-heal",
+      "detail": "frr-reload.py",
+      "expect": "running == intent after re-apply",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "br1-r1"
+    },
+    {
+      "category": "drift-heal",
+      "detail": "frr-reload.py",
+      "expect": "running == intent after re-apply",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "br2-r1"
+    },
+    {
+      "category": "drift-heal",
+      "detail": "frr-reload.py",
+      "expect": "running == intent after re-apply",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "hq-r1"
+    },
+    {
+      "category": "drift-heal",
+      "detail": "untouched",
+      "expect": "running == intent after re-apply",
+      "observed": "clean",
+      "status": "PASS",
+      "subject": "hq-r2"
+    }
+  ],
+  "counts": {
+    "FAIL": 0,
+    "PASS": 18,
+    "SKIP": 0
+  },
+  "generated_at": "2026-10-16T18:57:59Z",
+  "metrics": {
+    "drift_detected": 3,
+    "drift_injected": 3,
+    "drift_report_after_injection": {
+      "br1-r1": {
+        "clean": false,
+        "extra": [],
+        "missing": [
+          "router bgp 65010 > neighbor 172.16.0.1 description hq-r2"
+        ],
+        "router": "br1-r1"
+      },
+      "br2-r1": {
+        "clean": false,
+        "extra": [
+          "ip route 203.0.113.0/24 blackhole"
+        ],
+        "missing": [],
+        "router": "br2-r1"
+      },
+      "hq-r1": {
+        "clean": false,
+        "extra": [
+          "interface eth1 > ip ospf cost 444"
+        ],
+        "missing": [],
+        "router": "hq-r1"
+      },
+      "hq-r2": {
+        "clean": true,
+        "extra": [],
+        "missing": [],
+        "router": "hq-r2"
+      }
+    },
+    "heal_method": {
+      "br1-r1": "frr-reload.py",
+      "br2-r1": "frr-reload.py",
+      "hq-r1": "frr-reload.py"
+    },
+    "heal_seconds": 0.9
+  },
+  "phase": "drift-demo",
+  "status": "PASS",
+  "title": "Drift: inject out-of-band changes, detect, heal"
+}

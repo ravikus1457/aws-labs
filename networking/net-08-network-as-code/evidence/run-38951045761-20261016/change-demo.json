@@ -1,0 +1,49 @@
+{
+  "checks": [
+    {
+      "category": "change-review",
+      "detail": "PR #41 add branch 3 - correct addressing",
+      "expect": "ACCEPT",
+      "observed": "ACCEPT",
+      "status": "PASS",
+      "subject": "pr-041-add-branch3"
+    },
+    {
+      "category": "change-review",
+      "detail": "PR #42 add branch 3 - overlapping user LAN; generator refused to render: True",
+      "expect": "REJECT with SUBNET_OVERLAP",
+      "observed": "REJECT (IFACE_MULTI_SUBNET, OUTSIDE_BLOCK, SUBNET_OVERLAP)",
+      "status": "PASS",
+      "subject": "pr-042-add-branch3-overlap"
+    }
+  ],
+  "counts": {
+    "FAIL": 0,
+    "PASS": 2,
+    "SKIP": 0
+  },
+  "generated_at": "2026-10-16T18:57:04Z",
+  "metrics": {
+    "changes": {
+      "pr-041-add-branch3": {
+        "codes": [],
+        "expected": "ACCEPT",
+        "generator_refused": null,
+        "verdict": "ACCEPT"
+      },
+      "pr-042-add-branch3-overlap": {
+        "codes": [
+          "IFACE_MULTI_SUBNET",
+          "OUTSIDE_BLOCK",
+          "SUBNET_OVERLAP"
+        ],
+        "expected": "REJECT",
+        "generator_refused": true,
+        "verdict": "REJECT"
+      }
+    }
+  },
+  "phase": "change-demo",
+  "status": "PASS",
+  "title": "PR-style changes: good one accepted, bad one rejected"
+}

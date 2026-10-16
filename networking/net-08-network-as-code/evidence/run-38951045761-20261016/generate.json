@@ -1,0 +1,160 @@
+{
+  "checks": [
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "acl/br1-r1.rules"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "acl/br2-r1.rules"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "acl/hq-r1.rules"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "acl/hq-r2.rules"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/br1-r1/daemons"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/br1-r1/frr.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/br1-r1/vtysh.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/br2-r1/daemons"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/br2-r1/frr.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/br2-r1/vtysh.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/hq-r1/daemons"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/hq-r1/frr.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/hq-r1/vtysh.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/hq-r2/daemons"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/hq-r2/frr.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "configs/hq-r2/vtysh.conf"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "plan.json"
+    },
+    {
+      "category": "rendered",
+      "detail": "",
+      "expect": "snapshot == generator output",
+      "observed": "identical",
+      "status": "PASS",
+      "subject": "topology.clab.yml"
+    }
+  ],
+  "counts": {
+    "FAIL": 0,
+    "PASS": 18,
+    "SKIP": 0
+  },
+  "generated_at": "2026-10-16T18:57:04Z",
+  "metrics": {
+    "files": 18
+  },
+  "phase": "generate",
+  "status": "PASS",
+  "title": "Rendered configs match the committed snapshot"
+}

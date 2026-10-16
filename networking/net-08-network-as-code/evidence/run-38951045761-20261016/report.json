@@ -1,0 +1,1855 @@
+{
+  "generated_at": "2026-10-16T18:58:34Z",
+  "missing_phases": [],
+  "overall": "PASS",
+  "phases": [
+    {
+      "checks": [
+        {
+          "category": "validate",
+          "detail": "0 warning(s)",
+          "expect": "ACCEPT",
+          "observed": "ACCEPT",
+          "status": "PASS",
+          "subject": "network.yaml"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 1,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:04Z",
+      "metrics": {
+        "acl_rules": 4,
+        "errors": 0,
+        "findings": [],
+        "hosts": 4,
+        "links": 7,
+        "probes": 16,
+        "routers": 4,
+        "subnets": 7,
+        "warnings": 0
+      },
+      "phase": "validate",
+      "status": "PASS",
+      "title": "Pre-deploy validation of the source of truth"
+    },
+    {
+      "checks": [
+        {
+          "category": "change-review",
+          "detail": "PR #41 add branch 3 - correct addressing",
+          "expect": "ACCEPT",
+          "observed": "ACCEPT",
+          "status": "PASS",
+          "subject": "pr-041-add-branch3"
+        },
+        {
+          "category": "change-review",
+          "detail": "PR #42 add branch 3 - overlapping user LAN; generator refused to render: True",
+          "expect": "REJECT with SUBNET_OVERLAP",
+          "observed": "REJECT (IFACE_MULTI_SUBNET, OUTSIDE_BLOCK, SUBNET_OVERLAP)",
+          "status": "PASS",
+          "subject": "pr-042-add-branch3-overlap"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 2,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:04Z",
+      "metrics": {
+        "changes": {
+          "pr-041-add-branch3": {
+            "codes": [],
+            "expected": "ACCEPT",
+            "generator_refused": null,
+            "verdict": "ACCEPT"
+          },
+          "pr-042-add-branch3-overlap": {
+            "codes": [
+              "IFACE_MULTI_SUBNET",
+              "OUTSIDE_BLOCK",
+              "SUBNET_OVERLAP"
+            ],
+            "expected": "REJECT",
+            "generator_refused": true,
+            "verdict": "REJECT"
+          }
+        }
+      },
+      "phase": "change-demo",
+      "status": "PASS",
+      "title": "PR-style changes: good one accepted, bad one rejected"
+    },
+    {
+      "checks": [
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "acl/br1-r1.rules"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "acl/br2-r1.rules"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "acl/hq-r1.rules"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "acl/hq-r2.rules"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/br1-r1/daemons"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/br1-r1/frr.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/br1-r1/vtysh.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/br2-r1/daemons"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/br2-r1/frr.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/br2-r1/vtysh.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/hq-r1/daemons"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/hq-r1/frr.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/hq-r1/vtysh.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/hq-r2/daemons"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/hq-r2/frr.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "configs/hq-r2/vtysh.conf"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "plan.json"
+        },
+        {
+          "category": "rendered",
+          "detail": "",
+          "expect": "snapshot == generator output",
+          "observed": "identical",
+          "status": "PASS",
+          "subject": "topology.clab.yml"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 18,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:04Z",
+      "metrics": {
+        "files": 18
+      },
+      "phase": "generate",
+      "status": "PASS",
+      "title": "Rendered configs match the committed snapshot"
+    },
+    {
+      "checks": [
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "ip_forward=1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "iptables-restore acl/br1-r1.rules",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "ip_forward=1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "iptables-restore acl/br2-r1.rules",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "ip_forward=1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "iptables-restore acl/hq-r1.rules",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "ip_forward=1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "hq-r2"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "iptables-restore acl/hq-r2.rules",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "hq-r2"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "10.20.10.10/24 gw 10.20.10.1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br1-pc1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "10.30.99.10/24 gw 10.30.99.1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br2-guest1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "10.30.10.10/24 gw 10.30.10.1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "br2-pc1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "10.10.10.10/24 gw 10.10.10.1",
+          "observed": "ok",
+          "status": "PASS",
+          "subject": "hq-srv1"
+        },
+        {
+          "category": "setup",
+          "detail": "",
+          "expect": "listening tcp/22,80",
+          "observed": "tcp/22,80",
+          "status": "PASS",
+          "subject": "hq-srv1"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 13,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:07Z",
+      "metrics": {},
+      "phase": "post-deploy",
+      "status": "PASS",
+      "title": "Post-deploy setup (forwarding, ACLs, host addressing, listeners)"
+    },
+    {
+      "checks": [
+        {
+          "category": "convergence",
+          "detail": "",
+          "expect": "converged within 180 s",
+          "observed": "14.6 s",
+          "status": "PASS",
+          "subject": "all routers"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 3, sent 1",
+          "observed": "received 3, sent 1",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br1-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.99.0/24"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r1 -> 10.255.0.2 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "hq-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.255.0.2/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65010",
+          "observed": "Established, AS65010",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 1, sent 3",
+          "observed": "received 1, sent 3",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65020",
+          "observed": "Established, AS65020",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r2 -> 10.255.0.1 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.255.0.1/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.99.0/24"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 29,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:22Z",
+      "metrics": {
+        "interval": 2,
+        "polls": 7,
+        "seconds": 14.6,
+        "timeout": 180.0
+      },
+      "phase": "converge",
+      "status": "PASS",
+      "title": "Control plane converged to intent"
+    },
+    {
+      "checks": [
+        {
+          "category": "acl-installed",
+          "detail": "",
+          "expect": "jump + rules in intent order: acl:br1-no-ssh-servers",
+          "observed": "FORWARD -> NET08-ACL; rules: acl:br1-no-ssh-servers",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "acl-installed",
+          "detail": "",
+          "expect": "jump + rules in intent order: acl:guest-no-hq-servers, acl:guest-no-br1-users, acl:guest-no-br2-users",
+          "observed": "FORWARD -> NET08-ACL; rules: acl:guest-no-hq-servers, acl:guest-no-br1-users, acl:guest-no-br2-users",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 3, sent 1",
+          "observed": "received 3, sent 1",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br1-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.99.0/24"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r1 -> 10.255.0.2 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "hq-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.255.0.2/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65010",
+          "observed": "Established, AS65010",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 1, sent 3",
+          "observed": "received 1, sent 3",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65020",
+          "observed": "Established, AS65020",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r2 -> 10.255.0.1 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.255.0.1/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.99.0/24"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> br2-guest1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> br2-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> hq-srv1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "deny by guest-no-br1-users on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-br1-users)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> br1-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "deny by guest-no-br2-users on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-br2-users)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> br2-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "deny by guest-no-hq-servers on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-hq-servers)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> hq-srv1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> br1-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> br2-guest1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> hq-srv1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "hq-srv1 -> br1-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "hq-srv1 -> br2-guest1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "hq-srv1 -> br2-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> hq-srv1 tcp/80"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "deny by br1-no-ssh-servers on br1-r1",
+          "observed": "blocked (+3 pkts on br1-no-ssh-servers)",
+          "status": "PASS",
+          "subject": "br1-pc1 -> hq-srv1 tcp/22"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> hq-srv1 tcp/22"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "deny by guest-no-hq-servers on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-hq-servers)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> hq-srv1 tcp/80"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 46,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:57Z",
+      "metrics": {
+        "probes_deny": 5,
+        "probes_passed": 16,
+        "probes_total": 16
+      },
+      "phase": "test-initial",
+      "status": "PASS",
+      "title": "Post-deploy tests"
+    },
+    {
+      "checks": [
+        {
+          "category": "drift-baseline",
+          "detail": "",
+          "expect": "running == intent",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "drift-baseline",
+          "detail": "",
+          "expect": "running == intent",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "drift-baseline",
+          "detail": "",
+          "expect": "running == intent",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "drift-baseline",
+          "detail": "",
+          "expect": "running == intent",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "hq-r2"
+        },
+        {
+          "category": "drift-inject",
+          "detail": "",
+          "expect": "undocumented static route added by hand",
+          "observed": "ip route 203.0.113.0/24 blackhole",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "drift-inject",
+          "detail": "",
+          "expect": "OSPF cost tuned on the box during an incident",
+          "observed": "interface eth1 / ip ospf cost 444",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "drift-inject",
+          "detail": "",
+          "expect": "a configured line removed on the box",
+          "observed": "router bgp 65010 / no neighbor 172.16.0.1 description",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "drift-detect",
+          "detail": "",
+          "expect": "extra: ip route 203.0.113.0/24 blackhole",
+          "observed": "reported",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "drift-detect",
+          "detail": "",
+          "expect": "extra: interface eth1 > ip ospf cost 444",
+          "observed": "reported",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "drift-detect",
+          "detail": "",
+          "expect": "missing: router bgp 65010 > neighbor 172.16.0.1 description hq-r2",
+          "observed": "reported",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "drift-precision",
+          "detail": "",
+          "expect": "no drift beyond what was injected",
+          "observed": "0 unexplained",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "drift-precision",
+          "detail": "",
+          "expect": "no drift beyond what was injected",
+          "observed": "0 unexplained",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "drift-precision",
+          "detail": "",
+          "expect": "no drift beyond what was injected",
+          "observed": "0 unexplained",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "drift-precision",
+          "detail": "",
+          "expect": "no drift beyond what was injected",
+          "observed": "0 unexplained",
+          "status": "PASS",
+          "subject": "hq-r2"
+        },
+        {
+          "category": "drift-heal",
+          "detail": "frr-reload.py",
+          "expect": "running == intent after re-apply",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "drift-heal",
+          "detail": "frr-reload.py",
+          "expect": "running == intent after re-apply",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "drift-heal",
+          "detail": "frr-reload.py",
+          "expect": "running == intent after re-apply",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "hq-r1"
+        },
+        {
+          "category": "drift-heal",
+          "detail": "untouched",
+          "expect": "running == intent after re-apply",
+          "observed": "clean",
+          "status": "PASS",
+          "subject": "hq-r2"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 18,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:59Z",
+      "metrics": {
+        "drift_detected": 3,
+        "drift_injected": 3,
+        "drift_report_after_injection": {
+          "br1-r1": {
+            "clean": false,
+            "extra": [],
+            "missing": [
+              "router bgp 65010 > neighbor 172.16.0.1 description hq-r2"
+            ],
+            "router": "br1-r1"
+          },
+          "br2-r1": {
+            "clean": false,
+            "extra": [
+              "ip route 203.0.113.0/24 blackhole"
+            ],
+            "missing": [],
+            "router": "br2-r1"
+          },
+          "hq-r1": {
+            "clean": false,
+            "extra": [
+              "interface eth1 > ip ospf cost 444"
+            ],
+            "missing": [],
+            "router": "hq-r1"
+          },
+          "hq-r2": {
+            "clean": true,
+            "extra": [],
+            "missing": [],
+            "router": "hq-r2"
+          }
+        },
+        "heal_method": {
+          "br1-r1": "frr-reload.py",
+          "br2-r1": "frr-reload.py",
+          "hq-r1": "frr-reload.py"
+        },
+        "heal_seconds": 0.9
+      },
+      "phase": "drift-demo",
+      "status": "PASS",
+      "title": "Drift: inject out-of-band changes, detect, heal"
+    },
+    {
+      "checks": [
+        {
+          "category": "convergence",
+          "detail": "",
+          "expect": "converged within 120 s",
+          "observed": "0.4 s",
+          "status": "PASS",
+          "subject": "all routers"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 3, sent 1",
+          "observed": "received 3, sent 1",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br1-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.99.0/24"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r1 -> 10.255.0.2 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "hq-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.255.0.2/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65010",
+          "observed": "Established, AS65010",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 1, sent 3",
+          "observed": "received 1, sent 3",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65020",
+          "observed": "Established, AS65020",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r2 -> 10.255.0.1 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.255.0.1/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.99.0/24"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 29,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:57:59Z",
+      "metrics": {
+        "interval": 2,
+        "polls": 1,
+        "seconds": 0.4,
+        "timeout": 120.0
+      },
+      "phase": "converge-post-heal",
+      "status": "PASS",
+      "title": "Control plane re-converged after the heal"
+    },
+    {
+      "checks": [
+        {
+          "category": "acl-installed",
+          "detail": "",
+          "expect": "jump + rules in intent order: acl:br1-no-ssh-servers",
+          "observed": "FORWARD -> NET08-ACL; rules: acl:br1-no-ssh-servers",
+          "status": "PASS",
+          "subject": "br1-r1"
+        },
+        {
+          "category": "acl-installed",
+          "detail": "",
+          "expect": "jump + rules in intent order: acl:guest-no-hq-servers, acl:guest-no-br1-users, acl:guest-no-br2-users",
+          "observed": "FORWARD -> NET08-ACL; rules: acl:guest-no-hq-servers, acl:guest-no-br1-users, acl:guest-no-br2-users",
+          "status": "PASS",
+          "subject": "br2-r1"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 3, sent 1",
+          "observed": "received 3, sent 1",
+          "status": "PASS",
+          "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br1-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br1-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65000",
+          "observed": "Established, AS65000",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "br2-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "br2-r1 10.30.99.0/24"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r1 -> 10.255.0.2 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "connected",
+          "observed": "connected",
+          "status": "PASS",
+          "subject": "hq-r1 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.255.0.2/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r1 10.30.99.0/24"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65010",
+          "observed": "Established, AS65010",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 1, sent 3",
+          "observed": "received 1, sent 3",
+          "status": "PASS",
+          "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+        },
+        {
+          "category": "bgp-session",
+          "detail": "",
+          "expect": "Established, AS65020",
+          "observed": "Established, AS65020",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "bgp-policy",
+          "detail": "",
+          "expect": "received 2, sent 2",
+          "observed": "received 2, sent 2",
+          "status": "PASS",
+          "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+        },
+        {
+          "category": "ospf-adjacency",
+          "detail": "",
+          "expect": "Full",
+          "observed": "Full/-",
+          "status": "PASS",
+          "subject": "hq-r2 -> 10.255.0.1 via eth1"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.10.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.20.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "ospf",
+          "observed": "ospf",
+          "status": "PASS",
+          "subject": "hq-r2 10.255.0.1/32"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.10.0/24"
+        },
+        {
+          "category": "route",
+          "detail": "",
+          "expect": "bgp",
+          "observed": "bgp",
+          "status": "PASS",
+          "subject": "hq-r2 10.30.99.0/24"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> br2-guest1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> br2-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> hq-srv1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "deny by guest-no-br1-users on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-br1-users)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> br1-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "deny by guest-no-br2-users on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-br2-users)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> br2-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "deny by guest-no-hq-servers on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-hq-servers)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> hq-srv1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> br1-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> br2-guest1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> hq-srv1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "hq-srv1 -> br1-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "hq-srv1 -> br2-guest1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "matrix",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "hq-srv1 -> br2-pc1 icmp"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br1-pc1 -> hq-srv1 tcp/80"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "deny by br1-no-ssh-servers on br1-r1",
+          "observed": "blocked (+3 pkts on br1-no-ssh-servers)",
+          "status": "PASS",
+          "subject": "br1-pc1 -> hq-srv1 tcp/22"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "allow",
+          "observed": "reached",
+          "status": "PASS",
+          "subject": "br2-pc1 -> hq-srv1 tcp/22"
+        },
+        {
+          "category": "reachability",
+          "detail": "declared",
+          "expect": "deny by guest-no-hq-servers on br2-r1",
+          "observed": "blocked (+3 pkts on guest-no-hq-servers)",
+          "status": "PASS",
+          "subject": "br2-guest1 -> hq-srv1 tcp/80"
+        }
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 46,
+        "SKIP": 0
+      },
+      "generated_at": "2026-10-16T18:58:34Z",
+      "metrics": {
+        "probes_deny": 5,
+        "probes_passed": 16,
+        "probes_total": 16
+      },
+      "phase": "test-post-heal",
+      "status": "PASS",
+      "title": "Post-deploy tests again, after the heal"
+    }
+  ],
+  "required_phases": [
+    "validate",
+    "change-demo",
+    "generate",
+    "post-deploy",
+    "converge",
+    "test-initial",
+    "drift-demo",
+    "converge-post-heal",
+    "test-post-heal"
+  ],
+  "totals": {
+    "FAIL": 0,
+    "PASS": 202,
+    "SKIP": 0
+  }
+}

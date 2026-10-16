@@ -1,0 +1,251 @@
+{
+  "checks": [
+    {
+      "category": "convergence",
+      "detail": "",
+      "expect": "converged within 120 s",
+      "observed": "0.4 s",
+      "status": "PASS",
+      "subject": "all routers"
+    },
+    {
+      "category": "bgp-session",
+      "detail": "",
+      "expect": "Established, AS65000",
+      "observed": "Established, AS65000",
+      "status": "PASS",
+      "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+    },
+    {
+      "category": "bgp-policy",
+      "detail": "",
+      "expect": "received 3, sent 1",
+      "observed": "received 3, sent 1",
+      "status": "PASS",
+      "subject": "br1-r1 -> hq-r2 (172.16.0.1)"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "br1-r1 10.10.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "connected",
+      "observed": "connected",
+      "status": "PASS",
+      "subject": "br1-r1 10.20.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "br1-r1 10.30.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "br1-r1 10.30.99.0/24"
+    },
+    {
+      "category": "bgp-session",
+      "detail": "",
+      "expect": "Established, AS65000",
+      "observed": "Established, AS65000",
+      "status": "PASS",
+      "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+    },
+    {
+      "category": "bgp-policy",
+      "detail": "",
+      "expect": "received 2, sent 2",
+      "observed": "received 2, sent 2",
+      "status": "PASS",
+      "subject": "br2-r1 -> hq-r2 (172.16.0.5)"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "br2-r1 10.10.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "br2-r1 10.20.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "connected",
+      "observed": "connected",
+      "status": "PASS",
+      "subject": "br2-r1 10.30.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "connected",
+      "observed": "connected",
+      "status": "PASS",
+      "subject": "br2-r1 10.30.99.0/24"
+    },
+    {
+      "category": "ospf-adjacency",
+      "detail": "",
+      "expect": "Full",
+      "observed": "Full/-",
+      "status": "PASS",
+      "subject": "hq-r1 -> 10.255.0.2 via eth1"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "connected",
+      "observed": "connected",
+      "status": "PASS",
+      "subject": "hq-r1 10.10.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "ospf",
+      "observed": "ospf",
+      "status": "PASS",
+      "subject": "hq-r1 10.20.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "ospf",
+      "observed": "ospf",
+      "status": "PASS",
+      "subject": "hq-r1 10.255.0.2/32"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "ospf",
+      "observed": "ospf",
+      "status": "PASS",
+      "subject": "hq-r1 10.30.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "ospf",
+      "observed": "ospf",
+      "status": "PASS",
+      "subject": "hq-r1 10.30.99.0/24"
+    },
+    {
+      "category": "bgp-session",
+      "detail": "",
+      "expect": "Established, AS65010",
+      "observed": "Established, AS65010",
+      "status": "PASS",
+      "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+    },
+    {
+      "category": "bgp-policy",
+      "detail": "",
+      "expect": "received 1, sent 3",
+      "observed": "received 1, sent 3",
+      "status": "PASS",
+      "subject": "hq-r2 -> br1-r1 (172.16.0.2)"
+    },
+    {
+      "category": "bgp-session",
+      "detail": "",
+      "expect": "Established, AS65020",
+      "observed": "Established, AS65020",
+      "status": "PASS",
+      "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+    },
+    {
+      "category": "bgp-policy",
+      "detail": "",
+      "expect": "received 2, sent 2",
+      "observed": "received 2, sent 2",
+      "status": "PASS",
+      "subject": "hq-r2 -> br2-r1 (172.16.0.6)"
+    },
+    {
+      "category": "ospf-adjacency",
+      "detail": "",
+      "expect": "Full",
+      "observed": "Full/-",
+      "status": "PASS",
+      "subject": "hq-r2 -> 10.255.0.1 via eth1"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "ospf",
+      "observed": "ospf",
+      "status": "PASS",
+      "subject": "hq-r2 10.10.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "hq-r2 10.20.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "ospf",
+      "observed": "ospf",
+      "status": "PASS",
+      "subject": "hq-r2 10.255.0.1/32"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "hq-r2 10.30.10.0/24"
+    },
+    {
+      "category": "route",
+      "detail": "",
+      "expect": "bgp",
+      "observed": "bgp",
+      "status": "PASS",
+      "subject": "hq-r2 10.30.99.0/24"
+    }
+  ],
+  "counts": {
+    "FAIL": 0,
+    "PASS": 29,
+    "SKIP": 0
+  },
+  "generated_at": "2026-10-16T18:57:59Z",
+  "metrics": {
+    "interval": 2,
+    "polls": 1,
+    "seconds": 0.4,
+    "timeout": 120.0
+  },
+  "phase": "converge-post-heal",
+  "status": "PASS",
+  "title": "Control plane re-converged after the heal"
+}

@@ -1,0 +1,201 @@
+version: 1
+lab:
+  name: net08
+  mgmt_subnet: 172.20.80.0/24
+  images:
+    router: quay.io/frrouting/frr:10.4.5
+    host: nicolaka/netshoot:v0.16
+ip_plan:
+  wan_block: 172.16.0.0/24
+  loopback_block: 10.255.0.0/24
+sites:
+  hq:
+    asn: 65000
+    role: hub
+    block: 10.10.0.0/16
+    description: Headquarters / data center
+  br1:
+    asn: 65010
+    role: spoke
+    block: 10.20.0.0/16
+    description: Branch 1 (staff)
+  br2:
+    asn: 65020
+    role: spoke
+    block: 10.30.0.0/16
+    description: Branch 2 (staff + guest Wi-Fi)
+  br3:
+    asn: 65030
+    role: spoke
+    block: 10.40.0.0/16
+    description: Branch 3
+subnets:
+  hq-transit:
+    prefix: 10.10.255.0/30
+    kind: p2p
+    site: hq
+  hq-servers:
+    prefix: 10.10.10.0/24
+    kind: lan
+    site: hq
+  br1-users:
+    prefix: 10.20.10.0/24
+    kind: lan
+    site: br1
+  br2-users:
+    prefix: 10.30.10.0/24
+    kind: lan
+    site: br2
+  br2-guest:
+    prefix: 10.30.99.0/24
+    kind: lan
+    site: br2
+  wan-hq-br1:
+    prefix: 172.16.0.0/30
+    kind: p2p
+  wan-hq-br2:
+    prefix: 172.16.0.4/30
+    kind: p2p
+  br3-users:
+    prefix: 10.40.10.0/24
+    kind: lan
+    site: br3
+  wan-hq-br3:
+    prefix: 172.16.0.8/30
+    kind: p2p
+routers:
+  hq-r1:
+    site: hq
+    loopback: 10.255.0.1
+    interfaces:
+      eth1:
+        subnet: hq-transit
+        ip: 10.10.255.1
+        ospf: active
+      eth2:
+        subnet: hq-servers
+        ip: 10.10.10.1
+        ospf: passive
+  hq-r2:
+    site: hq
+    loopback: 10.255.0.2
+    ospf:
+      redistribute_bgp: true
+    interfaces:
+      eth1:
+        subnet: hq-transit
+        ip: 10.10.255.2
+        ospf: active
+      eth2:
+        subnet: wan-hq-br1
+        ip: 172.16.0.1
+      eth3:
+        subnet: wan-hq-br2
+        ip: 172.16.0.5
+      eth4:
+        subnet: wan-hq-br3
+        ip: 172.16.0.9
+  br1-r1:
+    site: br1
+    loopback: 10.255.0.11
+    interfaces:
+      eth1:
+        subnet: wan-hq-br1
+        ip: 172.16.0.2
+      eth2:
+        subnet: br1-users
+        ip: 10.20.10.1
+  br2-r1:
+    site: br2
+    loopback: 10.255.0.21
+    interfaces:
+      eth1:
+        subnet: wan-hq-br2
+        ip: 172.16.0.6
+      eth2:
+        subnet: br2-users
+        ip: 10.30.10.1
+      eth3:
+        subnet: br2-guest
+        ip: 10.30.99.1
+  br3-r1:
+    site: br3
+    loopback: 10.255.0.31
+    interfaces:
+      eth1:
+        subnet: wan-hq-br3
+        ip: 172.16.0.10
+      eth2:
+        subnet: br3-users
+        ip: 10.40.10.1
+bgp_sessions:
+- - hq-r2
+  - br1-r1
+- - hq-r2
+  - br2-r1
+- - hq-r2
+  - br3-r1
+hosts:
+  hq-srv1:
+    subnet: hq-servers
+    ip: 10.10.10.10
+    services:
+    - tcp/22
+    - tcp/80
+  br1-pc1:
+    subnet: br1-users
+    ip: 10.20.10.10
+  br2-pc1:
+    subnet: br2-users
+    ip: 10.30.10.10
+  br2-guest1:
+    subnet: br2-guest
+    ip: 10.30.99.10
+  br3-pc1:
+    subnet: br3-users
+    ip: 10.40.10.10
+acl:
+  default_action: permit
+  rules:
+  - name: guest-no-hq-servers
+    src: br2-guest
+    dst: hq-servers
+    proto: any
+    action: deny
+  - name: guest-no-br1-users
+    src: br2-guest
+    dst: br1-users
+    proto: any
+    action: deny
+  - name: guest-no-br2-users
+    src: br2-guest
+    dst: br2-users
+    proto: any
+    action: deny
+  - name: br1-no-ssh-servers
+    src: br1-users
+    dst: hq-servers
+    proto: tcp
+    port: 22
+    action: deny
+probes:
+- from: br1-pc1
+  to: hq-srv1
+  proto: tcp
+  port: 80
+  expect: allow
+- from: br1-pc1
+  to: hq-srv1
+  proto: tcp
+  port: 22
+  expect: deny
+- from: br2-pc1
+  to: hq-srv1
+  proto: tcp
+  port: 22
+  expect: allow
+- from: br2-guest1
+  to: hq-srv1
+  proto: tcp
+  port: 80
+  expect: deny

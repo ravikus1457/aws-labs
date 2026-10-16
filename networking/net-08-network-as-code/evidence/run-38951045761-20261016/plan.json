@@ -1,0 +1,273 @@
+{
+  "hosts": {
+    "br1-pc1": {
+      "gateway": "10.20.10.1",
+      "ip": "10.20.10.10/24",
+      "routes": [
+        "10.10.0.0/16",
+        "10.20.0.0/16",
+        "10.30.0.0/16"
+      ],
+      "services": []
+    },
+    "br2-guest1": {
+      "gateway": "10.30.99.1",
+      "ip": "10.30.99.10/24",
+      "routes": [
+        "10.10.0.0/16",
+        "10.20.0.0/16",
+        "10.30.0.0/16"
+      ],
+      "services": []
+    },
+    "br2-pc1": {
+      "gateway": "10.30.10.1",
+      "ip": "10.30.10.10/24",
+      "routes": [
+        "10.10.0.0/16",
+        "10.20.0.0/16",
+        "10.30.0.0/16"
+      ],
+      "services": []
+    },
+    "hq-srv1": {
+      "gateway": "10.10.10.1",
+      "ip": "10.10.10.10/24",
+      "routes": [
+        "10.10.0.0/16",
+        "10.20.0.0/16",
+        "10.30.0.0/16"
+      ],
+      "services": [
+        "tcp/22",
+        "tcp/80"
+      ]
+    }
+  },
+  "images": {
+    "host": "nicolaka/netshoot:v0.16",
+    "router": "quay.io/frrouting/frr:10.4.5"
+  },
+  "lab": "net08",
+  "links": [
+    [
+      "hq-r1:eth2",
+      "hq-srv1:eth1"
+    ],
+    [
+      "hq-r1:eth1",
+      "hq-r2:eth1"
+    ],
+    [
+      "br1-r1:eth2",
+      "br1-pc1:eth1"
+    ],
+    [
+      "br2-r1:eth2",
+      "br2-pc1:eth1"
+    ],
+    [
+      "br2-r1:eth3",
+      "br2-guest1:eth1"
+    ],
+    [
+      "br1-r1:eth1",
+      "hq-r2:eth2"
+    ],
+    [
+      "br2-r1:eth1",
+      "hq-r2:eth3"
+    ]
+  ],
+  "probes": [
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br1-pc1 -> br2-guest1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br1-pc1 -> br2-pc1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br1-pc1 -> hq-srv1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": "br2-r1",
+      "expect": "deny",
+      "id": "br2-guest1 -> br1-pc1 icmp",
+      "origin": "matrix",
+      "rule": "guest-no-br1-users"
+    },
+    {
+      "enforced_on": "br2-r1",
+      "expect": "deny",
+      "id": "br2-guest1 -> br2-pc1 icmp",
+      "origin": "matrix",
+      "rule": "guest-no-br2-users"
+    },
+    {
+      "enforced_on": "br2-r1",
+      "expect": "deny",
+      "id": "br2-guest1 -> hq-srv1 icmp",
+      "origin": "matrix",
+      "rule": "guest-no-hq-servers"
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br2-pc1 -> br1-pc1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br2-pc1 -> br2-guest1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br2-pc1 -> hq-srv1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "hq-srv1 -> br1-pc1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "hq-srv1 -> br2-guest1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "hq-srv1 -> br2-pc1 icmp",
+      "origin": "matrix",
+      "rule": null
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br1-pc1 -> hq-srv1 tcp/80",
+      "origin": "declared",
+      "rule": null
+    },
+    {
+      "enforced_on": "br1-r1",
+      "expect": "deny",
+      "id": "br1-pc1 -> hq-srv1 tcp/22",
+      "origin": "declared",
+      "rule": "br1-no-ssh-servers"
+    },
+    {
+      "enforced_on": null,
+      "expect": "allow",
+      "id": "br2-pc1 -> hq-srv1 tcp/22",
+      "origin": "declared",
+      "rule": null
+    },
+    {
+      "enforced_on": "br2-r1",
+      "expect": "deny",
+      "id": "br2-guest1 -> hq-srv1 tcp/80",
+      "origin": "declared",
+      "rule": "guest-no-hq-servers"
+    }
+  ],
+  "routers": {
+    "br1-r1": {
+      "acl_rules": [
+        "br1-no-ssh-servers"
+      ],
+      "asn": 65010,
+      "expected_bgp_peers": {
+        "172.16.0.1": 65000
+      },
+      "expected_ospf_neighbors": {},
+      "expected_routes": {
+        "10.10.10.0/24": "bgp",
+        "10.20.10.0/24": "connected",
+        "10.30.10.0/24": "bgp",
+        "10.30.99.0/24": "bgp"
+      },
+      "router_id": "10.255.0.11",
+      "site": "br1"
+    },
+    "br2-r1": {
+      "acl_rules": [
+        "guest-no-hq-servers",
+        "guest-no-br1-users",
+        "guest-no-br2-users"
+      ],
+      "asn": 65020,
+      "expected_bgp_peers": {
+        "172.16.0.5": 65000
+      },
+      "expected_ospf_neighbors": {},
+      "expected_routes": {
+        "10.10.10.0/24": "bgp",
+        "10.20.10.0/24": "bgp",
+        "10.30.10.0/24": "connected",
+        "10.30.99.0/24": "connected"
+      },
+      "router_id": "10.255.0.21",
+      "site": "br2"
+    },
+    "hq-r1": {
+      "acl_rules": [],
+      "asn": 65000,
+      "expected_bgp_peers": {},
+      "expected_ospf_neighbors": {
+        "10.255.0.2": "eth1"
+      },
+      "expected_routes": {
+        "10.10.10.0/24": "connected",
+        "10.20.10.0/24": "ospf",
+        "10.255.0.2/32": "ospf",
+        "10.30.10.0/24": "ospf",
+        "10.30.99.0/24": "ospf"
+      },
+      "router_id": "10.255.0.1",
+      "site": "hq"
+    },
+    "hq-r2": {
+      "acl_rules": [],
+      "asn": 65000,
+      "expected_bgp_peers": {
+        "172.16.0.2": 65010,
+        "172.16.0.6": 65020
+      },
+      "expected_ospf_neighbors": {
+        "10.255.0.1": "eth1"
+      },
+      "expected_routes": {
+        "10.10.10.0/24": "ospf",
+        "10.20.10.0/24": "bgp",
+        "10.255.0.1/32": "ospf",
+        "10.30.10.0/24": "bgp",
+        "10.30.99.0/24": "bgp"
+      },
+      "router_id": "10.255.0.2",
+      "site": "hq"
+    }
+  }
+}

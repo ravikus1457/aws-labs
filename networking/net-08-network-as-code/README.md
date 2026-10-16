@@ -230,21 +230,21 @@ The runner needs nothing paid and no secrets. The pins:
 - FRR image **quay.io/frrouting/frr:10.4.5**
 - host image **nicolaka/netshoot:v0.16**
 
-## Results (filled by the first CI run)
+## Results: first CI run, [GitHub Actions 38951045761](https://github.com/ravikus1457/aws-labs/actions/runs/38951045761), 2026-10-16 (202 checks passed, 0 failed)
 | Measure | Value | Source |
 |---|---|---|
-| Unit tests (offline) | 116 passed locally; CI: _filled by first CI run_ | pytest |
+| Unit tests (offline) | 116 passed locally; CI: 116 passed | pytest |
 | Mutation check (offline) | 20/20 deliberate bugs caught | done by hand while building, see above |
 | Validation of the real intent | ACCEPT, 0 errors, 0 warnings (local) | `validate.json` |
 | Bad change pr-042 | REJECTED (`SUBNET_OVERLAP`, plus `OUTSIDE_BLOCK` and 4 × `IFACE_MULTI_SUBNET`), generator refused (local) | `change-demo.json` |
-| `containerlab deploy` time | _filled by first CI run_ | deploy step log |
-| Control-plane convergence after config applied | _filled by first CI run_ | `converge.json` (polled every 2 s) |
-| Post-deploy checks passed | _filled by first CI run_ (of 46) | `test-initial.json` |
-| Reachability probes passed / must-deny probes proven by ACL counters | _filled by first CI run_ (of 16 / 5) | `test-initial.json` |
-| Out-of-band changes detected | _filled by first CI run_ (of 3) | `drift-demo.json` |
-| Heal time and method | _filled by first CI run_ | `drift-demo.json` |
-| Checks passed after heal | _filled by first CI run_ | `test-post-heal.json` |
-| Containers left after destroy | _filled by first CI run_ | destroy step log |
+| `containerlab deploy` time | 1 s | deploy step log |
+| Control-plane convergence after config applied | 14.6 s | `converge.json` (polled every 2 s) |
+| Post-deploy checks passed | 46 of 46 | `test-initial.json` |
+| Reachability probes passed / must-deny probes proven by ACL counters | 16 of 16 / 5 of 5 | `test-initial.json` |
+| Out-of-band changes detected | 3 of 3 | `drift-demo.json` |
+| Heal time and method | 0.9 s, `frr-reload.py` on all 3 drifted routers | `drift-demo.json` |
+| Checks passed after heal | 46 of 46 (and 29 of 29 re-convergence checks) | `test-post-heal.json` |
+| Containers left after destroy | 0 | destroy step log |
 
 ## Decisions and trade-offs
 | Decision | Chosen | Why / alternatives |

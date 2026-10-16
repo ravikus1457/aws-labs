@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "category": "validate",
+      "detail": "0 warning(s)",
+      "expect": "ACCEPT",
+      "observed": "ACCEPT",
+      "status": "PASS",
+      "subject": "network.yaml"
+    }
+  ],
+  "counts": {
+    "FAIL": 0,
+    "PASS": 1,
+    "SKIP": 0
+  },
+  "generated_at": "2026-10-16T18:57:04Z",
+  "metrics": {
+    "acl_rules": 4,
+    "errors": 0,
+    "findings": [],
+    "hosts": 4,
+    "links": 7,
+    "probes": 16,
+    "routers": 4,
+    "subnets": 7,
+    "warnings": 0
+  },
+  "phase": "validate",
+  "status": "PASS",
+  "title": "Pre-deploy validation of the source of truth"
+}
