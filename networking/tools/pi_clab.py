@@ -17,8 +17,8 @@ also runs on a Pi:
   * start  -> after wiring, the image's normal entrypoint is started (FRR's docker-start), then each node's
               `exec:` commands run, in order.
 
-Supported subset of the containerlab schema: name, mgmt (ignored beyond the name), topology.nodes
-(kind linux, image, binds, exec, env, cmd, entrypoint), topology.defaults/kinds image+binds,
+Supported subset of the containerlab schema: name, mgmt (ignored: pi_clab makes its own mgmt bridge), topology.nodes
+(kind linux, image, binds, exec, env, cmd, entrypoint, sysctls), topology.defaults/kinds (incl. sysctls),
 topology.links[].endpoints. Anything else is reported, never silently ignored.
 
   pi_clab.py deploy  -t lab.clab.yml
@@ -37,7 +37,7 @@ import time
 
 import yaml
 
-SUPPORTED_NODE_KEYS = {"kind", "image", "binds", "exec", "env", "cmd", "entrypoint", "labels"}
+SUPPORTED_NODE_KEYS = {"kind", "image", "binds", "exec", "env", "cmd", "entrypoint", "labels", "sysctls"}
 
 
 def sh(args, check=True, capture=True):
@@ -59,6 +59,8 @@ def load(path: pathlib.Path) -> dict:
         spec = dict(spec or {})
         kind = spec.get("kind") or defaults.get("kind") or "linux"
         merged = {**defaults, **(kinds.get(kind) or {}), **spec}
+        merged["sysctls"] = {**(defaults.get("sysctls") or {}), **((kinds.get(kind) or {}).get("sysctls") or {}),
+                             **(spec.get("sysctls") or {})}
         for k in merged:
             if k not in SUPPORTED_NODE_KEYS:
                 unsupported.append(f"node {n}: '{k}'")
@@ -121,6 +123,8 @@ def deploy(topo):
                 "--network", f"clab-{lab}-mgmt", "--label", f"pi-clab={lab}",
                 "--sysctl", "net.ipv4.ip_forward=1", "--sysctl", "net.ipv6.conf.all.disable_ipv6=0",
                 "--entrypoint", "sleep"]
+        for k, v in (spec.get("sysctls") or {}).items():
+            args += ["--sysctl", f"{k}={v}"]
         for b in spec.get("binds") or []:
             args += ["-v", bind_arg(b, base)]
         for k, v in (spec.get("env") or {}).items():
@@ -181,9 +185,17 @@ def inspect(topo):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("action", choices=["deploy", "destroy", "inspect"])
-    ap.add_argument("-t", "--topo", required=True)
+    ap.add_argument("action", choices=["deploy", "destroy", "inspect", "version"])
+    ap.add_argument("-t", "--topo")
+    # containerlab-compatible flags the lab scripts pass; deploy always rebuilds and destroy always cleans up.
+    ap.add_argument("--reconfigure", action="store_true")
+    ap.add_argument("--cleanup", action="store_true")
     a = ap.parse_args()
+    if a.action == "version":
+        print("    version: pi_clab-1.0 (plain Docker; containerlab-compatible subset)")
+        return
+    if not a.topo:
+        ap.error("-t/--topo is required")
     topo = load(pathlib.Path(a.topo))
     {"deploy": deploy, "destroy": destroy, "inspect": inspect}[a.action](topo)
 

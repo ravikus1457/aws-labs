@@ -13,6 +13,16 @@ from the same `.clab.yml` with plain Docker:
 | interface names | renamed in-container to the topology's names (eth1, eth2...) by MAC |
 | startup | image entrypoint started after wiring, then each node's `exec:` |
 
+**Run a whole lab on the Pi** (the same `run.sh` CI runs; `pi-containerlab` is a drop-in for `containerlab`):
+```
+cd networking/net-06-bgp-multihoming-bfd
+CLAB=$HOME/aws-devops-labs/networking/tools/pi-containerlab SUDO= sg docker -c ./run.sh
+```
+Verified 2026-10-16 on the Pi 5: **N6 PASS, 0 failed** (BFD 340 ms vs hold timer 28.1 s = 82.7x; port-down 72/360 ms),
+destroy left 0 containers / 0 networks. N7 needs `containerlab tools veth` (re-cabling a restarted node) and N8 needs
+passwordless `sudo nsenter` for its ACLs, so those two stay CI-only for now.
+
+Low-level:
 ```
 sg docker -c "python3 networking/tools/pi_clab.py deploy  -t networking/<lab>/<lab>.clab.yml"
 sg docker -c "python3 networking/tools/pi_clab.py inspect -t ..."
