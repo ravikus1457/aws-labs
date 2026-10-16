@@ -134,9 +134,11 @@ def route_nexthops(route_doc, prefix):
     ips = set()
     for e in chosen:
         nhs = e.get("nexthops") or []
-        fib = [nh for nh in nhs if nh.get("fib")]
-        if not fib and e.get("installed"):
-            fib = [nh for nh in nhs if nh.get("active")]
+        # A next hop counts only if FRR marks it ACTIVE (and, when FRR reports it, in the FIB). First CI run
+        # (38954476813): after core1 was killed, dc still LISTED 10.0.11.1 with "fib":true but no "active",
+        # interfaceName "unknown" and internalNextHopActiveNum 1 -- traffic had already moved to core2 only,
+        # but counting listed/fib next hops reported ECMP for the whole 35 s window (reconverge = None).
+        fib = [nh for nh in nhs if nh.get("active") and nh.get("fib", True)]
         ips.update(nh["ip"] for nh in fib if nh.get("ip"))
     return frozenset(ips)
 
