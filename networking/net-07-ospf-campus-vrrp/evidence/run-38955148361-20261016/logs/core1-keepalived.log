@@ -1,0 +1,88 @@
+Fri Oct 16 19:29:07 2026: Starting Keepalived v2.3.1 (05/24,2024)
+Fri Oct 16 19:29:07 2026: Running on Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 (built for Linux 6.14.2)
+Fri Oct 16 19:29:07 2026: Command line: 'keepalived' '-n' '-l' '-D' '-f' '/etc/keepalived/keepalived.conf'
+Fri Oct 16 19:29:07 2026: Opening file '/etc/keepalived/keepalived.conf'.
+Fri Oct 16 19:29:07 2026: Configuration file /etc/keepalived/keepalived.conf
+Fri Oct 16 19:29:07 2026: NOTICE: setting config option max_auto_priority should result in better keepalived performance
+Fri Oct 16 19:29:07 2026: Starting VRRP child process, pid=164
+Fri Oct 16 19:29:07 2026: Registering Kernel netlink reflector
+Fri Oct 16 19:29:07 2026: Registering Kernel netlink command channel
+Fri Oct 16 19:29:07 2026: SECURITY VIOLATION - scripts are being executed but script_security not enabled.
+Fri Oct 16 19:29:07 2026: Assigned address 10.10.10.2 for interface eth1.10
+Fri Oct 16 19:29:07 2026: Assigned address fe80::a8c1:abff:fe67:2535 for interface eth1.10
+Fri Oct 16 19:29:07 2026: Assigned address 10.10.20.2 for interface eth1.20
+Fri Oct 16 19:29:07 2026: Assigned address fe80::a8c1:abff:fe67:2535 for interface eth1.20
+Fri Oct 16 19:29:07 2026: Registering gratuitous ARP shared channel
+Fri Oct 16 19:29:07 2026: (VLAN10) removing VIPs.
+Fri Oct 16 19:29:07 2026: Startup complete
+Fri Oct 16 19:29:07 2026: (VLAN20) removing VIPs.
+Fri Oct 16 19:29:07 2026: (VLAN10) Entering BACKUP STATE (init)
+Fri Oct 16 19:29:07 2026: (VLAN20) Entering BACKUP STATE (init)
+Fri Oct 16 19:29:07 2026: VRRP sockpool: [ifindex(  3), family(IPv4), proto(112), fd(12,13) multicast, address(224.0.0.18)]
+Fri Oct 16 19:29:07 2026: VRRP sockpool: [ifindex(  4), family(IPv4), proto(112), fd(14,15) multicast, address(224.0.0.18)]
+Fri Oct 16 19:29:07 2026: VRRP_Script(uplink) succeeded
+Fri Oct 16 19:29:08 2026: (VLAN10) Receive advertisement timeout
+Fri Oct 16 19:29:08 2026: (VLAN10) Entering MASTER STATE
+Fri Oct 16 19:29:08 2026: (VLAN10) setting VIPs.
+Fri Oct 16 19:29:08 2026: (VLAN10) Sending/queueing gratuitous ARPs on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:08 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:08 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:08 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:13 2026: (VLAN10) Sending/queueing gratuitous ARPs on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:13 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:13 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:13 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:33 2026: Starting Keepalived v2.3.1 (05/24,2024)
+Fri Oct 16 19:29:33 2026: Running on Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 (built for Linux 6.14.2)
+Fri Oct 16 19:29:33 2026: Command line: 'keepalived' '-n' '-l' '-D' '-f' '/etc/keepalived/keepalived.conf'
+Fri Oct 16 19:29:33 2026: Opening file '/etc/keepalived/keepalived.conf'.
+Fri Oct 16 19:29:33 2026: Configuration file /etc/keepalived/keepalived.conf
+Fri Oct 16 19:29:33 2026: Remove a zombie pid file /run/keepalived/keepalived.pid
+Fri Oct 16 19:29:33 2026: Remove a zombie pid file /run/keepalived/vrrp.pid
+Fri Oct 16 19:29:33 2026: NOTICE: setting config option max_auto_priority should result in better keepalived performance
+Fri Oct 16 19:29:33 2026: Starting VRRP child process, pid=160
+Fri Oct 16 19:29:33 2026: Registering Kernel netlink reflector
+Fri Oct 16 19:29:33 2026: Registering Kernel netlink command channel
+Fri Oct 16 19:29:33 2026: SECURITY VIOLATION - scripts are being executed but script_security not enabled.
+Fri Oct 16 19:29:33 2026: Assigned address 10.10.10.2 for interface eth1.10
+Fri Oct 16 19:29:33 2026: Assigned address fe80::a8c1:abff:fee2:aad0 for interface eth1.10
+Fri Oct 16 19:29:33 2026: Assigned address 10.10.20.2 for interface eth1.20
+Fri Oct 16 19:29:33 2026: Assigned address fe80::a8c1:abff:fee2:aad0 for interface eth1.20
+Fri Oct 16 19:29:33 2026: Registering gratuitous ARP shared channel
+Fri Oct 16 19:29:33 2026: Startup complete
+Fri Oct 16 19:29:33 2026: (VLAN10) removing VIPs.
+Fri Oct 16 19:29:33 2026: (VLAN20) removing VIPs.
+Fri Oct 16 19:29:33 2026: (VLAN10) Entering BACKUP STATE (init)
+Fri Oct 16 19:29:33 2026: (VLAN20) Entering BACKUP STATE (init)
+Fri Oct 16 19:29:33 2026: VRRP sockpool: [ifindex(  3), family(IPv4), proto(112), fd(12,13) multicast, address(224.0.0.18)]
+Fri Oct 16 19:29:33 2026: VRRP sockpool: [ifindex(  4), family(IPv4), proto(112), fd(14,15) multicast, address(224.0.0.18)]
+Fri Oct 16 19:29:33 2026: Script `uplink` now returning 1
+Fri Oct 16 19:29:33 2026: VRRP_Script(uplink) failed (exited with status 1)
+Fri Oct 16 19:29:33 2026: (VLAN10) Changing effective priority from 200 to 50
+Fri Oct 16 19:29:33 2026: (VLAN20) Changing effective priority from 100 to 1
+Fri Oct 16 19:29:40 2026: Interface clab-918f4070 added
+Fri Oct 16 19:29:40 2026: Interface name has changed from clab-918f4070 to eth2
+Fri Oct 16 19:29:40 2026: Interface eth2 added
+Fri Oct 16 19:29:40 2026: (eth2) MAC Address changed from 46:39:e8:20:e1:f8 to aa:c1:ab:cf:dc:ee
+Fri Oct 16 19:29:43 2026: Interface clab-bf242744 added
+Fri Oct 16 19:29:43 2026: Interface name has changed from clab-bf242744 to eth3
+Fri Oct 16 19:29:43 2026: Interface eth3 added
+Fri Oct 16 19:29:43 2026: (eth3) MAC Address changed from c2:fd:8d:e7:96:1a to aa:c1:ab:4e:6a:d3
+Fri Oct 16 19:29:47 2026: Script `uplink` now returning 0
+Fri Oct 16 19:29:47 2026: VRRP_Script(uplink) succeeded
+Fri Oct 16 19:29:47 2026: (VLAN10) Changing effective priority from 50 to 200
+Fri Oct 16 19:29:47 2026: (VLAN20) Changing effective priority from 1 to 100
+Fri Oct 16 19:29:47 2026: (VLAN10) received lower priority (100) advert from 10.10.10.3 - discarding
+Fri Oct 16 19:29:47 2026: (VLAN10) received lower priority (100) advert from 10.10.10.3 - discarding
+Fri Oct 16 19:29:47 2026: (VLAN10) received lower priority (100) advert from 10.10.10.3 - discarding
+Fri Oct 16 19:29:47 2026: (VLAN10) Receive advertisement timeout
+Fri Oct 16 19:29:47 2026: (VLAN10) Entering MASTER STATE
+Fri Oct 16 19:29:47 2026: (VLAN10) setting VIPs.
+Fri Oct 16 19:29:47 2026: (VLAN10) Sending/queueing gratuitous ARPs on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:47 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:47 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:47 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:52 2026: (VLAN10) Sending/queueing gratuitous ARPs on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:52 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:52 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1
+Fri Oct 16 19:29:52 2026: Sending gratuitous ARP on eth1.10 for 10.10.10.1

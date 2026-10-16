@@ -1,0 +1,380 @@
+{
+  "kind": "scenario",
+  "scenario": "master_kill",
+  "checks": [
+    {
+      "id": "master_kill.pre.core1_is_master",
+      "status": "PASS",
+      "detail": "before the fault 10.10.10.1 is on core1=True, core2=False (want core1 only)",
+      "value": null
+    },
+    {
+      "id": "master_kill.pre.ecmp",
+      "status": "PASS",
+      "detail": "before the fault dc reaches 10.10.0.0/16 via ['10.0.11.1', '10.0.12.1'] (want both cores)",
+      "value": null
+    },
+    {
+      "id": "master_kill.fault_effective",
+      "status": "PASS",
+      "detail": "core1 running right after the kill / just before the repair: [False, False] (want false/false: nothing restarted it behind the lab's back)",
+      "value": null
+    },
+    {
+      "id": "master_kill.h10_to_srv.baseline_clean",
+      "status": "PASS",
+      "detail": "VLAN 10 h10->srv (its gateway master dies): 0/477 packets lost BEFORE the fault",
+      "value": null
+    },
+    {
+      "id": "master_kill.h10_to_srv.failover",
+      "status": "PASS",
+      "detail": "VLAN 10 h10->srv (its gateway master dies): traffic resumed while core1 was still dead (542 packets delivered)",
+      "value": null
+    },
+    {
+      "id": "master_kill.h10_to_srv.gap_ms",
+      "status": "PASS",
+      "detail": "VLAN 10 h10->srv (its gateway master dies): gap 640.0 ms (64 packets lost; limit 2000 ms)",
+      "value": 640.0
+    },
+    {
+      "id": "master_kill.h10_to_srv.failback_loss_ms",
+      "status": "PASS",
+      "detail": "VLAN 10 h10->srv (its gateway master dies): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.srv_to_h10.baseline_clean",
+      "status": "PASS",
+      "detail": "VLAN 10 srv->h10 (return path): 0/473 packets lost BEFORE the fault",
+      "value": null
+    },
+    {
+      "id": "master_kill.srv_to_h10.failover",
+      "status": "PASS",
+      "detail": "VLAN 10 srv->h10 (return path): traffic resumed while core1 was still dead (614 packets delivered)",
+      "value": null
+    },
+    {
+      "id": "master_kill.srv_to_h10.gap_ms",
+      "status": "PASS",
+      "detail": "VLAN 10 srv->h10 (return path): gap 0.0 ms (0 packets lost; limit 2000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.srv_to_h10.failback_loss_ms",
+      "status": "PASS",
+      "detail": "VLAN 10 srv->h10 (return path): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.h20_to_srv.baseline_clean",
+      "status": "PASS",
+      "detail": "VLAN 20 h20->srv (control: gateway master survives): 0/469 packets lost BEFORE the fault",
+      "value": null
+    },
+    {
+      "id": "master_kill.h20_to_srv.failover",
+      "status": "PASS",
+      "detail": "VLAN 20 h20->srv (control: gateway master survives): traffic resumed while core1 was still dead (614 packets delivered)",
+      "value": null
+    },
+    {
+      "id": "master_kill.h20_to_srv.gap_ms",
+      "status": "PASS",
+      "detail": "VLAN 20 h20->srv (control: gateway master survives): gap 0.0 ms (0 packets lost; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.h20_to_srv.failback_loss_ms",
+      "status": "PASS",
+      "detail": "VLAN 20 h20->srv (control: gateway master survives): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.srv_to_h20.baseline_clean",
+      "status": "PASS",
+      "detail": "VLAN 20 srv->h20 (control, return path): 0/466 packets lost BEFORE the fault",
+      "value": null
+    },
+    {
+      "id": "master_kill.srv_to_h20.failover",
+      "status": "PASS",
+      "detail": "VLAN 20 srv->h20 (control, return path): traffic resumed while core1 was still dead (614 packets delivered)",
+      "value": null
+    },
+    {
+      "id": "master_kill.srv_to_h20.gap_ms",
+      "status": "PASS",
+      "detail": "VLAN 20 srv->h20 (control, return path): gap 0.0 ms (0 packets lost; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.srv_to_h20.failback_loss_ms",
+      "status": "PASS",
+      "detail": "VLAN 20 srv->h20 (control, return path): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "master_kill.vrrp_takeover_ms",
+      "status": "PASS",
+      "detail": "core2 took over gateway 10.10.10.1 745.7 ms after the kill (bracket [724.2, 745.7]; limit 2000 ms)",
+      "value": 745.7
+    },
+    {
+      "id": "master_kill.ospf_neighbor_down_ms",
+      "status": "PASS",
+      "detail": "dc dropped its OSPF adjacency to core1 99.7 ms after the kill",
+      "value": 99.7
+    },
+    {
+      "id": "master_kill.ospf_reconverge_ms",
+      "status": "PASS",
+      "detail": "dc's route to 10.10.0.0/16 collapsed from ECMP to core2 only 99.7 ms after the kill (limit 2000 ms)",
+      "value": 99.7
+    },
+    {
+      "id": "master_kill.ecmp_restored_ms",
+      "status": "PASS",
+      "detail": "dc back to ECMP over both cores 14347.6 ms after core1 was powered on",
+      "value": 14347.6
+    },
+    {
+      "id": "master_kill.preemption",
+      "status": "PASS",
+      "detail": "core1 (priority 200) took 10.10.10.1 back 10501.2 ms after its backbone links were re-cabled; core2 released it 18641.9 ms after core1 was powered on",
+      "value": 10501.2
+    },
+    {
+      "id": "master_kill.preempt_waits_for_routing",
+      "status": "PASS",
+      "detail": "while core1 ran keepalived with no route to the servers (201 samples) it held the gateway in 0; samples with gateway but no route: 0 (want a tested gate: >= 3 samples, 0 and 0)",
+      "value": []
+    },
+    {
+      "id": "master_kill.path_during.h10_srv",
+      "status": "PASS",
+      "detail": "traceroute h10->srv during the fault: ['10.10.10.3', '10.0.12.2', '10.100.0.10'] (want first hop 10.10.10.3 (core2))",
+      "value": [
+        "10.10.10.3",
+        "10.0.12.2",
+        "10.100.0.10"
+      ]
+    },
+    {
+      "id": "master_kill.path_during.srv_h10",
+      "status": "PASS",
+      "detail": "traceroute srv->h10 during the fault: ['10.100.0.1', '10.0.12.1', '10.10.10.10'] (want via core2 only)",
+      "value": [
+        "10.100.0.1",
+        "10.0.12.1",
+        "10.10.10.10"
+      ]
+    },
+    {
+      "id": "master_kill.path_after.h10_srv",
+      "status": "PASS",
+      "detail": "traceroute h10->srv after the fault: ['10.10.10.2', '10.0.12.2', '10.100.0.10'] (want first hop 10.10.10.2 (core1 again))",
+      "value": [
+        "10.10.10.2",
+        "10.0.12.2",
+        "10.100.0.10"
+      ]
+    },
+    {
+      "id": "master_kill.gateway_arp_during",
+      "status": "PASS",
+      "detail": "during the fault h10 resolves 10.10.10.1 to aa:c1:ab:e9:c5:b8; the core2 gateway interface is aa:c1:ab:e9:c5:b8 (gratuitous ARP moved the host)",
+      "value": null
+    },
+    {
+      "id": "master_kill.gateway_arp_after",
+      "status": "PASS",
+      "detail": "after the fault h10 resolves 10.10.10.1 to aa:c1:ab:e2:aa:d0; the core1 gateway interface is aa:c1:ab:e2:aa:d0 (gratuitous ARP moved the host)",
+      "value": null
+    }
+  ],
+  "summary": {
+    "scenario": "master_kill",
+    "h10_to_srv": {
+      "sent": 3556,
+      "received": 3492,
+      "lost": 64,
+      "send_errors": 0,
+      "sender_max_gap_ms": 22.2,
+      "pre_fault_lost": 0,
+      "pre_fault_sent": 477,
+      "outage": {
+        "lost": 64,
+        "window_ms": 640.0,
+        "longest_run_ms": 640.0,
+        "recovered": true,
+        "start": 1792178963.288997,
+        "end": 1792178963.928994
+      },
+      "delivered_during_fault_after_outage": 542,
+      "failback": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_after_restore": 2434
+    },
+    "srv_to_h10": {
+      "sent": 3560,
+      "received": 3560,
+      "lost": 0,
+      "send_errors": 0,
+      "sender_max_gap_ms": 17.6,
+      "pre_fault_lost": 0,
+      "pre_fault_sent": 473,
+      "outage": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_during_fault_after_outage": 614,
+      "failback": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_after_restore": 2443
+    },
+    "h20_to_srv": {
+      "sent": 3552,
+      "received": 3552,
+      "lost": 0,
+      "send_errors": 0,
+      "sender_max_gap_ms": 17.0,
+      "pre_fault_lost": 0,
+      "pre_fault_sent": 469,
+      "outage": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_during_fault_after_outage": 614,
+      "failback": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_after_restore": 2439
+    },
+    "srv_to_h20": {
+      "sent": 3553,
+      "received": 3553,
+      "lost": 0,
+      "send_errors": 0,
+      "sender_max_gap_ms": 17.5,
+      "pre_fault_lost": 0,
+      "pre_fault_sent": 466,
+      "outage": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_during_fault_after_outage": 614,
+      "failback": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_after_restore": 2443
+    },
+    "vrrp_takeover": {
+      "ms": 745.7,
+      "bracket_ms": [
+        724.2,
+        745.7
+      ],
+      "at": 1792178963.941022
+    },
+    "ospf_neighbor_down": {
+      "ms": 99.7,
+      "bracket_ms": [
+        61.6,
+        99.7
+      ],
+      "at": 1792178963.295091
+    },
+    "ospf_reconverge": {
+      "ms": 99.7,
+      "bracket_ms": [
+        61.6,
+        99.7
+      ],
+      "at": 1792178963.295091
+    },
+    "ecmp_restored": {
+      "ms": 14347.6,
+      "bracket_ms": [
+        14310.4,
+        14347.6
+      ],
+      "at": 1792178983.69105
+    },
+    "preempt_after_wired": {
+      "ms": 10501.2,
+      "bracket_ms": [
+        10478.8,
+        10501.2
+      ],
+      "at": 1792178987.982904
+    },
+    "core2_release": {
+      "ms": 18641.9,
+      "bracket_ms": [
+        18620.6,
+        18641.9
+      ],
+      "at": 1792178987.985374
+    }
+  },
+  "meta": {
+    "scenario": "master_kill",
+    "t_fault": 1792178963.1953547,
+    "t_restore": 1792178969.343451,
+    "t_wired": 1792178977.4816895,
+    "t_keepalived": 1792178973.4476666,
+    "gate_s": 4,
+    "core1_running_after_kill": false,
+    "core1_running_before_restore": false,
+    "probe_interval_ms": 10,
+    "run_saw_failover": true,
+    "run_saw_failback": true,
+    "vrrp": {
+      "advert_int_s": 0.2,
+      "priority_master": 200,
+      "priority_backup": 100,
+      "track_weight": -150
+    },
+    "ospf_timers": {
+      "hello_s": 1,
+      "dead_s": 4
+    }
+  }
+}

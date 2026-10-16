@@ -1,0 +1,117 @@
+ OSPF Routing Process, Router ID: 10.255.0.1
+ Supports only single TOS (TOS0) routes
+ This implementation conforms to RFC2328
+ RFC1583Compatibility flag is disabled
+ OpaqueCapability flag is disabled
+ Initial SPF scheduling delay 0 millisec(s)
+ Minimum hold time between consecutive SPFs 50 millisec(s)
+ Maximum hold time between consecutive SPFs 5000 millisec(s)
+ Hold time multiplier is currently 1
+ SPF algorithm last executed 8.756s ago
+ Last SPF duration 57 usecs
+ SPF timer is inactive
+ LSA minimum interval 5000 msecs
+ LSA minimum arrival 1000 msecs
+ Write Multiplier set to 20 
+ Refresh timer 10 secs
+ Maximum multiple paths(ECMP) supported 64
+ Administrative distance 110
+ This router is an ABR, ABR type is: Alternative Cisco
+ Number of external LSA 0. Checksum Sum 0x00000000
+ Number of opaque AS LSA 0. Checksum Sum 0x00000000
+ Number of areas attached to this router: 2
+ Area ID: 0.0.0.0 (Backbone)
+   Number of interfaces in this area: Total: 3, Active: 3
+   Number of fully adjacent neighbors in this area: 2
+   Area has no authentication
+   SPF algorithm executed 9 times
+   Number of LSA 5
+   Number of router LSA 3. Checksum Sum 0x0001fab6
+   Number of network LSA 0. Checksum Sum 0x00000000
+   Number of summary LSA 2. Checksum Sum 0x0000e383
+   Number of ASBR summary LSA 0. Checksum Sum 0x00000000
+   Number of NSSA LSA 0. Checksum Sum 0x00000000
+   Number of opaque link LSA 0. Checksum Sum 0x00000000
+   Number of opaque area LSA 0. Checksum Sum 0x00000000
+
+ Area ID: 0.0.0.1
+   Shortcutting mode: Default, S-bit consensus: ok
+   Number of interfaces in this area: Total: 2, Active: 2
+   Number of fully adjacent neighbors in this area: 0
+   Area has no authentication
+   Number of full virtual adjacencies going through this area: 0
+   SPF algorithm executed 5 times
+   Number of LSA 8
+   Number of router LSA 1. Checksum Sum 0x00004c83
+   Number of network LSA 0. Checksum Sum 0x00000000
+   Number of summary LSA 7. Checksum Sum 0x0004b874
+   Number of ASBR summary LSA 0. Checksum Sum 0x00000000
+   Number of NSSA LSA 0. Checksum Sum 0x00000000
+   Number of opaque link LSA 0. Checksum Sum 0x00000000
+   Number of opaque area LSA 0. Checksum Sum 0x00000000
+
+
+
+       OSPF Router with ID (10.255.0.1)
+
+                Router Link States (Area 0.0.0.0)
+
+Link ID         ADV Router      Age  Seq#       CkSum  Link count
+10.255.0.1     10.255.0.1        13 0x80000006 0x7301 5
+10.255.0.2     10.255.0.2        18 0x80000006 0xabc3 5
+10.255.0.3     10.255.0.3        14 0x80000006 0xdbf2 6
+
+                Summary Link States (Area 0.0.0.0)
+
+Link ID         ADV Router      Age  Seq#       CkSum  Route
+10.10.0.0      10.255.0.1        18 0x80000001 0x74bf 10.10.0.0/16
+10.10.0.0      10.255.0.2        19 0x80000001 0x6ec4 10.10.0.0/16
+
+                Router Link States (Area 0.0.0.1)
+
+Link ID         ADV Router      Age  Seq#       CkSum  Link count
+10.255.0.1     10.255.0.1        18 0x80000003 0x4c83 2
+
+                Summary Link States (Area 0.0.0.1)
+
+Link ID         ADV Router      Age  Seq#       CkSum  Route
+10.0.0.0       10.255.0.1        18 0x80000001 0xda66 10.0.0.0/30
+10.0.11.0      10.255.0.1        18 0x80000001 0x61d4 10.0.11.0/30
+10.0.12.0      10.255.0.1        13 0x80000001 0xba70 10.0.12.0/30
+10.100.0.0     10.255.0.1        13 0x80000001 0x9c33 10.100.0.0/24
+10.255.0.1     10.255.0.1        18 0x80000001 0x7ec8 10.255.0.1/32
+10.255.0.2     10.255.0.1        13 0x80000001 0xd863 10.255.0.2/32
+10.255.0.3     10.255.0.1        13 0x80000001 0xce6c 10.255.0.3/32
+
+
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv4 unicast VRF default:
+O   10.0.0.0/30 [110/10] is directly connected, eth3, weight 1, 00:00:20
+C>* 10.0.0.0/30 is directly connected, eth3, weight 1, 00:00:20
+L>* 10.0.0.1/32 is directly connected, eth3, weight 1, 00:00:20
+O   10.0.11.0/30 [110/10] is directly connected, eth2, weight 1, 00:00:20
+C>* 10.0.11.0/30 is directly connected, eth2, weight 1, 00:00:20
+L>* 10.0.11.1/32 is directly connected, eth2, weight 1, 00:00:20
+O>* 10.0.12.0/30 [110/20] via 10.0.0.2, eth3, weight 1, 00:00:14
+  *                       via 10.0.11.2, eth2, weight 1, 00:00:14
+O>* 10.10.0.0/16 [110/0] unreachable (blackhole), weight 1, 00:00:09
+C>* 10.10.10.0/24 is directly connected, eth1.10, weight 1, 00:00:19
+O   10.10.10.0/24 [110/10] is directly connected, eth1.10, weight 1, 00:00:19
+L>* 10.10.10.2/32 is directly connected, eth1.10, weight 1, 00:00:19
+O   10.10.20.0/24 [110/10] is directly connected, eth1.20, weight 1, 00:00:19
+C>* 10.10.20.0/24 is directly connected, eth1.20, weight 1, 00:00:19
+L>* 10.10.20.2/32 is directly connected, eth1.20, weight 1, 00:00:19
+O>* 10.100.0.0/24 [110/20] via 10.0.11.2, eth2, weight 1, 00:00:14
+O   10.255.0.1/32 [110/0] is directly connected, lo, weight 1, 00:00:20
+L * 10.255.0.1/32 is directly connected, lo, weight 1, 00:00:20
+C>* 10.255.0.1/32 is directly connected, lo, weight 1, 00:00:20
+O>* 10.255.0.2/32 [110/10] via 10.0.0.2, eth3, weight 1, 00:00:14
+O>* 10.255.0.3/32 [110/10] via 10.0.11.2, eth2, weight 1, 00:00:14
+C>* 172.20.70.0/24 is directly connected, eth0, weight 1, 00:00:20
+L>* 172.20.70.6/32 is directly connected, eth0, weight 1, 00:00:20

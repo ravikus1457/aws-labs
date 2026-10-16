@@ -1,0 +1,23 @@
+{
+  "scenario": "master_kill",
+  "t_fault": 1792178963.1953547,
+  "t_restore": 1792178969.343451,
+  "t_wired": 1792178977.4816895,
+  "t_keepalived": 1792178973.4476666,
+  "gate_s": 4,
+  "core1_running_after_kill": false,
+  "core1_running_before_restore": false,
+  "probe_interval_ms": 10,
+  "run_saw_failover": true,
+  "run_saw_failback": true,
+  "vrrp": {
+    "advert_int_s": 0.2,
+    "priority_master": 200,
+    "priority_backup": 100,
+    "track_weight": -150
+  },
+  "ospf_timers": {
+    "hello_s": 1,
+    "dead_s": 4
+  }
+}

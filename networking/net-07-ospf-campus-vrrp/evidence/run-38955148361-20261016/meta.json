@@ -1,0 +1,12 @@
+{
+  "lab": "net07",
+  "run_id": "gha-38955148361",
+  "started": "2026-10-16T19:28:58Z",
+  "frr_image": "quay.io/frrouting/frr:10.6.2",
+  "core_image": "net07-core:local",
+  "keepalived": "Keepalived v2.3.1 (05/24,2024)",
+  "host_image": "nicolaka/netshoot:v0.16",
+  "clab_version": "0.79.0",
+  "kernel": "6.17.0-1022-azure",
+  "probe_interval_ms": 10
+}

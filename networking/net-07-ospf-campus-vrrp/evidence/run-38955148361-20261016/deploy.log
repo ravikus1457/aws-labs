@@ -1,0 +1,51 @@
+19:28:54 INFO Containerlab started version=0.79.0
+19:28:54 INFO Parsing & checking topology file=topology.clab.yml
+19:28:54 INFO Removing directory path=/home/runner/work/aws-labs/aws-labs/networking/net-07-ospf-campus-vrrp/clab-net07
+19:28:54 INFO Creating docker network name=net07-mgmt IPv4 subnet=172.20.70.0/24 IPv6 subnet="" MTU=0
+19:28:54 INFO Creating lab directory path=/home/runner/work/aws-labs/aws-labs/networking/net-07-ospf-campus-vrrp/clab-net07
+19:28:54 INFO Creating container name=h20
+19:28:54 INFO Creating container name=srv
+19:28:54 INFO Creating container name=sw
+19:28:54 INFO Creating container name=core2
+19:28:55 INFO Created link: core2:eth1 ▪┄┄▪ sw:eth2
+19:28:55 INFO Creating container name=dc
+19:28:55 INFO Creating container name=core1
+19:28:55 INFO Created link: sw:eth4 ▪┄┄▪ h20:eth1
+19:28:55 INFO Creating container name=h10
+19:28:55 INFO Created link: core1:eth1 ▪┄┄▪ sw:eth1
+19:28:55 INFO Created link: core1:eth3 ▪┄┄▪ core2:eth3
+19:28:56 INFO Created link: core1:eth2 ▪┄┄▪ dc:eth1
+19:28:56 INFO Created link: core2:eth2 ▪┄┄▪ dc:eth2
+19:28:56 INFO Created link: dc:eth3 ▪┄┄▪ srv:eth1
+19:28:56 INFO Created link: sw:eth3 ▪┄┄▪ h10:eth1
+19:28:56 INFO Adding host entries path=/etc/hosts
+19:28:56 INFO Adding SSH config for nodes path=/etc/ssh/ssh_config.d/clab-net07.conf
+19:28:56 INFO containerlab version
+  🎉=
+  │ A newer containerlab version (0.81.1) is available!
+  │ Release notes: https://containerlab.dev/rn/0.81/#0811
+  │ Run 'clab version upgrade' or see https://containerlab.dev/install/ for other installation options.
+[1m╭[0m[1m──────────────────[0m[1m┬[0m[1m──────────────────────────────[0m[1m┬[0m[1m─────────[0m[1m┬[0m[1m────────────────[0m[1m╮[0m
+[1m│[0m[1m       Name       [0m[1m│[0m[1m          Kind/Image          [0m[1m│[0m[1m  State  [0m[1m│[0m[1m IPv4/6 Address [0m[1m│[0m
+[1m├[0m[1m──────────────────[0m[1m┼[0m[1m──────────────────────────────[0m[1m┼[0m[1m─────────[0m[1m┼[0m[1m────────────────[0m[1m┤[0m
+│ clab-net07-core1 │ linux                        │ running │ 172.20.70.6    │
+│                  │ net07-core:local             │         │ N/A            │
+├──────────────────┼──────────────────────────────┼─────────┼────────────────┤
+│ clab-net07-core2 │ linux                        │ running │ 172.20.70.2    │
+│                  │ net07-core:local             │         │ N/A            │
+├──────────────────┼──────────────────────────────┼─────────┼────────────────┤
+│ clab-net07-dc    │ linux                        │ running │ 172.20.70.7    │
+│                  │ quay.io/frrouting/frr:10.6.2 │         │ N/A            │
+├──────────────────┼──────────────────────────────┼─────────┼────────────────┤
+│ clab-net07-h10   │ linux                        │ running │ 172.20.70.8    │
+│                  │ nicolaka/netshoot:v0.16      │         │ N/A            │
+├──────────────────┼──────────────────────────────┼─────────┼────────────────┤
+│ clab-net07-h20   │ linux                        │ running │ 172.20.70.4    │
+│                  │ nicolaka/netshoot:v0.16      │         │ N/A            │
+├──────────────────┼──────────────────────────────┼─────────┼────────────────┤
+│ clab-net07-srv   │ linux                        │ running │ 172.20.70.5    │
+│                  │ nicolaka/netshoot:v0.16      │         │ N/A            │
+├──────────────────┼──────────────────────────────┼─────────┼────────────────┤
+│ clab-net07-sw    │ linux                        │ running │ 172.20.70.3    │
+│                  │ nicolaka/netshoot:v0.16      │         │ N/A            │
+╰──────────────────┴──────────────────────────────┴─────────┴────────────────╯

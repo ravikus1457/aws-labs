@@ -1,0 +1,107 @@
+{
+  "kind": "baseline",
+  "checks": [
+    {
+      "id": "baseline.ospf_full.dc",
+      "status": "PASS",
+      "detail": "dc: OSPF adjacencies Full with ['10.255.0.1', '10.255.0.2'] (want ['10.255.0.1', '10.255.0.2'])",
+      "value": [
+        "10.255.0.1",
+        "10.255.0.2"
+      ]
+    },
+    {
+      "id": "baseline.ospf_full.core1",
+      "status": "PASS",
+      "detail": "core1: OSPF adjacencies Full with ['10.255.0.2', '10.255.0.3'] (want ['10.255.0.2', '10.255.0.3'])",
+      "value": [
+        "10.255.0.2",
+        "10.255.0.3"
+      ]
+    },
+    {
+      "id": "baseline.ospf_full.core2",
+      "status": "PASS",
+      "detail": "core2: OSPF adjacencies Full with ['10.255.0.1', '10.255.0.3'] (want ['10.255.0.1', '10.255.0.3'])",
+      "value": [
+        "10.255.0.1",
+        "10.255.0.3"
+      ]
+    },
+    {
+      "id": "baseline.area1_summarised",
+      "status": "PASS",
+      "detail": "dc sees area 1 as 10.10.0.0/16: yes; leaked /24 specifics: none",
+      "value": {
+        "summary": true,
+        "specifics": []
+      }
+    },
+    {
+      "id": "baseline.ecmp_fib",
+      "status": "PASS",
+      "detail": "dc FIB next hops for 10.10.0.0/16: ['10.0.11.1', '10.0.12.1'] (want both cores ['10.0.11.1', '10.0.12.1'])",
+      "value": [
+        "10.0.11.1",
+        "10.0.12.1"
+      ]
+    },
+    {
+      "id": "baseline.ecmp_dataplane",
+      "status": "PASS",
+      "detail": "kernel next hop per flow over 16 flows (L4 hash): {'10.0.11.1': 5, '10.0.12.1': 11} (want both cores used)",
+      "value": {
+        "10.0.11.1": 5,
+        "10.0.12.1": 11
+      }
+    },
+    {
+      "id": "baseline.vrrp_roles",
+      "status": "PASS",
+      "detail": "gateway VIPs: 10.10.10.1 on core1=True core2=False; 10.10.20.1 on core1=False core2=True (want VLAN 10 on core1 only, VLAN 20 on core2 only)",
+      "value": null
+    },
+    {
+      "id": "baseline.gateway_arp.h10",
+      "status": "PASS",
+      "detail": "h10 resolves gateway 10.10.10.1 to aa:c1:ab:67:25:35 (the master's interface is aa:c1:ab:67:25:35)",
+      "value": null
+    },
+    {
+      "id": "baseline.gateway_arp.h20",
+      "status": "PASS",
+      "detail": "h20 resolves gateway 10.10.20.1 to aa:c1:ab:e9:c5:b8 (the master's interface is aa:c1:ab:e9:c5:b8)",
+      "value": null
+    },
+    {
+      "id": "baseline.first_hop.h10->srv",
+      "status": "PASS",
+      "detail": "traceroute h10->srv: first hop 10.10.10.2 (want 10.10.10.2), reaches 10.100.0.10 (hops ['10.10.10.2', '10.0.12.2', '10.100.0.10'])",
+      "value": [
+        "10.10.10.2",
+        "10.0.12.2",
+        "10.100.0.10"
+      ]
+    },
+    {
+      "id": "baseline.first_hop.h20->srv",
+      "status": "PASS",
+      "detail": "traceroute h20->srv: first hop 10.10.20.3 (want 10.10.20.3), reaches 10.100.0.10 (hops ['10.10.20.3', '10.0.11.2', '10.100.0.10'])",
+      "value": [
+        "10.10.20.3",
+        "10.0.11.2",
+        "10.100.0.10"
+      ]
+    },
+    {
+      "id": "baseline.reach.srv->h10",
+      "status": "PASS",
+      "detail": "traceroute srv->h10 reaches 10.10.10.10 via ['10.100.0.1', '10.0.12.1', '10.10.10.10']",
+      "value": [
+        "10.100.0.1",
+        "10.0.12.1",
+        "10.10.10.10"
+      ]
+    }
+  ]
+}

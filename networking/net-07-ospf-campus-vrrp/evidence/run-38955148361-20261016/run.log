@@ -1,0 +1,140 @@
+19:28:54 deploying /home/runner/work/aws-labs/aws-labs/networking/net-07-ospf-campus-vrrp/topology.clab.yml (run gha-38955148361, evidence /home/runner/work/aws-labs/aws-labs/networking/net-07-ospf-campus-vrrp/evidence/run-38955148361-20261016)
+19:28:56 ok: core1: FRR answers vtysh (0s)
+19:28:56 ok: core2: FRR answers vtysh (0s)
+19:28:56 ok: dc: FRR answers vtysh (0s)
+19:28:57 ok: core1: VLAN interfaces addressed (0s)
+19:28:57 ok: core2: VLAN interfaces addressed (0s)
+19:29:07 ok: OSPF converged (all adjacencies Full, dc ECMP to 10.10.0.0/16) (9s)
+19:29:07 ok: core1 + core2 have the OSPF route to the servers (track script will pass) (0s)
+19:29:08 ok: VRRP roles settled (core1 VLAN 10, core2 VLAN 20) (1s)
+19:29:16 baseline checks:
+PASS baseline.ospf_full.dc: dc: OSPF adjacencies Full with ['10.255.0.1', '10.255.0.2'] (want ['10.255.0.1', '10.255.0.2'])
+PASS baseline.ospf_full.core1: core1: OSPF adjacencies Full with ['10.255.0.2', '10.255.0.3'] (want ['10.255.0.2', '10.255.0.3'])
+PASS baseline.ospf_full.core2: core2: OSPF adjacencies Full with ['10.255.0.1', '10.255.0.3'] (want ['10.255.0.1', '10.255.0.3'])
+PASS baseline.area1_summarised: dc sees area 1 as 10.10.0.0/16: yes; leaked /24 specifics: none
+PASS baseline.ecmp_fib: dc FIB next hops for 10.10.0.0/16: ['10.0.11.1', '10.0.12.1'] (want both cores ['10.0.11.1', '10.0.12.1'])
+PASS baseline.ecmp_dataplane: kernel next hop per flow over 16 flows (L4 hash): {'10.0.11.1': 5, '10.0.12.1': 11} (want both cores used)
+PASS baseline.vrrp_roles: gateway VIPs: 10.10.10.1 on core1=True core2=False; 10.10.20.1 on core1=False core2=True (want VLAN 10 on core1 only, VLAN 20 on core2 only)
+PASS baseline.gateway_arp.h10: h10 resolves gateway 10.10.10.1 to aa:c1:ab:67:25:35 (the master's interface is aa:c1:ab:67:25:35)
+PASS baseline.gateway_arp.h20: h20 resolves gateway 10.10.20.1 to aa:c1:ab:e9:c5:b8 (the master's interface is aa:c1:ab:e9:c5:b8)
+PASS baseline.first_hop.h10->srv: traceroute h10->srv: first hop 10.10.10.2 (want 10.10.10.2), reaches 10.100.0.10 (hops ['10.10.10.2', '10.0.12.2', '10.100.0.10'])
+PASS baseline.first_hop.h20->srv: traceroute h20->srv: first hop 10.10.20.3 (want 10.10.20.3), reaches 10.100.0.10 (hops ['10.10.20.3', '10.0.11.2', '10.100.0.10'])
+PASS baseline.reach.srv->h10: traceroute srv->h10 reaches 10.10.10.10 via ['10.100.0.1', '10.0.12.1', '10.10.10.10']
+19:29:16 === scenario master_kill: kill core1 (VLAN 10 gateway master) under traffic
+19:29:16 ok: converged (OSPF full, dc ECMP) (0s)
+19:29:16 ok: VRRP roles: core1 = VLAN 10 master, core2 = VLAN 20 master (0s)
+19:29:23 fault: core1 killed at 1792178963.195354771
+19:29:24 ok: failed over (core2 owns 10.10.10.1, dc routes via core2 only) (1s)
+19:29:29 repair: core1 powered on at 1792178969.343451086
+19:29:29 INFO Creating node node=clab-net07-core1
+19:29:29 INFO Creating node node=clab-net07-sw
+19:29:32 INFO Creating link link="clab-net07-core1:eth1 -- clab-net07-sw:eth1"
+19:29:32 INFO Created link: clab-net07-core1:eth1 ▪┄┄▪ clab-net07-sw:eth1
+19:29:32 INFO veth interface successfully created!
+19:29:32 ok: core1: VLAN interfaces addressed (0s)
+19:29:32 ok: core1: FRR answers vtysh (0s)
+19:29:37 INFO Creating node node=clab-net07-core1
+19:29:37 INFO Creating node node=clab-net07-dc
+19:29:40 INFO Creating link link="clab-net07-core1:eth2 -- clab-net07-dc:eth1"
+19:29:40 INFO Created link: clab-net07-core1:eth2 ▪┄┄▪ clab-net07-dc:eth1
+19:29:40 INFO veth interface successfully created!
+19:29:40 INFO Creating node node=clab-net07-core1
+19:29:40 INFO Creating node node=clab-net07-core2
+19:29:43 INFO Creating link link="clab-net07-core1:eth3 -- clab-net07-core2:eth3"
+19:29:43 INFO Created link: clab-net07-core1:eth3 ▪┄┄▪ clab-net07-core2:eth3
+19:29:43 INFO veth interface successfully created!
+19:29:43 ok: dc:eth1 readdressed by zebra (0s)
+19:29:43 ok: core2:eth3 readdressed by zebra (0s)
+19:29:43 ok: core1:eth2 readdressed by zebra (0s)
+19:29:43 ok: core1:eth3 readdressed by zebra (0s)
+19:29:43 core1: keepalived started at 1792178973.447666591, backbone re-cabled at 1792178977.481689412
+19:29:48 ok: failed back (core1 owns 10.10.10.1 again, dc ECMP restored) (5s)
+19:29:56 scenario master_kill checks:
+PASS master_kill.pre.core1_is_master: before the fault 10.10.10.1 is on core1=True, core2=False (want core1 only)
+PASS master_kill.pre.ecmp: before the fault dc reaches 10.10.0.0/16 via ['10.0.11.1', '10.0.12.1'] (want both cores)
+PASS master_kill.fault_effective: core1 running right after the kill / just before the repair: [False, False] (want false/false: nothing restarted it behind the lab's back)
+PASS master_kill.h10_to_srv.baseline_clean: VLAN 10 h10->srv (its gateway master dies): 0/477 packets lost BEFORE the fault
+PASS master_kill.h10_to_srv.failover: VLAN 10 h10->srv (its gateway master dies): traffic resumed while core1 was still dead (542 packets delivered)
+PASS master_kill.h10_to_srv.gap_ms: VLAN 10 h10->srv (its gateway master dies): gap 640.0 ms (64 packets lost; limit 2000 ms)
+PASS master_kill.h10_to_srv.failback_loss_ms: VLAN 10 h10->srv (its gateway master dies): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.srv_to_h10.baseline_clean: VLAN 10 srv->h10 (return path): 0/473 packets lost BEFORE the fault
+PASS master_kill.srv_to_h10.failover: VLAN 10 srv->h10 (return path): traffic resumed while core1 was still dead (614 packets delivered)
+PASS master_kill.srv_to_h10.gap_ms: VLAN 10 srv->h10 (return path): gap 0.0 ms (0 packets lost; limit 2000 ms)
+PASS master_kill.srv_to_h10.failback_loss_ms: VLAN 10 srv->h10 (return path): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.h20_to_srv.baseline_clean: VLAN 20 h20->srv (control: gateway master survives): 0/469 packets lost BEFORE the fault
+PASS master_kill.h20_to_srv.failover: VLAN 20 h20->srv (control: gateway master survives): traffic resumed while core1 was still dead (614 packets delivered)
+PASS master_kill.h20_to_srv.gap_ms: VLAN 20 h20->srv (control: gateway master survives): gap 0.0 ms (0 packets lost; limit 1000 ms)
+PASS master_kill.h20_to_srv.failback_loss_ms: VLAN 20 h20->srv (control: gateway master survives): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.srv_to_h20.baseline_clean: VLAN 20 srv->h20 (control, return path): 0/466 packets lost BEFORE the fault
+PASS master_kill.srv_to_h20.failover: VLAN 20 srv->h20 (control, return path): traffic resumed while core1 was still dead (614 packets delivered)
+PASS master_kill.srv_to_h20.gap_ms: VLAN 20 srv->h20 (control, return path): gap 0.0 ms (0 packets lost; limit 1000 ms)
+PASS master_kill.srv_to_h20.failback_loss_ms: VLAN 20 srv->h20 (control, return path): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.vrrp_takeover_ms: core2 took over gateway 10.10.10.1 745.7 ms after the kill (bracket [724.2, 745.7]; limit 2000 ms)
+PASS master_kill.ospf_neighbor_down_ms: dc dropped its OSPF adjacency to core1 99.7 ms after the kill
+PASS master_kill.ospf_reconverge_ms: dc's route to 10.10.0.0/16 collapsed from ECMP to core2 only 99.7 ms after the kill (limit 2000 ms)
+PASS master_kill.ecmp_restored_ms: dc back to ECMP over both cores 14347.6 ms after core1 was powered on
+PASS master_kill.preemption: core1 (priority 200) took 10.10.10.1 back 10501.2 ms after its backbone links were re-cabled; core2 released it 18641.9 ms after core1 was powered on
+PASS master_kill.preempt_waits_for_routing: while core1 ran keepalived with no route to the servers (201 samples) it held the gateway in 0; samples with gateway but no route: 0 (want a tested gate: >= 3 samples, 0 and 0)
+PASS master_kill.path_during.h10_srv: traceroute h10->srv during the fault: ['10.10.10.3', '10.0.12.2', '10.100.0.10'] (want first hop 10.10.10.3 (core2))
+PASS master_kill.path_during.srv_h10: traceroute srv->h10 during the fault: ['10.100.0.1', '10.0.12.1', '10.10.10.10'] (want via core2 only)
+PASS master_kill.path_after.h10_srv: traceroute h10->srv after the fault: ['10.10.10.2', '10.0.12.2', '10.100.0.10'] (want first hop 10.10.10.2 (core1 again))
+PASS master_kill.gateway_arp_during: during the fault h10 resolves 10.10.10.1 to aa:c1:ab:e9:c5:b8; the core2 gateway interface is aa:c1:ab:e9:c5:b8 (gratuitous ARP moved the host)
+PASS master_kill.gateway_arp_after: after the fault h10 resolves 10.10.10.1 to aa:c1:ab:e2:aa:d0; the core1 gateway interface is aa:c1:ab:e2:aa:d0 (gratuitous ARP moved the host)
+19:29:56 report:
+PASS baseline.ospf_full.dc: dc: OSPF adjacencies Full with ['10.255.0.1', '10.255.0.2'] (want ['10.255.0.1', '10.255.0.2'])
+PASS baseline.ospf_full.core1: core1: OSPF adjacencies Full with ['10.255.0.2', '10.255.0.3'] (want ['10.255.0.2', '10.255.0.3'])
+PASS baseline.ospf_full.core2: core2: OSPF adjacencies Full with ['10.255.0.1', '10.255.0.3'] (want ['10.255.0.1', '10.255.0.3'])
+PASS baseline.area1_summarised: dc sees area 1 as 10.10.0.0/16: yes; leaked /24 specifics: none
+PASS baseline.ecmp_fib: dc FIB next hops for 10.10.0.0/16: ['10.0.11.1', '10.0.12.1'] (want both cores ['10.0.11.1', '10.0.12.1'])
+PASS baseline.ecmp_dataplane: kernel next hop per flow over 16 flows (L4 hash): {'10.0.11.1': 5, '10.0.12.1': 11} (want both cores used)
+PASS baseline.vrrp_roles: gateway VIPs: 10.10.10.1 on core1=True core2=False; 10.10.20.1 on core1=False core2=True (want VLAN 10 on core1 only, VLAN 20 on core2 only)
+PASS baseline.gateway_arp.h10: h10 resolves gateway 10.10.10.1 to aa:c1:ab:67:25:35 (the master's interface is aa:c1:ab:67:25:35)
+PASS baseline.gateway_arp.h20: h20 resolves gateway 10.10.20.1 to aa:c1:ab:e9:c5:b8 (the master's interface is aa:c1:ab:e9:c5:b8)
+PASS baseline.first_hop.h10->srv: traceroute h10->srv: first hop 10.10.10.2 (want 10.10.10.2), reaches 10.100.0.10 (hops ['10.10.10.2', '10.0.12.2', '10.100.0.10'])
+PASS baseline.first_hop.h20->srv: traceroute h20->srv: first hop 10.10.20.3 (want 10.10.20.3), reaches 10.100.0.10 (hops ['10.10.20.3', '10.0.11.2', '10.100.0.10'])
+PASS baseline.reach.srv->h10: traceroute srv->h10 reaches 10.10.10.10 via ['10.100.0.1', '10.0.12.1', '10.10.10.10']
+PASS master_kill.pre.core1_is_master: before the fault 10.10.10.1 is on core1=True, core2=False (want core1 only)
+PASS master_kill.pre.ecmp: before the fault dc reaches 10.10.0.0/16 via ['10.0.11.1', '10.0.12.1'] (want both cores)
+PASS master_kill.fault_effective: core1 running right after the kill / just before the repair: [False, False] (want false/false: nothing restarted it behind the lab's back)
+PASS master_kill.h10_to_srv.baseline_clean: VLAN 10 h10->srv (its gateway master dies): 0/477 packets lost BEFORE the fault
+PASS master_kill.h10_to_srv.failover: VLAN 10 h10->srv (its gateway master dies): traffic resumed while core1 was still dead (542 packets delivered)
+PASS master_kill.h10_to_srv.gap_ms: VLAN 10 h10->srv (its gateway master dies): gap 640.0 ms (64 packets lost; limit 2000 ms)
+PASS master_kill.h10_to_srv.failback_loss_ms: VLAN 10 h10->srv (its gateway master dies): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.srv_to_h10.baseline_clean: VLAN 10 srv->h10 (return path): 0/473 packets lost BEFORE the fault
+PASS master_kill.srv_to_h10.failover: VLAN 10 srv->h10 (return path): traffic resumed while core1 was still dead (614 packets delivered)
+PASS master_kill.srv_to_h10.gap_ms: VLAN 10 srv->h10 (return path): gap 0.0 ms (0 packets lost; limit 2000 ms)
+PASS master_kill.srv_to_h10.failback_loss_ms: VLAN 10 srv->h10 (return path): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.h20_to_srv.baseline_clean: VLAN 20 h20->srv (control: gateway master survives): 0/469 packets lost BEFORE the fault
+PASS master_kill.h20_to_srv.failover: VLAN 20 h20->srv (control: gateway master survives): traffic resumed while core1 was still dead (614 packets delivered)
+PASS master_kill.h20_to_srv.gap_ms: VLAN 20 h20->srv (control: gateway master survives): gap 0.0 ms (0 packets lost; limit 1000 ms)
+PASS master_kill.h20_to_srv.failback_loss_ms: VLAN 20 h20->srv (control: gateway master survives): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.srv_to_h20.baseline_clean: VLAN 20 srv->h20 (control, return path): 0/466 packets lost BEFORE the fault
+PASS master_kill.srv_to_h20.failover: VLAN 20 srv->h20 (control, return path): traffic resumed while core1 was still dead (614 packets delivered)
+PASS master_kill.srv_to_h20.gap_ms: VLAN 20 srv->h20 (control, return path): gap 0.0 ms (0 packets lost; limit 1000 ms)
+PASS master_kill.srv_to_h20.failback_loss_ms: VLAN 20 srv->h20 (control, return path): loss while core1 came back and took over again: 0.0 ms (0 packets; limit 1000 ms)
+PASS master_kill.vrrp_takeover_ms: core2 took over gateway 10.10.10.1 745.7 ms after the kill (bracket [724.2, 745.7]; limit 2000 ms)
+PASS master_kill.ospf_neighbor_down_ms: dc dropped its OSPF adjacency to core1 99.7 ms after the kill
+PASS master_kill.ospf_reconverge_ms: dc's route to 10.10.0.0/16 collapsed from ECMP to core2 only 99.7 ms after the kill (limit 2000 ms)
+PASS master_kill.ecmp_restored_ms: dc back to ECMP over both cores 14347.6 ms after core1 was powered on
+PASS master_kill.preemption: core1 (priority 200) took 10.10.10.1 back 10501.2 ms after its backbone links were re-cabled; core2 released it 18641.9 ms after core1 was powered on
+PASS master_kill.preempt_waits_for_routing: while core1 ran keepalived with no route to the servers (201 samples) it held the gateway in 0; samples with gateway but no route: 0 (want a tested gate: >= 3 samples, 0 and 0)
+PASS master_kill.path_during.h10_srv: traceroute h10->srv during the fault: ['10.10.10.3', '10.0.12.2', '10.100.0.10'] (want first hop 10.10.10.3 (core2))
+PASS master_kill.path_during.srv_h10: traceroute srv->h10 during the fault: ['10.100.0.1', '10.0.12.1', '10.10.10.10'] (want via core2 only)
+PASS master_kill.path_after.h10_srv: traceroute h10->srv after the fault: ['10.10.10.2', '10.0.12.2', '10.100.0.10'] (want first hop 10.10.10.2 (core1 again))
+PASS master_kill.gateway_arp_during: during the fault h10 resolves 10.10.10.1 to aa:c1:ab:e9:c5:b8; the core2 gateway interface is aa:c1:ab:e9:c5:b8 (gratuitous ARP moved the host)
+PASS master_kill.gateway_arp_after: after the fault h10 resolves 10.10.10.1 to aa:c1:ab:e2:aa:d0; the core1 gateway interface is aa:c1:ab:e2:aa:d0 (gratuitous ARP moved the host)
+verdict: PASS (0 failed)
+19:29:56 report: /home/runner/work/aws-labs/aws-labs/networking/net-07-ospf-campus-vrrp/evidence/run-38955148361-20261016/report.md
+19:29:56 destroying the lab
+19:29:56 INFO Parsing & checking topology file=topology.clab.yml
+19:29:56 INFO Parsing & checking topology file=topology.clab.yml
+19:29:56 INFO Destroying lab name=net07
+19:29:56 INFO Removed container name=clab-net07-h10
+19:29:57 INFO Removed container name=clab-net07-dc
+19:29:57 INFO Removed container name=clab-net07-h20
+19:29:57 INFO Removed container name=clab-net07-core2
+19:29:57 INFO Removed container name=clab-net07-srv
+19:29:57 INFO Removed container name=clab-net07-core1
+19:29:57 INFO Removed container name=clab-net07-sw
+19:29:57 INFO Removing host entries path=/etc/hosts
+19:29:57 INFO Removing SSH config path=/etc/ssh/ssh_config.d/clab-net07.conf

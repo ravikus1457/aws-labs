@@ -1,8 +1,7 @@
 # Net Lab 07 — OSPF campus with a VRRP gateway pair: pull the plug on the active core and measure it
 
-> **Status: runs in CI; results table is filled by the first CI run.** Everything below describes what the
-> lab does and how each claim is checked. No number appears in the Results table until a GitHub Actions run
-> has produced it.
+> **Status: green in CI** (run 38955148361, 42/42 checks). Every number in the Results table comes from that run;
+> the raw evidence is committed under `evidence/`.
 
 **What it proves.** A two-core campus runs **OSPF with two areas** (area 0 backbone, area 1 = the user
 VLANs, **summarised** to one /16 at the ABRs), reaches the data centre over **equal-cost paths (ECMP)**,
@@ -87,18 +86,18 @@ failback loss ≤ 1 s.
 
 ## Results
 
-Filled by the first CI run (report in the job summary and `evidence/run-*/report.md`).
+CI run [GitHub Actions 38955148361](https://github.com/ravikus1457/aws-labs/actions/runs/38955148361), 2026-10-16, **42/42 checks passed** (FRR 10.6.2, keepalived 2.3.1, containerlab 0.79.0, probe every 10 ms per direction). Full report: [`evidence/run-38955148361-20261016/report.md`](evidence/run-38955148361-20261016/report.md). The first run (38954476813) failed ONE check, and it was the measurement, not the network: FRR keeps a dead next hop listed (`fib` but not `active`) after its router dies, and the parser counted it. Fixed to count active next hops, with a regression test built from that exact output.
 
 | Measurement | Value |
 |---|---|
-| User gap, VLAN 10 h10 → srv (gateway moved) | _filled by first CI run_ |
-| User gap, VLAN 10 srv → h10 (return path) | _filled by first CI run_ |
-| Control VLAN 20, both directions | _filled by first CI run_ |
-| VRRP takeover (core2 holds 10.10.10.1) | _filled by first CI run_ |
-| OSPF: dc reroutes 10.10.0.0/16 onto core2 only | _filled by first CI run_ |
-| ECMP restored after core1 power-on | _filled by first CI run_ |
-| Preemption after core1's backbone returns | _filled by first CI run_ |
-| Loss during failback | _filled by first CI run_ |
+| User gap, VLAN 10 h10 → srv (gateway moved) | 640.0 ms |
+| User gap, VLAN 10 srv → h10 (return path) | 0.0 ms |
+| Control VLAN 20, both directions | 0.0 / 0.0 ms |
+| VRRP takeover (core2 holds 10.10.10.1) | 745.7 ms |
+| OSPF: dc reroutes 10.10.0.0/16 onto core2 only | 99.7 ms |
+| ECMP restored after core1 power-on | 14,347.6 ms |
+| Preemption after core1's backbone returns | 10,501.2 ms |
+| Loss during failback | 0.0 / 0.0 ms |
 
 ## How to run
 
