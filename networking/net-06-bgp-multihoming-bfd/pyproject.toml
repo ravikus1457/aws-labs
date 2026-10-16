@@ -1,0 +1,8 @@
+# Tooling config only (nothing here is packaged). CI: pytest, see .github/workflows/net06.yml.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"

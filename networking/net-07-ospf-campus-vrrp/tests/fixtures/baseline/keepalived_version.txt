@@ -1,0 +1,13 @@
+Keepalived v2.3.1 (05/24,2024)
+
+Copyright(C) 2001-2024 Alexandre Cassen, <acassen@gmail.com>
+
+Built with kernel headers for Linux 6.14.2
+Running on Linux 6.18.50+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.18.50-1+rpt1 (2026-09-11)
+Distro: Alpine Linux v3.22
+
+configure options: --build=aarch64-alpine-linux-musl --host=aarch64-alpine-linux-musl --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --enable-vrrp --enable-sha1 build_alias=aarch64-alpine-linux-musl host_alias=aarch64-alpine-linux-musl CC=cc CFLAGS=-Os -fstack-clash-protection -Wformat -Werror=format-security LDFLAGS=-Wl,--as-needed,-O1,--sort-common -Wl,-z,pack-relative-relocs
+
+Config options:  LVS VRRP VRRP_AUTH VRRP_VMAC OLD_CHKSUM_COMPAT INIT=systemd
+
+System options:  VSYSLOG MEMFD_CREATE IPV6_MULTICAST_ALL IPV4_DEVCONF LIBNL3 RTA_ENCAP RTA_EXPIRES RTA_NEWDST RTA_PREF FRA_SUPPRESS_PREFIXLEN FRA_SUPPRESS_IFGROUP FRA_TUN_ID RTAX_CC_ALGO RTAX_QUICKACK RTEXT_FILTER_SKIP_STATS FRA_L3MDEV FRA_UID_RANGE RTAX_FASTOPEN_NO_COOKIE RTA_VIA FRA_PROTOCOL FRA_IP_PROTO FRA_SPORT_RANGE FRA_DPORT_RANGE RTA_TTL_PROPAGATE IFA_FLAGS LWTUNNEL_ENCAP_MPLS LWTUNNEL_ENCAP_ILA NET_LINUX_IF_H_COLLISION NETINET_LINUX_IF_ETHER_H_COLLISION LIBIPTC_LINUX_NET_IF_H_COLLISION LIBIPVS_NETLINK IPVS_DEST_ATTR_ADDR_FAMILY IPVS_SYNCD_ATTRIBUTES IPVS_64BIT_STATS IPVS_TUN_TYPE IPVS_TUN_CSUM IPVS_TUN_GRE VRRP_IPVLAN IFLA_LINK_NETNSID INET6_ADDR_GEN_MODE VRF SO_MARK

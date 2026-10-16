@@ -1,0 +1,43 @@
+{
+  "routerId":"10.255.0.2",
+  "as":65010,
+  "vrfId":0,
+  "vrfName":"default",
+  "tableVersion":7,
+  "ribCount":6,
+  "ribMemory":912,
+  "peerCount":1,
+  "peerMemory":16904,
+  "peers":{
+    "10.255.0.1":{
+      "hostname":"ent",
+      "softwareVersion":"n/a",
+      "remoteAs":65010,
+      "localAs":65010,
+      "version":4,
+      "msgRcvd":7,
+      "msgSent":4,
+      "tableVersion":7,
+      "outq":0,
+      "inq":0,
+      "peerUptime":"00:00:13",
+      "peerUptimeMsec":13000,
+      "peerUptimeEstablishedEpoch":1792176871,
+      "pfxRcd":3,
+      "pfxSnt":1,
+      "state":"Established",
+      "peerState":"OK",
+      "connectionsEstablished":1,
+      "connectionsDropped":0,
+      "desc":"ent (iBGP)",
+      "idType":"ipv4"
+    }
+  },
+  "failedPeers":0,
+  "displayedPeers":1,
+  "totalPeers":1,
+  "dynamicPeers":0,
+  "bestPath":{
+    "multiPathRelax":"false"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "scenario": "bfd",
+  "t_fault": 1792176897.9003336,
+  "t_restore": 1792176904.3710978,
+  "probe_interval_ms": 10,
+  "run_saw_failover": true,
+  "run_saw_failback": true,
+  "bgp_timers": {
+    "keepalive_s": 10,
+    "hold_s": 30,
+    "connect_s": 5
+  },
+  "bfd_profile": {
+    "tx_ms": 100,
+    "rx_ms": 100,
+    "multiplier": 3
+  }
+}

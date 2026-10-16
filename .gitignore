@@ -50,3 +50,9 @@ __pycache__/
 # runner evidence from REAL runs is committed per lab (the portfolio's proof); scratch runs stay under evidence/
 labs/*/evidence/*
 !labs/*/evidence/run-*/
+
+# networking labs: CI evidence (evidence/run-*/) may be committed; local scratch runs and containerlab's
+# per-lab state directories never are
+networking/*/evidence/*
+!networking/*/evidence/run-*/
+networking/*/clab-*/

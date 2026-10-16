@@ -1,0 +1,28 @@
+{
+  "scenario": "master_kill",
+  "t_fault": 1792177856.9526196,
+  "t_restore": 1792177866.184752,
+  "t_wired": 1792177874.616691,
+  "t_keepalived": 1792177870.5420413,
+  "gate_s": 4,
+  "core1_running_after_kill": false,
+  "core1_running_before_restore": false,
+  "probe_interval_ms": 10,
+  "run_saw_failover": true,
+  "run_saw_failback": true,
+  "vrrp": {
+    "advert_int_s": 0.2,
+    "priority_master": 200,
+    "priority_backup": 100,
+    "track_weight": -150
+  },
+  "ospf_timers": {
+    "hello_s": 1,
+    "dead_s": 4
+  },
+  "thresholds": {
+    "h10_gap_max_ms": 5000,
+    "ospf_reconverge_max_ms": 5000
+  },
+  "thresholds_note": "recorded on a local plain-Docker harness (no containerlab on the Pi): links are Docker bridges, so killing core1 does not drop carrier on dc and OSPF's 4 s dead interval decides; limits relaxed here ONLY so this real run can serve as the known-good fixture. tests also prove it FAILS the defaults."
+}

@@ -1,0 +1,123 @@
+# Lab N7 - OSPF campus + VRRP gateway pair, run for real on a GitHub runner: containerlab, FRRouting (OSPF)
+# and keepalived (VRRPv3) containers, an 802.1Q Linux-bridge access switch and test hosts.
+#
+#   push (lab files) / manual  ->  test: pytest (measure.py vs real-run fixtures, incl. ones that MUST fail),
+#                                        static topology checks, shellcheck, py_compile
+#                               ->  lab:  install containerlab (pinned) -> build the core image (FRR + keepalived)
+#                                        -> run.sh: deploy, baseline assertions, kill the gateway master under traffic,
+#                                        measure, power it back on, prove preemption -> report to the job summary,
+#                                        evidence artifact -> ALWAYS destroy
+#
+# COST: $0. Public-repo runner minutes are free; no cloud account, no secrets, nothing outlives the job.
+name: net07-ospf-campus-vrrp
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "networking/net-07-ospf-campus-vrrp/**"
+      - ".github/workflows/net07.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: net07-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: networking/net-07-ospf-campus-vrrp
+  CLAB_VERSION: "0.79.0"
+  PYTHON_VERSION: "3.12"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: pytest + lint (no containers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: pytest (measure.py on real-run fixtures; mutated fixtures must FAIL; static topology checks)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          pip install --quiet -r requirements-dev.txt
+          python -m pytest -v
+      - name: shellcheck + bash -n + py_compile
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          bash -n run.sh
+          shellcheck -S warning run.sh configs/keepalived/chk_uplink.sh
+          python -m py_compile measure.py tools/probe.py tools/poll.py
+
+  lab:
+    name: containerlab run (deploy -> baseline -> kill master -> measure -> preempt -> destroy)
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install containerlab ${{ env.CLAB_VERSION }} (official installer, pinned version, checksum verified)
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)" -- --version "$CLAB_VERSION" --verify-checksum
+          containerlab version
+
+      - name: Kernel modules (802.1Q for the VLAN sub-interfaces) + pinned images + core image build
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          sudo modprobe 8021q
+          awk '$1 == "image:" && $2 !~ /:local$/ {print $2}' topology.clab.yml | sort -u | xargs -n1 docker pull -q
+          docker build -t net07-core:local .
+          {
+            echo "### Runner"
+            echo "- kernel \`$(uname -r)\`, $(nproc) vCPU, $(free -g | awk '/Mem:/{print $2}') GB RAM, docker $(docker version -f '{{.Server.Version}}')"
+            echo "- core image: $(docker run --rm --entrypoint sh net07-core:local -c 'keepalived --version 2>&1 | head -n1')"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: run.sh (deploy, baseline, kill the VLAN 10 gateway master, failback + preemption, report)
+        id: run
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          EVIDENCE="evidence/run-${GITHUB_RUN_ID}-$(date -u +%Y%m%d)"
+          echo "evidence=$EVIDENCE" >> "$GITHUB_OUTPUT"
+          export EVIDENCE RUN_ID="gha-${GITHUB_RUN_ID}" BUILD=0
+          ./run.sh
+
+      - name: Report -> job summary
+        if: always()
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          EVIDENCE: ${{ steps.run.outputs.evidence }}
+        run: |
+          if [ -n "$EVIDENCE" ] && [ -f "$EVIDENCE/report.md" ]; then
+            cat "$EVIDENCE/report.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No report.md - the run did not get far enough. See the run.sh step log and the evidence artifact." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: net07-evidence-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Destroy (always) + leftover check
+        if: always()
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          sudo containerlab destroy -t topology.clab.yml --cleanup || true
+          left=$(docker ps -a --filter "name=clab-net07-" -q | wc -l)
+          echo "containers left: $left"
+          [ "$left" -eq 0 ]

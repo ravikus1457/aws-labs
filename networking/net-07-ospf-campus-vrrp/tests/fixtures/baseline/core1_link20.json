@@ -1,0 +1,1 @@
+[{"ifindex":3,"link":"eth1","ifname":"eth1.20","flags":["BROADCAST","MULTICAST","UP","LOWER_UP"],"mtu":1500,"qdisc":"noqueue","operstate":"UP","linkmode":"DEFAULT","group":"default","txqlen":1000,"link_type":"ether","address":"02:42:ac:1d:29:02","broadcast":"ff:ff:ff:ff:ff:ff"}]

@@ -1,0 +1,90 @@
+# Lab N6 - BGP multihoming with BFD (containerlab topology).
+#
+#   h1 -- core ==iBGP/OSPF== ent --(nida: ISP-A access circuit)-- ispa --\
+#                               \                                        inet -- srv
+#                                \------------------------------- ispb --/
+#
+# Every image is pinned. The FRR routers read configs/<node>/frr.conf; the Linux hosts and the
+# NID are configured by run.sh (addresses, default routes, the NID's bridge), so the whole lab
+# is described by this file + configs/ + run.sh.
+name: net06
+
+mgmt:
+  network: net06-mgmt
+  ipv4-subnet: 172.20.60.0/24
+
+topology:
+  defaults:
+    sysctls:
+      net.ipv4.ip_forward: 1
+      net.ipv4.conf.all.rp_filter: 0
+      net.ipv4.conf.default.rp_filter: 0
+
+  nodes:
+    ent:
+      kind: linux
+      image: quay.io/frrouting/frr:10.6.2
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/ent/frr.conf:/etc/frr/frr.conf:ro
+    core:
+      kind: linux
+      image: quay.io/frrouting/frr:10.6.2
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/core/frr.conf:/etc/frr/frr.conf:ro
+    ispa:
+      kind: linux
+      image: quay.io/frrouting/frr:10.6.2
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/ispa/frr.conf:/etc/frr/frr.conf:ro
+    ispb:
+      kind: linux
+      image: quay.io/frrouting/frr:10.6.2
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/ispb/frr.conf:/etc/frr/frr.conf:ro
+    inet:
+      kind: linux
+      image: quay.io/frrouting/frr:10.6.2
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/inet/frr.conf:/etc/frr/frr.conf:ro
+    # ISP-A's access circuit: a plain L2 bridge (think metro-Ethernet NID). Both routers' ports stay
+    # UP when it fails, which is exactly the failure BFD exists for.
+    nida:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+      binds:
+        - tools:/lab/tools:ro
+    h1:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+      binds:
+        - tools:/lab/tools:ro
+    srv:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+      binds:
+        - tools:/lab/tools:ro
+
+  links:
+    - endpoints: ["ent:eth1", "nida:eth1"]
+    - endpoints: ["nida:eth2", "ispa:eth1"]
+    - endpoints: ["ent:eth2", "ispb:eth1"]
+    - endpoints: ["ent:eth3", "core:eth1"]
+    - endpoints: ["core:eth2", "h1:eth1"]
+    - endpoints: ["ispa:eth2", "inet:eth1"]
+    - endpoints: ["ispb:eth2", "inet:eth2"]
+    - endpoints: ["inet:eth3", "srv:eth1"]

@@ -1,0 +1,89 @@
+# Lab N7 - OSPF campus with a VRRP first-hop gateway pair (containerlab topology).
+#
+#   h10 (VLAN 10) --\                   /-- core1 --\
+#                    sw (802.1Q bridge) ---- core2 --- dc -- srv
+#   h20 (VLAN 20) --/   trunks to both cores   \_____/  (core1-core2 link, area 0)
+#
+# core1/core2: OSPF ABRs (area 0 backbone, area 1 = the user VLANs, summarised to 10.10.0.0/16) and the
+# keepalived VRRPv3 pair that owns the gateway addresses .1. dc: backbone router with the server LAN.
+# sw: a Linux VLAN-aware bridge (access ports for the hosts, 802.1Q trunks to both cores).
+#
+# Images are pinned. net07-core:local is quay.io/frrouting/frr:10.6.2 + keepalived (./Dockerfile); build it
+# before deploying (the workflow and run.sh do). restart-policy "no": containerlab's default for linux nodes
+# is "always", and the lab kills core1 on purpose - Docker must not resurrect it behind the lab's back.
+name: net07
+
+mgmt:
+  network: net07-mgmt
+  ipv4-subnet: 172.20.70.0/24
+
+topology:
+  defaults:
+    restart-policy: "no"
+    sysctls:
+      net.ipv4.ip_forward: 1
+      net.ipv4.conf.all.rp_filter: 0
+      net.ipv4.conf.default.rp_filter: 0
+
+  nodes:
+    core1:
+      kind: linux
+      image: net07-core:local
+      image-pull-policy: Never
+      restart-policy: "no" # the node the lab kills
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/core1/frr.conf:/etc/frr/frr.conf:ro
+        - configs/core1/keepalived.conf:/etc/keepalived/keepalived.conf:ro
+        - configs/keepalived/chk_uplink.sh:/etc/keepalived/chk_uplink.sh:ro
+    core2:
+      kind: linux
+      image: net07-core:local
+      image-pull-policy: Never
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/core2/frr.conf:/etc/frr/frr.conf:ro
+        - configs/core2/keepalived.conf:/etc/keepalived/keepalived.conf:ro
+        - configs/keepalived/chk_uplink.sh:/etc/keepalived/chk_uplink.sh:ro
+    dc:
+      kind: linux
+      image: quay.io/frrouting/frr:10.6.2
+      binds:
+        - tools:/lab/tools:ro
+        - configs/daemons:/etc/frr/daemons:ro
+        - configs/vtysh.conf:/etc/frr/vtysh.conf:ro
+        - configs/dc/frr.conf:/etc/frr/frr.conf:ro
+      sysctls:
+        net.ipv4.fib_multipath_hash_policy: 1
+    sw:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+    h10:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+      binds:
+        - tools:/lab/tools:ro
+    h20:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+      binds:
+        - tools:/lab/tools:ro
+    srv:
+      kind: linux
+      image: nicolaka/netshoot:v0.16
+      binds:
+        - tools:/lab/tools:ro
+
+  links:
+    - endpoints: ["core1:eth1", "sw:eth1"]
+    - endpoints: ["core2:eth1", "sw:eth2"]
+    - endpoints: ["sw:eth3", "h10:eth1"]
+    - endpoints: ["sw:eth4", "h20:eth1"]
+    - endpoints: ["core1:eth2", "dc:eth1"]
+    - endpoints: ["core2:eth2", "dc:eth2"]
+    - endpoints: ["core1:eth3", "core2:eth3"]
+    - endpoints: ["dc:eth3", "srv:eth1"]

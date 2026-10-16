@@ -1,0 +1,1 @@
+[{"ifindex":3,"link":"eth1","ifname":"eth1.20","flags":["BROADCAST","MULTICAST","UP","LOWER_UP"],"mtu":1500,"qdisc":"noqueue","operstate":"UP","group":"default","txqlen":1000,"addr_info":[{"family":"inet","local":"10.10.20.2","prefixlen":24,"broadcast":"10.10.20.255","scope":"global","label":"eth1.20","valid_life_time":4294967295,"preferred_life_time":4294967295}]}]

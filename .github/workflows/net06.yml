@@ -1,0 +1,118 @@
+# Lab N6 - BGP multihoming + BFD, run for real on a GitHub runner: containerlab + FRRouting containers.
+#
+#   push (lab files) / manual  ->  test: pytest (measure.py vs real-run fixtures, incl. ones that MUST fail),
+#                                        static topology checks, shellcheck, py_compile
+#                               ->  lab:  install containerlab (pinned) -> run.sh: deploy, baseline assertions,
+#                                        3 fault scenarios measured in ms, failback -> report to the job summary,
+#                                        evidence artifact -> ALWAYS destroy
+#
+# COST: $0. Public-repo runner minutes are free; no cloud account, no secrets, nothing outlives the job.
+name: net06-bgp-multihoming-bfd
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "networking/net-06-bgp-multihoming-bfd/**"
+      - ".github/workflows/net06.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: net06-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LAB_DIR: networking/net-06-bgp-multihoming-bfd
+  CLAB_VERSION: "0.79.0"
+  PYTHON_VERSION: "3.12"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: pytest + lint (no containers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: pytest (measure.py on real-run fixtures; mutated fixtures must FAIL; static topology checks)
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          pip install --quiet -r requirements-dev.txt
+          python -m pytest -v
+      - name: shellcheck + bash -n + py_compile
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          bash -n run.sh
+          shellcheck -S warning run.sh
+          python -m py_compile measure.py tools/probe.py tools/poll.py
+
+  lab:
+    name: containerlab run (deploy -> baseline -> faults -> measure -> failback -> destroy)
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install containerlab ${{ env.CLAB_VERSION }} (official installer, pinned version, checksum verified)
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)" -- --version "$CLAB_VERSION" --verify-checksum
+          containerlab version
+
+      - name: Pull the pinned images
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          awk '$1 == "image:" {print $2}' topology.clab.yml | sort -u | xargs -n1 docker pull -q
+          {
+            echo "### Runner"
+            echo "- kernel \`$(uname -r)\`, $(nproc) vCPU, $(free -g | awk '/Mem:/{print $2}') GB RAM, docker $(docker version -f '{{.Server.Version}}')"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: run.sh (deploy, baseline, BFD / hold-timer / link-down scenarios, failback, report)
+        id: run
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          EVIDENCE="evidence/run-${GITHUB_RUN_ID}-$(date -u +%Y%m%d)"
+          echo "evidence=$EVIDENCE" >> "$GITHUB_OUTPUT"
+          export EVIDENCE RUN_ID="gha-${GITHUB_RUN_ID}"
+          ./run.sh
+
+      - name: Report -> job summary
+        if: always()
+        working-directory: ${{ env.LAB_DIR }}
+        env:
+          EVIDENCE: ${{ steps.run.outputs.evidence }}
+        run: |
+          if [ -n "$EVIDENCE" ] && [ -f "$EVIDENCE/report.md" ]; then
+            cat "$EVIDENCE/report.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No report.md - the run did not get far enough. See the run.sh step log and the evidence artifact." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: net06-evidence-${{ github.run_id }}
+          path: ${{ env.LAB_DIR }}/evidence
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Destroy (always) + leftover check
+        if: always()
+        working-directory: ${{ env.LAB_DIR }}
+        run: |
+          sudo containerlab destroy -t topology.clab.yml --cleanup || true
+          left=$(docker ps -a --filter "name=clab-net06-" -q | wc -l)
+          echo "containers left: $left"
+          [ "$left" -eq 0 ]

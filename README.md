@@ -45,6 +45,8 @@ with objectives, topology, key steps, and an honest "be ready to explain" list.
 | N3 | [DNS & DHCP services](networking/net-03-dns-dhcp) | Authoritative DNS, DHCP scopes, name resolution | dnsmasq, BIND, Linux |
 | N4 | [Stateful firewall & least-privilege ACLs](networking/net-04-firewall-acls) | nftables rules, AWS SG/NACL, default-deny | nftables, iptables, AWS SG |
 | N5 | [Packet capture & traffic analysis](networking/net-05-packet-analysis) | TCP handshake, DNS/TLS dissection, latency | tcpdump, Wireshark |
+| N6 | [BGP multihoming with BFD](networking/net-06-bgp-multihoming-bfd) | Dual-homed eBGP edge: prefix filters (no transit, bogons dropped), local-pref outbound, AS-path prepend inbound, BFD; ISP-A broken 3 ways under 10 ms probes → measured outage (ms) with BFD vs hold timer, reroute times, failback | containerlab, FRRouting, Python, GitHub Actions |
+| N7 | [OSPF campus + VRRP gateway pair](networking/net-07-ospf-campus-vrrp) | OSPF areas 0/1 with summarisation, ECMP, 802.1Q access VLANs, VRRPv3 gateway pair with tracked preemption; active core killed under traffic → measured gateway gap, VRRP takeover, OSPF reconvergence, safe preemption | containerlab, FRRouting, keepalived, Python, GitHub Actions |
 | N8 | [Network as code (GitOps for the network)](networking/net-08-network-as-code) | YAML source of truth → validated (overlaps, duplicate IPs, ACL intent) → Jinja2-rendered FRR configs → containerlab deploy in CI → BGP/OSPF/route + reachability/deny tests → drift detect & heal; overlapping-subnet PR rejected pre-deploy | Python, Jinja2, FRRouting, containerlab, GitHub Actions |
 
 ## Repo layout
