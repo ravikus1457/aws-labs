@@ -1,8 +1,7 @@
 # Net Lab 06 — BGP multihoming with BFD: break the primary ISP under live traffic and measure the outage
 
-> **Status: runs in CI; results table is filled by the first CI run.** Everything below describes what the
-> lab does and how each claim is checked. No number appears in the Results table until a GitHub Actions run
-> has produced it.
+> **Status: green in CI** (run 38954476622, 73/73 checks). Every number in the Results table comes from that
+> GitHub Actions run; the raw evidence is committed under `evidence/`.
 
 **What it proves.** An enterprise edge router (`ent`, AS 65010) is dual-homed to two ISPs over eBGP and
 runs the policy a real edge needs: it announces **only its own prefix** (no transit, no leaks), **drops
@@ -76,13 +75,13 @@ the hold-timer outage must be at least **5×** the BFD outage.
 
 ## Results
 
-Filled by the first CI run (report in the job summary and `evidence/run-*/report.md`).
+First CI run: [GitHub Actions 38954476622](https://github.com/ravikus1457/aws-labs/actions/runs/38954476622), 2026-10-16, **73/73 checks passed** (FRR 10.6.2, containerlab 0.79.0, probe every 10 ms per direction). Full report: [`evidence/run-38954476622-20261016/report.md`](evidence/run-38954476622-20261016/report.md). BFD cut the outage from **~28.8 s to ~0.3 s** (about 96x).
 
 | Scenario | Outage h1→srv (ms) | Outage srv→h1 (ms) | BGP detect (ms) | ent reroute (ms) | inet reroute (ms) | Failback loss (ms) |
 |---|---|---|---|---|---|---|
-| BFD on, circuit black-holes | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ |
-| BFD off (hold timer), circuit black-holes | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ |
-| Local port down, BFD on | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ | _filled by first CI run_ |
+| BFD on, circuit black-holes | 300.0 | 340.0 | 278.9 | 358.9 | 393.5 | 0.0 / 0.0 |
+| BFD off (hold timer), circuit black-holes | 28,840.1 | 28,889.7 | 28,832.1 | 28,891.2 | 28,951.0 | 0.0 / 0.0 |
+| Local port down, BFD on | 59.7 | 420.0 | 44.0 | 115.9 | 476.4 | 0.0 / 0.0 |
 
 ## How to run
 

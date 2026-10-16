@@ -1,0 +1,278 @@
+{
+  "kind": "scenario",
+  "scenario": "bfd",
+  "checks": [
+    {
+      "id": "bfd.pre.sessions",
+      "status": "PASS",
+      "detail": "before the fault: ISP-A Established, ISP-B Established",
+      "value": null
+    },
+    {
+      "id": "bfd.pre.bfd",
+      "status": "PASS",
+      "detail": "before the fault: BFD to ISP-A is up (want up)",
+      "value": "up"
+    },
+    {
+      "id": "bfd.h1_to_srv.baseline_clean",
+      "status": "PASS",
+      "detail": "outbound h1->srv: 0/469 packets lost BEFORE the fault",
+      "value": null
+    },
+    {
+      "id": "bfd.h1_to_srv.failover",
+      "status": "PASS",
+      "detail": "outbound h1->srv: traffic resumed while ISP-A was still broken (554 packets delivered over the backup path)",
+      "value": null
+    },
+    {
+      "id": "bfd.h1_to_srv.outage_ms",
+      "status": "PASS",
+      "detail": "outbound h1->srv: loss window 300.0 ms (30 packets, longest run 300.0 ms; limit 1500 ms)",
+      "value": 300.0
+    },
+    {
+      "id": "bfd.h1_to_srv.failback_loss_ms",
+      "status": "PASS",
+      "detail": "outbound h1->srv: failback loss window 0.0 ms (0 packets; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "bfd.srv_to_h1.baseline_clean",
+      "status": "PASS",
+      "detail": "inbound srv->h1: 0/464 packets lost BEFORE the fault",
+      "value": null
+    },
+    {
+      "id": "bfd.srv_to_h1.failover",
+      "status": "PASS",
+      "detail": "inbound srv->h1: traffic resumed while ISP-A was still broken (551 packets delivered over the backup path)",
+      "value": null
+    },
+    {
+      "id": "bfd.srv_to_h1.outage_ms",
+      "status": "PASS",
+      "detail": "inbound srv->h1: loss window 340.0 ms (34 packets, longest run 340.0 ms; limit 1500 ms)",
+      "value": 340.0
+    },
+    {
+      "id": "bfd.srv_to_h1.failback_loss_ms",
+      "status": "PASS",
+      "detail": "inbound srv->h1: failback loss window 0.0 ms (0 packets; limit 1000 ms)",
+      "value": 0.0
+    },
+    {
+      "id": "bfd.detect_ms",
+      "status": "PASS",
+      "detail": "ent declared the ISP-A session down 278.9 ms after the fault (bracket [244.4, 278.9]; expected 0..1000 ms)",
+      "value": 278.9
+    },
+    {
+      "id": "bfd.ent_reroute_ms",
+      "status": "PASS",
+      "detail": "ent FIB moved to the ISP-B path 358.9 ms after the fault (limit 1500 ms)",
+      "value": 358.9
+    },
+    {
+      "id": "bfd.ent_failback_ms",
+      "status": "PASS",
+      "detail": "ent FIB back on the ISP-A path 1676.3 ms after the repair (must happen and stay; limit 120 s)",
+      "value": 1676.3
+    },
+    {
+      "id": "bfd.inet_reroute_ms",
+      "status": "PASS",
+      "detail": "inet FIB moved to the ISP-B path 393.5 ms after the fault (limit 1500 ms)",
+      "value": 393.5
+    },
+    {
+      "id": "bfd.inet_failback_ms",
+      "status": "PASS",
+      "detail": "inet FIB back on the ISP-A path 1789.2 ms after the repair (must happen and stay; limit 120 s)",
+      "value": 1789.2
+    },
+    {
+      "id": "bfd.path_during.h1->srv",
+      "status": "PASS",
+      "detail": "traceroute h1->srv during the fault: isp-b (want isp-b; hops ['203.0.113.1', '10.0.0.1', '10.0.2.1', '10.1.2.2', '198.51.100.10'])",
+      "value": [
+        "203.0.113.1",
+        "10.0.0.1",
+        "10.0.2.1",
+        "10.1.2.2",
+        "198.51.100.10"
+      ]
+    },
+    {
+      "id": "bfd.path_during.srv->h1",
+      "status": "PASS",
+      "detail": "traceroute srv->h1 during the fault: isp-b (want isp-b; hops ['198.51.100.1', '10.1.2.1', '10.0.2.2', '10.0.0.2', '203.0.113.10'])",
+      "value": [
+        "198.51.100.1",
+        "10.1.2.1",
+        "10.0.2.2",
+        "10.0.0.2",
+        "203.0.113.10"
+      ]
+    },
+    {
+      "id": "bfd.path_after.h1->srv",
+      "status": "PASS",
+      "detail": "traceroute h1->srv after the fault: isp-a (want isp-a; hops ['203.0.113.1', '10.0.0.1', '10.0.1.1', '10.1.1.2', '198.51.100.10'])",
+      "value": [
+        "203.0.113.1",
+        "10.0.0.1",
+        "10.0.1.1",
+        "10.1.1.2",
+        "198.51.100.10"
+      ]
+    },
+    {
+      "id": "bfd.path_after.srv->h1",
+      "status": "PASS",
+      "detail": "traceroute srv->h1 after the fault: isp-a (want isp-a; hops ['198.51.100.1', '10.1.1.1', '10.0.1.2', '10.0.0.2', '203.0.113.10'])",
+      "value": [
+        "198.51.100.1",
+        "10.1.1.1",
+        "10.0.1.2",
+        "10.0.0.2",
+        "203.0.113.10"
+      ]
+    }
+  ],
+  "summary": {
+    "scenario": "bfd",
+    "description": "ISP-A circuit black-holes (ports stay up), BFD on",
+    "bfd": "up",
+    "h1_to_srv": {
+      "sent": 1842,
+      "received": 1812,
+      "lost": 30,
+      "send_errors": 0,
+      "first_send": 1792178625.39717,
+      "last_send": 1792178643.807298,
+      "sender_max_gap_ms": 18.7,
+      "pre_fault_lost": 0,
+      "pre_fault_sent": 469,
+      "outage": {
+        "lost": 30,
+        "window_ms": 300.0,
+        "longest_run_ms": 300.0,
+        "recovered": true,
+        "start": 1792178630.427289,
+        "end": 1792178630.727276
+      },
+      "delivered_during_fault_after_outage": 554,
+      "failback": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_after_restore": 755
+    },
+    "srv_to_h1": {
+      "sent": 1842,
+      "received": 1808,
+      "lost": 34,
+      "send_errors": 0,
+      "first_send": 1792178625.444493,
+      "last_send": 1792178643.854589,
+      "sender_max_gap_ms": 11.7,
+      "pre_fault_lost": 0,
+      "pre_fault_sent": 464,
+      "outage": {
+        "lost": 34,
+        "window_ms": 340.0,
+        "longest_run_ms": 340.0,
+        "recovered": true,
+        "start": 1792178630.424591,
+        "end": 1792178630.764576
+      },
+      "delivered_during_fault_after_outage": 551,
+      "failback": {
+        "lost": 0,
+        "window_ms": 0.0,
+        "longest_run_ms": 0.0,
+        "recovered": true,
+        "start": null,
+        "end": null
+      },
+      "delivered_after_restore": 759
+    },
+    "worst_outage_ms": 340.0,
+    "poll": {
+      "ent": {
+        "samples": 787,
+        "max_gap_ms": 26.0,
+        "median_period_ms": 20.1
+      },
+      "inet": {
+        "samples": 787,
+        "max_gap_ms": 26.3,
+        "median_period_ms": 20.1
+      }
+    },
+    "detect": {
+      "ms": 278.9,
+      "bracket_ms": [
+        244.4,
+        278.9
+      ],
+      "at": 1792178630.658893
+    },
+    "ent_reroute": {
+      "ms": 358.9,
+      "bracket_ms": [
+        324.8,
+        358.9
+      ],
+      "at": 1792178630.738898
+    },
+    "ent_failback": {
+      "ms": 1676.3,
+      "bracket_ms": [
+        1642.2,
+        1676.3
+      ],
+      "at": 1792178637.941859
+    },
+    "inet_reroute": {
+      "ms": 393.5,
+      "bracket_ms": [
+        359.8,
+        393.5
+      ],
+      "at": 1792178630.773497
+    },
+    "inet_failback": {
+      "ms": 1789.2,
+      "bracket_ms": [
+        1755.4,
+        1789.2
+      ],
+      "at": 1792178638.054715
+    }
+  },
+  "meta": {
+    "scenario": "bfd",
+    "t_fault": 1792178630.3799837,
+    "t_restore": 1792178636.2655396,
+    "probe_interval_ms": 10,
+    "run_saw_failover": true,
+    "run_saw_failback": true,
+    "bgp_timers": {
+      "keepalive_s": 10,
+      "hold_s": 30,
+      "connect_s": 5
+    },
+    "bfd_profile": {
+      "tx_ms": 100,
+      "rx_ms": 100,
+      "multiplier": 3
+    }
+  }
+}

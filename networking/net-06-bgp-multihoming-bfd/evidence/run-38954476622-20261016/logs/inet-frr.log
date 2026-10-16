@@ -1,0 +1,11 @@
+2026/10/16 19:23:27 OSPF: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:27 BFD: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:27 BGP: [J9K4Q-T8STY][EC 33554466] 10.1.1.1 [FSM] Failure handling event BGP_Start in state Idle, prior events (null), (null), fd -1, last reset: No AFI/SAFI activated for peer
+2026/10/16 19:23:27 BGP: [J9K4Q-T8STY][EC 33554466] 10.1.2.1 [FSM] Failure handling event BGP_Start in state Idle, prior events (null), (null), fd -1, last reset: No AFI/SAFI activated for peer
+2026/10/16 19:23:27 BGP: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:28 ZEBRA: [YDG3W-JND95] FD Limit set: 1048576 is stupidly large.  Is this what you intended?  Consider using --limit-fds also limiting size to 100000
+2026/10/16 19:23:28 ZEBRA: [V98V0-MTWPF] client 65 says hello and bids fair to announce only bgp routes vrf=0
+2026/10/16 19:23:31 BGP: [N9HHH-F8H1M] %ADJCHANGE: neighbor 10.1.1.1(ispa) in vrf default Up
+2026/10/16 19:23:31 BGP: [N9HHH-F8H1M] %ADJCHANGE: neighbor 10.1.2.1(ispb) in vrf default Up
+2026/10/16 19:23:32 BGP: [M59KS-A3ZXZ] bgp_update_receive_eor: rcvd End-of-RIB for IPv4 Unicast from 10.1.2.1 in vrf default
+2026/10/16 19:23:32 BGP: [M59KS-A3ZXZ] bgp_update_receive_eor: rcvd End-of-RIB for IPv4 Unicast from 10.1.1.1 in vrf default

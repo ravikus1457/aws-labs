@@ -1,0 +1,18 @@
+{
+  "scenario": "linkdown",
+  "t_fault": 1792178716.2257934,
+  "t_restore": 1792178722.194824,
+  "probe_interval_ms": 10,
+  "run_saw_failover": true,
+  "run_saw_failback": true,
+  "bgp_timers": {
+    "keepalive_s": 10,
+    "hold_s": 30,
+    "connect_s": 5
+  },
+  "bfd_profile": {
+    "tx_ms": 100,
+    "rx_ms": 100,
+    "multiplier": 3
+  }
+}

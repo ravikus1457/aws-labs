@@ -1,0 +1,11 @@
+{
+  "lab": "net06",
+  "run_id": "gha-38954476622",
+  "started": "2026-10-16T19:23:28Z",
+  "frr_image": "quay.io/frrouting/frr:10.6.2",
+  "host_image": "nicolaka/netshoot:v0.16",
+  "clab_version": "0.79.0",
+  "kernel": "6.17.0-1022-azure",
+  "probe_interval_ms": 10,
+  "scenarios": "bfd holdtimer linkdown"
+}

@@ -1,0 +1,9 @@
+2026/10/16 19:23:27 OSPF: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:27 BGP: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:27 STATIC: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:27 BFD: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
+2026/10/16 19:23:27 ZEBRA: [YDG3W-JND95] FD Limit set: 1048576 is stupidly large.  Is this what you intended?  Consider using --limit-fds also limiting size to 100000
+2026/10/16 19:23:27 ZEBRA: [V98V0-MTWPF] client 65 says hello and bids fair to announce only bgp routes vrf=0
+2026/10/16 19:23:28 OSPF: [S5PCG-77H23] Packet[DD]: Neighbor 10.255.0.1 Negotiation done (Master).
+2026/10/16 19:23:33 BGP: [N9HHH-F8H1M] %ADJCHANGE: neighbor 10.255.0.1(ent) in vrf default Up
+2026/10/16 19:23:34 BGP: [M59KS-A3ZXZ] bgp_update_receive_eor: rcvd End-of-RIB for IPv4 Unicast from 10.255.0.1 in vrf default

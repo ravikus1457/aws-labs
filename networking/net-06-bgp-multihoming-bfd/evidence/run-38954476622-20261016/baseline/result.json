@@ -1,0 +1,214 @@
+{
+  "kind": "baseline",
+  "checks": [
+    {
+      "id": "baseline.sessions.ent",
+      "status": "PASS",
+      "detail": "ent: 3/3 BGP sessions Established",
+      "value": {
+        "10.0.1.1": "Established",
+        "10.0.2.1": "Established",
+        "10.255.0.2": "Established"
+      }
+    },
+    {
+      "id": "baseline.sessions.inet",
+      "status": "PASS",
+      "detail": "inet: 2/2 BGP sessions Established",
+      "value": {
+        "10.1.1.1": "Established",
+        "10.1.2.1": "Established"
+      }
+    },
+    {
+      "id": "baseline.sessions.core",
+      "status": "PASS",
+      "detail": "core: 1/1 BGP sessions Established",
+      "value": {
+        "10.255.0.1": "Established"
+      }
+    },
+    {
+      "id": "baseline.outbound_filter.10.0.1.1",
+      "status": "PASS",
+      "detail": "ent advertises exactly {203.0.113.0/24} to 10.0.1.1 (got ['203.0.113.0/24']) - no transit, no infra leak",
+      "value": [
+        "203.0.113.0/24"
+      ]
+    },
+    {
+      "id": "baseline.outbound_filter.10.0.2.1",
+      "status": "PASS",
+      "detail": "ent advertises exactly {203.0.113.0/24} to 10.0.2.1 (got ['203.0.113.0/24']) - no transit, no infra leak",
+      "value": [
+        "203.0.113.0/24"
+      ]
+    },
+    {
+      "id": "baseline.inbound_filter.10.0.1.1",
+      "status": "PASS",
+      "detail": "10.0.1.1 sent 3/3 junk prefixes, ent accepted 0 of them ; legit routes missing: none",
+      "value": {
+        "received": [
+          "0.0.0.0/0",
+          "10.66.0.0/16",
+          "100.64.0.0/10",
+          "192.0.2.0/24",
+          "198.51.100.0/24",
+          "198.51.100.128/25",
+          "203.0.113.0/24"
+        ],
+        "accepted": [
+          "0.0.0.0/0",
+          "192.0.2.0/24",
+          "198.51.100.0/24"
+        ]
+      }
+    },
+    {
+      "id": "baseline.inbound_filter.10.0.2.1",
+      "status": "PASS",
+      "detail": "10.0.2.1 sent 2/2 junk prefixes, ent accepted 0 of them ; legit routes missing: none",
+      "value": {
+        "received": [
+          "0.0.0.0/0",
+          "192.0.2.0/24",
+          "192.168.50.0/24",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "203.0.113.128/25"
+        ],
+        "accepted": [
+          "0.0.0.0/0",
+          "192.0.2.0/24",
+          "198.51.100.0/24"
+        ]
+      }
+    },
+    {
+      "id": "baseline.local_preference",
+      "status": "PASS",
+      "detail": "ent best path to 198.51.100.0/24: via 10.0.1.1 LP 200; backup via ISP-B LP 100 (want ISP-A/200 best, ISP-B/100 standby)",
+      "value": {
+        "best": {
+          "nexthop": "10.0.1.1",
+          "peer": "10.0.1.1",
+          "locprf": 200,
+          "aspath": [
+            64501,
+            64500
+          ],
+          "best": true,
+          "valid": true
+        },
+        "backup": {
+          "nexthop": "10.0.2.1",
+          "peer": "10.0.2.1",
+          "locprf": 100,
+          "aspath": [
+            64502,
+            64500
+          ],
+          "best": false,
+          "valid": true
+        }
+      }
+    },
+    {
+      "id": "baseline.default_route",
+      "status": "PASS",
+      "detail": "ent best default route via 10.0.1.1 (want 10.0.1.1)",
+      "value": {
+        "nexthop": "10.0.1.1",
+        "peer": "10.0.1.1",
+        "locprf": 200,
+        "aspath": [
+          64501
+        ],
+        "best": true,
+        "valid": true
+      }
+    },
+    {
+      "id": "baseline.as_path_prepend",
+      "status": "PASS",
+      "detail": "inet best path to 203.0.113.0/24: via 10.1.1.1 AS-path [64501, 65010]; via ISP-B AS-path [64502, 65010, 65010, 65010] (want ISP-A best, 65010 x3 via ISP-B)",
+      "value": {
+        "best": {
+          "nexthop": "10.1.1.1",
+          "peer": "10.1.1.1",
+          "locprf": null,
+          "aspath": [
+            64501,
+            65010
+          ],
+          "best": true,
+          "valid": true
+        },
+        "via_ispb": {
+          "nexthop": "10.1.2.1",
+          "peer": "10.1.2.1",
+          "locprf": null,
+          "aspath": [
+            64502,
+            65010,
+            65010,
+            65010
+          ],
+          "best": false,
+          "valid": true
+        }
+      }
+    },
+    {
+      "id": "baseline.bfd",
+      "status": "PASS",
+      "detail": "BFD sessions: {'10.0.1.1': 'up', '10.0.2.1': 'up', 'ispa->ent': 'up'} (want all up)",
+      "value": {
+        "10.0.1.1": "up",
+        "10.0.2.1": "up",
+        "ispa->ent": "up"
+      }
+    },
+    {
+      "id": "baseline.fib",
+      "status": "PASS",
+      "detail": "ent FIB next hop for 198.51.100.0/24: ['10.0.1.1'] (want 10.0.1.1)",
+      "value": [
+        "10.0.1.1"
+      ]
+    },
+    {
+      "id": "baseline.ibgp_inside",
+      "status": "PASS",
+      "detail": "core has 198.51.100.0/24 installed via iBGP: next hops ['10.0.0.1']",
+      "value": [
+        "10.0.0.1"
+      ]
+    },
+    {
+      "id": "baseline.path.h1->srv",
+      "status": "PASS",
+      "detail": "traceroute h1->srv goes via isp-a (hops ['203.0.113.1', '10.0.0.1', '10.0.1.1', '10.1.1.2', '198.51.100.10']; want isp-a)",
+      "value": [
+        "203.0.113.1",
+        "10.0.0.1",
+        "10.0.1.1",
+        "10.1.1.2",
+        "198.51.100.10"
+      ]
+    },
+    {
+      "id": "baseline.path.srv->h1",
+      "status": "PASS",
+      "detail": "traceroute srv->h1 goes via isp-a (hops ['198.51.100.1', '10.1.1.1', '10.0.1.2', '10.0.0.2', '203.0.113.10']; want isp-a)",
+      "value": [
+        "198.51.100.1",
+        "10.1.1.1",
+        "10.0.1.2",
+        "10.0.0.2",
+        "203.0.113.10"
+      ]
+    }
+  ]
+}
