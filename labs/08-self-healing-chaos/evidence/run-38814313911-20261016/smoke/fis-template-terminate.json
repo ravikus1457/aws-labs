@@ -1,0 +1,53 @@
+{
+    "experimentTemplate": {
+        "id": "EXTBtAvnjNcZRRfYc",
+        "arn": "arn:aws:fis:us-east-1:<account-id>:experiment-template/EXTBtAvnjNcZRRfYc",
+        "description": "Lab 08: terminate ONE running web instance; the ASG must restore the baseline",
+        "targets": {
+            "one-web-instance": {
+                "resourceType": "aws:ec2:instance",
+                "resourceTags": {
+                    "lab08-role": "web"
+                },
+                "filters": [
+                    {
+                        "path": "State.Name",
+                        "values": [
+                            "running"
+                        ]
+                    }
+                ],
+                "selectionMode": "COUNT(1)"
+            }
+        },
+        "actions": {
+            "terminate-one-instance": {
+                "actionId": "aws:ec2:terminate-instances",
+                "targets": {
+                    "Instances": "one-web-instance"
+                }
+            }
+        },
+        "stopConditions": [
+            {
+                "source": "aws:cloudwatch:alarm",
+                "value": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-canary-failing"
+            }
+        ],
+        "creationTime": "2026-10-16T00:39:48.093000+00:00",
+        "lastUpdateTime": "2026-10-16T00:39:48.093000+00:00",
+        "roleArn": "arn:aws:iam::<account-id>:role/awslabs-lab08-fis",
+        "tags": {
+            "project": "awslabs",
+            "stack": "app",
+            "run_id": "lab08",
+            "lab": "08-self-healing-chaos",
+            "managed_by": "terraform",
+            "Name": "awslabs-lab08-terminate-instance"
+        },
+        "experimentOptions": {
+            "accountTargeting": "single-account",
+            "emptyTargetResolutionMode": "fail"
+        }
+    }
+}

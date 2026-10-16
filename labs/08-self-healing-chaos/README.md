@@ -256,13 +256,26 @@ runbook executions, canary runs, ASG activities, probe and sample logs), uploade
 records with `python3 measure.py experiment raw/<experiment> out.json`.
 
 ## Results
-**Filled in by the first run.** No experiment has been run yet; nothing here is measured.
+**First green run: GitHub Actions run 38814313911, 2026-10-16 (UTC).** Measured, not estimated; raw
+probes, alarm history, FIS records and runbook executions are in
+[`evidence/run-38814313911-20261016`](evidence/run-38814313911-20261016) (account id redacted).
 
-| Experiment | Time to detect | Time to recover | Failed probes / total | Canary failed runs |
-|---|---|---|---|---|
-| terminate | _first run_ | _first run_ | _first run_ | _first run_ |
-| cpu_stress | _first run_ | _first run_ | _first run_ | _first run_ |
-| network_latency | _first run (optional)_ | _first run_ | _first run_ | _first run_ |
+| Experiment | Time to detect | Time to recover | Failed probes / total | Longest outage seen by a 2-s probe | Canary failed runs | Remediation |
+|---|---|---|---|---|---|---|
+| terminate | 131.4 s (healthy-hosts-low) | 60.9 s (ALB targets back to 2) | 1 / 29 | 2.1 s | 0 / 3 | ASG replacement via ELB health check |
+| cpu_stress | 140.6 s (cpu-high) | 320.6 s (cpu-high back to OK) | 0 / 151 | 0 s | 0 / 7 | alarm -> EventBridge -> SSM runbook +1 instance (InService 166.6 s after the fault), then scaled back to 2 |
+| network_latency | not run (optional, `run_latency`) | | | | | |
+
+Smoke test before the chaos: 13/13 PASS, including a forced ALARM proving alarm -> EventBridge ->
+runbook scales out (2/2 executions Success) and back in. Teardown: 44 destroyed, every survivor
+category empty.
+
+What the first runs taught (each fixed in code, see git log): `CreateCanary` reads AWS's
+Synthetics library bucket with the caller's credentials; a failed `CreateCanary` orphans Lambda
+layers; EventBridge `FailedInvocations` gives no reason, so the targets now dead-letter to SQS and
+the smoke test prints `ERROR_CODE/ERROR_MESSAGE` plus the deployed policy, which showed that
+`ssm:StartAutomationExecution` is authorized on the document, the automation definition AND the
+new execution.
 
 ## Teardown
 - **Automatic:** the pipeline's `teardown` job (end of every run unless `keep_stack`),

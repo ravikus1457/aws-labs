@@ -1,0 +1,58 @@
+{
+    "experimentTemplate": {
+        "id": "EXT3ewsqRMsqPZya",
+        "arn": "arn:aws:fis:us-east-1:<account-id>:experiment-template/EXT3ewsqRMsqPZya",
+        "description": "Lab 08: +200ms egress latency on ALL web instances for 120s; detect-only",
+        "targets": {
+            "all-web-instances": {
+                "resourceType": "aws:ec2:instance",
+                "resourceTags": {
+                    "lab08-role": "web"
+                },
+                "filters": [
+                    {
+                        "path": "State.Name",
+                        "values": [
+                            "running"
+                        ]
+                    }
+                ],
+                "selectionMode": "ALL"
+            }
+        },
+        "actions": {
+            "network-latency": {
+                "actionId": "aws:ssm:send-command",
+                "parameters": {
+                    "documentArn": "arn:aws:ssm:us-east-1::document/AWSFIS-Run-Network-Latency",
+                    "documentParameters": "{\"DelayMilliseconds\":\"200\",\"DurationSeconds\":\"120\",\"InstallDependencies\":\"True\",\"Interface\":\"ens5\"}",
+                    "duration": "PT3M"
+                },
+                "targets": {
+                    "Instances": "all-web-instances"
+                }
+            }
+        },
+        "stopConditions": [
+            {
+                "source": "aws:cloudwatch:alarm",
+                "value": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-canary-failing"
+            }
+        ],
+        "creationTime": "2026-10-16T00:39:48.091000+00:00",
+        "lastUpdateTime": "2026-10-16T00:39:48.091000+00:00",
+        "roleArn": "arn:aws:iam::<account-id>:role/awslabs-lab08-fis",
+        "tags": {
+            "project": "awslabs",
+            "stack": "app",
+            "run_id": "lab08",
+            "lab": "08-self-healing-chaos",
+            "managed_by": "terraform",
+            "Name": "awslabs-lab08-network-latency"
+        },
+        "experimentOptions": {
+            "accountTargeting": "single-account",
+            "emptyTargetResolutionMode": "fail"
+        }
+    }
+}

@@ -1,0 +1,82 @@
+{
+    "CommandInvocations": [
+        {
+            "CommandId": "e4a84176-8bb5-4de8-aeec-52eba1c642fc",
+            "InstanceId": "i-0e459c9b925ed7801",
+            "InstanceName": "ip-10-80-1-237.ec2.internal",
+            "Comment": "lab08 preflight: FIS dependencies",
+            "DocumentName": "AWS-RunShellScript",
+            "DocumentVersion": "$DEFAULT",
+            "RequestedDateTime": "2026-10-16T00:40:13.749000+00:00",
+            "Status": "Success",
+            "StatusDetails": "Success",
+            "StandardOutputUrl": "",
+            "StandardErrorUrl": "",
+            "CommandPlugins": [
+                {
+                    "Name": "aws:runShellScript",
+                    "Status": "Success",
+                    "StatusDetails": "Success",
+                    "ResponseCode": 0,
+                    "ResponseStartDateTime": "2026-10-16T00:40:14.224000+00:00",
+                    "ResponseFinishDateTime": "2026-10-16T00:40:14.304000+00:00",
+                    "Output": "/usr/bin/stress-ng\n/usr/sbin/tc\n ens5\nactive\n",
+                    "StandardOutputUrl": "",
+                    "StandardErrorUrl": "",
+                    "OutputS3Region": "us-east-1",
+                    "OutputS3BucketName": "",
+                    "OutputS3KeyPrefix": ""
+                }
+            ],
+            "ServiceRole": "",
+            "NotificationConfig": {
+                "NotificationArn": "",
+                "NotificationEvents": [],
+                "NotificationType": ""
+            },
+            "CloudWatchOutputConfig": {
+                "CloudWatchLogGroupName": "",
+                "CloudWatchOutputEnabled": false
+            }
+        },
+        {
+            "CommandId": "e4a84176-8bb5-4de8-aeec-52eba1c642fc",
+            "InstanceId": "i-072a4eee7930cac56",
+            "InstanceName": "ip-10-80-0-22.ec2.internal",
+            "Comment": "lab08 preflight: FIS dependencies",
+            "DocumentName": "AWS-RunShellScript",
+            "DocumentVersion": "$DEFAULT",
+            "RequestedDateTime": "2026-10-16T00:40:13.736000+00:00",
+            "Status": "Success",
+            "StatusDetails": "Success",
+            "StandardOutputUrl": "",
+            "StandardErrorUrl": "",
+            "CommandPlugins": [
+                {
+                    "Name": "aws:runShellScript",
+                    "Status": "Success",
+                    "StatusDetails": "Success",
+                    "ResponseCode": 0,
+                    "ResponseStartDateTime": "2026-10-16T00:40:14.206000+00:00",
+                    "ResponseFinishDateTime": "2026-10-16T00:40:14.289000+00:00",
+                    "Output": "/usr/bin/stress-ng\n/usr/sbin/tc\n ens5\nactive\n",
+                    "StandardOutputUrl": "",
+                    "StandardErrorUrl": "",
+                    "OutputS3Region": "us-east-1",
+                    "OutputS3BucketName": "",
+                    "OutputS3KeyPrefix": ""
+                }
+            ],
+            "ServiceRole": "",
+            "NotificationConfig": {
+                "NotificationArn": "",
+                "NotificationEvents": [],
+                "NotificationType": ""
+            },
+            "CloudWatchOutputConfig": {
+                "CloudWatchLogGroupName": "",
+                "CloudWatchOutputEnabled": false
+            }
+        }
+    ]
+}

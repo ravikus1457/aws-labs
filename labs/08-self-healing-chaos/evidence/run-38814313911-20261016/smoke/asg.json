@@ -1,0 +1,149 @@
+{
+    "AutoScalingGroups": [
+        {
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg",
+            "LaunchTemplate": {
+                "LaunchTemplateId": "lt-041b06ca9d8355dd1",
+                "LaunchTemplateName": "awslabs-lab08-lt-20261016003640499200000005",
+                "Version": "1"
+            },
+            "MinSize": 2,
+            "MaxSize": 3,
+            "DesiredCapacity": 2,
+            "DefaultCooldown": 300,
+            "AvailabilityZones": [
+                "us-east-1a",
+                "us-east-1b"
+            ],
+            "AvailabilityZoneIds": [
+                "use1-az1",
+                "use1-az2"
+            ],
+            "LoadBalancerNames": [],
+            "TargetGroupARNs": [
+                "arn:aws:elasticloadbalancing:us-east-1:<account-id>:targetgroup/awslabs-lab08-tg/9fafdb59a6da845e"
+            ],
+            "HealthCheckType": "ELB",
+            "HealthCheckGracePeriod": 90,
+            "Instances": [
+                {
+                    "InstanceId": "i-072a4eee7930cac56",
+                    "InstanceType": "t3.micro",
+                    "AvailabilityZone": "us-east-1a",
+                    "AvailabilityZoneId": "use1-az1",
+                    "LifecycleState": "InService",
+                    "HealthStatus": "Healthy",
+                    "LaunchTemplate": {
+                        "LaunchTemplateId": "lt-041b06ca9d8355dd1",
+                        "LaunchTemplateName": "awslabs-lab08-lt-20261016003640499200000005",
+                        "Version": "1"
+                    },
+                    "ProtectedFromScaleIn": false
+                },
+                {
+                    "InstanceId": "i-0e459c9b925ed7801",
+                    "InstanceType": "t3.micro",
+                    "AvailabilityZone": "us-east-1b",
+                    "AvailabilityZoneId": "use1-az2",
+                    "LifecycleState": "InService",
+                    "HealthStatus": "Healthy",
+                    "LaunchTemplate": {
+                        "LaunchTemplateId": "lt-041b06ca9d8355dd1",
+                        "LaunchTemplateName": "awslabs-lab08-lt-20261016003640499200000005",
+                        "Version": "1"
+                    },
+                    "ProtectedFromScaleIn": false
+                }
+            ],
+            "CreatedTime": "2026-10-16T00:36:50.281000+00:00",
+            "SuspendedProcesses": [],
+            "VPCZoneIdentifier": "subnet-05d21e9536c0e09b1,subnet-0d1cfb344c79f8abc",
+            "EnabledMetrics": [
+                {
+                    "Metric": "GroupDesiredCapacity",
+                    "Granularity": "1Minute"
+                },
+                {
+                    "Metric": "GroupPendingInstances",
+                    "Granularity": "1Minute"
+                },
+                {
+                    "Metric": "GroupTerminatingInstances",
+                    "Granularity": "1Minute"
+                },
+                {
+                    "Metric": "GroupInServiceInstances",
+                    "Granularity": "1Minute"
+                }
+            ],
+            "Tags": [
+                {
+                    "ResourceId": "awslabs-lab08-asg",
+                    "ResourceType": "auto-scaling-group",
+                    "Key": "Name",
+                    "Value": "awslabs-lab08-web",
+                    "PropagateAtLaunch": false
+                },
+                {
+                    "ResourceId": "awslabs-lab08-asg",
+                    "ResourceType": "auto-scaling-group",
+                    "Key": "lab",
+                    "Value": "08-self-healing-chaos",
+                    "PropagateAtLaunch": false
+                },
+                {
+                    "ResourceId": "awslabs-lab08-asg",
+                    "ResourceType": "auto-scaling-group",
+                    "Key": "lab08-role",
+                    "Value": "web",
+                    "PropagateAtLaunch": false
+                },
+                {
+                    "ResourceId": "awslabs-lab08-asg",
+                    "ResourceType": "auto-scaling-group",
+                    "Key": "project",
+                    "Value": "awslabs",
+                    "PropagateAtLaunch": false
+                },
+                {
+                    "ResourceId": "awslabs-lab08-asg",
+                    "ResourceType": "auto-scaling-group",
+                    "Key": "run_id",
+                    "Value": "lab08",
+                    "PropagateAtLaunch": false
+                },
+                {
+                    "ResourceId": "awslabs-lab08-asg",
+                    "ResourceType": "auto-scaling-group",
+                    "Key": "stack",
+                    "Value": "app",
+                    "PropagateAtLaunch": false
+                }
+            ],
+            "TerminationPolicies": [
+                "Default"
+            ],
+            "NewInstancesProtectedFromScaleIn": false,
+            "ServiceLinkedRoleARN": "arn:aws:iam::<account-id>:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+            "DefaultInstanceWarmup": 60,
+            "TrafficSources": [
+                {
+                    "Identifier": "arn:aws:elasticloadbalancing:us-east-1:<account-id>:targetgroup/awslabs-lab08-tg/9fafdb59a6da845e",
+                    "Type": "elbv2"
+                }
+            ],
+            "AvailabilityZoneDistribution": {
+                "CapacityDistributionStrategy": "balanced-best-effort"
+            },
+            "CapacityReservationSpecification": {
+                "CapacityReservationPreference": "default"
+            },
+            "InstanceLifecyclePolicy": {
+                "RetentionTriggers": {
+                    "TerminateHookAbandon": "terminate"
+                }
+            }
+        }
+    ]
+}

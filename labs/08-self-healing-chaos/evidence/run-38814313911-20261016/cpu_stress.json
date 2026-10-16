@@ -1,0 +1,93 @@
+{
+  "experiment": "cpu_stress",
+  "fis_experiment_id": "EXPLApY57uZL849jj8",
+  "fis_template_id": "EXT9xGMq6mVqyFKyS",
+  "fis_final_state": "completed",
+  "fis_state_reason": "Experiment completed.",
+  "fault_started_at": "2026-10-16T00:47:19Z",
+  "fault_ended_at": "2026-10-16T00:50:22Z",
+  "fault_duration_s": 182.9,
+  "detection_alarm": "awslabs-lab08-cpu-high",
+  "baseline_capacity": 2,
+  "detected_at": "2026-10-16T00:49:39Z",
+  "time_to_detect_s": 140.6,
+  "alarm_cleared_at": "2026-10-16T00:52:39Z",
+  "recovered_at": "2026-10-16T00:52:39Z",
+  "recovery_signal": "awslabs-lab08-cpu-high back to OK",
+  "time_to_recover_s": 320.6,
+  "remediation": {
+    "scale_out_execution": {
+      "id": "78faf3ce-ab28-4884-8d8e-784f455548c7",
+      "status": "Success",
+      "start": "2026-10-16T00:49:40.004000+00:00",
+      "end": "2026-10-16T00:49:43.912000+00:00",
+      "direction": "out",
+      "outputs": {
+        "Scale.Result": [
+          "{\"direction\":\"out\",\"previous\":\"2\",\"desired\":\"3\",\"action\":\"set_desired_capacity\"}"
+        ]
+      }
+    },
+    "scale_in_execution": {
+      "id": "1730e496-2401-4697-9307-88fdb6e8f701",
+      "status": "Success",
+      "start": "2026-10-16T00:52:40.020000+00:00",
+      "end": "2026-10-16T00:52:44.024000+00:00",
+      "direction": "in",
+      "outputs": {
+        "Scale.Result": [
+          "{\"direction\":\"in\",\"previous\":\"3\",\"desired\":\"2\",\"action\":\"set_desired_capacity\"}"
+        ]
+      }
+    },
+    "runbook_started_after_detect_s": 0.2,
+    "extra_instance_in_service_at": "2026-10-16T00:50:05Z",
+    "time_to_added_capacity_s": 166.6,
+    "back_to_baseline_at": "2026-10-16T00:52:53Z"
+  },
+  "probe_impact": {
+    "probes": 151,
+    "failed": 0,
+    "availability_pct": 100.0,
+    "longest_failure_s": 0.0,
+    "latency_ms_p50": 114.6,
+    "latency_ms_p95": 134.8,
+    "latency_ms_max": 237.4,
+    "baseline_latency_ms_p50": 125.8,
+    "baseline_latency_ms_p95": 130.0,
+    "status_codes": []
+  },
+  "canary_impact": {
+    "runs": 7,
+    "passed": 7,
+    "failed": 0,
+    "failures": []
+  },
+  "checks": [
+    [
+      "PASS",
+      "cpu_stress: alarm -> EventBridge -> runbook scaled OUT ({'Scale.Result': ['{\"direction\":\"out\",\"previous\":\"2\",\"desired\":\"3\",\"action\":\"set_desired_capacity\"}']})"
+    ],
+    [
+      "PASS",
+      "cpu_stress: extra instance InService 166.6 s after the fault started"
+    ],
+    [
+      "PASS",
+      "cpu_stress: alarm OK -> runbook scaled IN; back to 2 at 2026-10-16T00:52:53Z"
+    ],
+    [
+      "PASS",
+      "cpu_stress: detected by awslabs-lab08-cpu-high in 140.6 s"
+    ],
+    [
+      "PASS",
+      "cpu_stress: recovered in 320.6 s (awslabs-lab08-cpu-high back to OK)"
+    ],
+    [
+      "INFO",
+      "cpu_stress: user impact 0/151 probes failed, longest failure 0.0 s, p95 134.8 ms (baseline p95 130.0 ms); canary 0 failed / 7 runs"
+    ]
+  ],
+  "passed": true
+}

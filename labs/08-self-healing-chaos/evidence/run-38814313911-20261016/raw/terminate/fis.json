@@ -1,0 +1,61 @@
+{
+    "experiment": {
+        "id": "EXP21eScjwmnW5uqErN",
+        "arn": "arn:aws:fis:us-east-1:<account-id>:experiment/EXP21eScjwmnW5uqErN",
+        "experimentTemplateId": "EXTBtAvnjNcZRRfYc",
+        "roleArn": "arn:aws:iam::<account-id>:role/awslabs-lab08-fis",
+        "state": {
+            "status": "completed",
+            "reason": "Experiment completed."
+        },
+        "targets": {
+            "one-web-instance": {
+                "resourceType": "aws:ec2:instance",
+                "resourceTags": {
+                    "lab08-role": "web"
+                },
+                "filters": [
+                    {
+                        "path": "State.Name",
+                        "values": [
+                            "running"
+                        ]
+                    }
+                ],
+                "selectionMode": "COUNT(1)"
+            }
+        },
+        "actions": {
+            "terminate-one-instance": {
+                "actionId": "aws:ec2:terminate-instances",
+                "targets": {
+                    "Instances": "one-web-instance"
+                },
+                "state": {
+                    "status": "completed",
+                    "reason": "Action was completed."
+                },
+                "startTime": "2026-10-16T00:42:50.725000+00:00",
+                "endTime": "2026-10-16T00:42:51.146000+00:00"
+            }
+        },
+        "stopConditions": [
+            {
+                "source": "aws:cloudwatch:alarm",
+                "value": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-canary-failing"
+            }
+        ],
+        "creationTime": "2026-10-16T00:42:29.467000+00:00",
+        "startTime": "2026-10-16T00:42:29.760000+00:00",
+        "endTime": "2026-10-16T00:42:51.640000+00:00",
+        "tags": {
+            "lab": "08-self-healing-chaos",
+            "run": "gha-38814313911"
+        },
+        "experimentOptions": {
+            "accountTargeting": "single-account",
+            "emptyTargetResolutionMode": "fail",
+            "actionsMode": "run-all"
+        }
+    }
+}

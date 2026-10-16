@@ -1,0 +1,58 @@
+{
+    "experimentTemplate": {
+        "id": "EXT9xGMq6mVqyFKyS",
+        "arn": "arn:aws:fis:us-east-1:<account-id>:experiment-template/EXT9xGMq6mVqyFKyS",
+        "description": "Lab 08: 100% CPU on ALL web instances for 180s; alarm -> EventBridge -> runbook must scale out, then back in",
+        "targets": {
+            "all-web-instances": {
+                "resourceType": "aws:ec2:instance",
+                "resourceTags": {
+                    "lab08-role": "web"
+                },
+                "filters": [
+                    {
+                        "path": "State.Name",
+                        "values": [
+                            "running"
+                        ]
+                    }
+                ],
+                "selectionMode": "ALL"
+            }
+        },
+        "actions": {
+            "cpu-stress": {
+                "actionId": "aws:ssm:send-command",
+                "parameters": {
+                    "documentArn": "arn:aws:ssm:us-east-1::document/AWSFIS-Run-CPU-Stress",
+                    "documentParameters": "{\"DurationSeconds\":\"180\",\"InstallDependencies\":\"True\"}",
+                    "duration": "PT4M"
+                },
+                "targets": {
+                    "Instances": "all-web-instances"
+                }
+            }
+        },
+        "stopConditions": [
+            {
+                "source": "aws:cloudwatch:alarm",
+                "value": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-canary-failing"
+            }
+        ],
+        "creationTime": "2026-10-16T00:39:48.103000+00:00",
+        "lastUpdateTime": "2026-10-16T00:39:48.103000+00:00",
+        "roleArn": "arn:aws:iam::<account-id>:role/awslabs-lab08-fis",
+        "tags": {
+            "project": "awslabs",
+            "stack": "app",
+            "run_id": "lab08",
+            "lab": "08-self-healing-chaos",
+            "managed_by": "terraform",
+            "Name": "awslabs-lab08-cpu-stress"
+        },
+        "experimentOptions": {
+            "accountTargeting": "single-account",
+            "emptyTargetResolutionMode": "fail"
+        }
+    }
+}

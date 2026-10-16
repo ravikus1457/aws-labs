@@ -1,0 +1,99 @@
+{
+    "Activities": [
+        {
+            "ActivityId": "13df8894-de3b-4f53-abcd-d8534ee7b1c7",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Terminating EC2 instance: i-086111eb888824ee4",
+            "Cause": "At 2026-10-16T00:52:42Z a user request explicitly set group desired capacity changing the desired capacity from 3 to 2.  At 2026-10-16T00:52:50Z an instance was taken out of service in response to a difference between desired and actual capacity, shrinking the capacity from 3 to 2.  At 2026-10-16T00:52:50Z instance i-086111eb888824ee4 was selected for termination.",
+            "StartTime": "2026-10-16T00:52:50.605000+00:00",
+            "StatusCode": "InProgress",
+            "Progress": 50,
+            "Details": "{\"Availability Zone ID\":\"use1-az1\",\"Subnet ID\":\"subnet-0d1cfb344c79f8abc\",\"Availability Zone\":\"us-east-1a\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "00268508-bf7b-2cf8-880a-573676767cd0",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Launching a new EC2 instance: i-086111eb888824ee4",
+            "Cause": "At 2026-10-16T00:49:42Z a user request explicitly set group desired capacity changing the desired capacity from 2 to 3.  At 2026-10-16T00:49:53Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 2 to 3.",
+            "StartTime": "2026-10-16T00:49:55.915000+00:00",
+            "EndTime": "2026-10-16T00:51:02+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az1\",\"Subnet ID\":\"subnet-0d1cfb344c79f8abc\",\"Availability Zone\":\"us-east-1a\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "a1e68508-a5f7-c929-610c-ec3beb21e6dd",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Launching a new EC2 instance: i-0b7f08a3392e81bbf",
+            "Cause": "At 2026-10-16T00:42:55Z an instance was launched in response to an unhealthy instance needing to be replaced.",
+            "StartTime": "2026-10-16T00:42:57.906000+00:00",
+            "EndTime": "2026-10-16T00:44:02+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az2\",\"Subnet ID\":\"subnet-05d21e9536c0e09b1\",\"Availability Zone\":\"us-east-1b\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "72d68508-a5d7-38d6-e205-2390dfde1146",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Terminating EC2 instance: i-0e459c9b925ed7801",
+            "Cause": "At 2026-10-16T00:42:55Z an instance was taken out of service in response to an EC2 health check indicating it has been terminated or stopped.",
+            "StartTime": "2026-10-16T00:42:55.822000+00:00",
+            "EndTime": "2026-10-16T00:43:16+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az2\",\"Subnet ID\":\"subnet-05d21e9536c0e09b1\",\"Availability Zone\":\"us-east-1b\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "5d8229b3-0fdd-4d74-9557-1465e1a6fc38",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Terminating EC2 instance: i-072a4eee7930cac56",
+            "Cause": "At 2026-10-16T00:41:42Z a user request explicitly set group desired capacity changing the desired capacity from 3 to 2.  At 2026-10-16T00:41:49Z an instance was taken out of service in response to a difference between desired and actual capacity, shrinking the capacity from 3 to 2.  At 2026-10-16T00:41:49Z instance i-072a4eee7930cac56 was selected for termination.",
+            "StartTime": "2026-10-16T00:41:49.448000+00:00",
+            "EndTime": "2026-10-16T00:42:47+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az1\",\"Subnet ID\":\"subnet-0d1cfb344c79f8abc\",\"Availability Zone\":\"us-east-1a\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "cc468508-9dd3-dd32-b7e9-ab3060150056",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Launching a new EC2 instance: i-079d2ce2fa0000405",
+            "Cause": "At 2026-10-16T00:40:31Z a user request explicitly set group desired capacity changing the desired capacity from 2 to 3.  At 2026-10-16T00:40:42Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 2 to 3.",
+            "StartTime": "2026-10-16T00:40:44.535000+00:00",
+            "EndTime": "2026-10-16T00:41:49+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az1\",\"Subnet ID\":\"subnet-0d1cfb344c79f8abc\",\"Availability Zone\":\"us-east-1a\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "ccf68508-8fb4-db8c-b0cc-6b19d3e8028b",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Launching a new EC2 instance: i-0e459c9b925ed7801",
+            "Cause": "At 2026-10-16T00:36:50Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 2.  At 2026-10-16T00:36:51Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 2.",
+            "StartTime": "2026-10-16T00:36:53.174000+00:00",
+            "EndTime": "2026-10-16T00:37:58+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az2\",\"Subnet ID\":\"subnet-05d21e9536c0e09b1\",\"Availability Zone\":\"us-east-1b\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        },
+        {
+            "ActivityId": "9f168508-8fb2-4bb3-2194-a71bc6246cf4",
+            "AutoScalingGroupName": "awslabs-lab08-asg",
+            "Description": "Launching a new EC2 instance: i-072a4eee7930cac56",
+            "Cause": "At 2026-10-16T00:36:50Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 2.  At 2026-10-16T00:36:51Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 2.",
+            "StartTime": "2026-10-16T00:36:53.010000+00:00",
+            "EndTime": "2026-10-16T00:37:59+00:00",
+            "StatusCode": "Successful",
+            "Progress": 100,
+            "Details": "{\"Availability Zone ID\":\"use1-az1\",\"Subnet ID\":\"subnet-0d1cfb344c79f8abc\",\"Availability Zone\":\"us-east-1a\"}",
+            "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:<account-id>:autoScalingGroup:c738df2d-adeb-40b5-a884-e255848600b4:autoScalingGroupName/awslabs-lab08-asg"
+        }
+    ]
+}

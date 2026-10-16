@@ -1,0 +1,66 @@
+{
+    "experiment": {
+        "id": "EXPLApY57uZL849jj8",
+        "arn": "arn:aws:fis:us-east-1:<account-id>:experiment/EXPLApY57uZL849jj8",
+        "experimentTemplateId": "EXT9xGMq6mVqyFKyS",
+        "roleArn": "arn:aws:iam::<account-id>:role/awslabs-lab08-fis",
+        "state": {
+            "status": "completed",
+            "reason": "Experiment completed."
+        },
+        "targets": {
+            "all-web-instances": {
+                "resourceType": "aws:ec2:instance",
+                "resourceTags": {
+                    "lab08-role": "web"
+                },
+                "filters": [
+                    {
+                        "path": "State.Name",
+                        "values": [
+                            "running"
+                        ]
+                    }
+                ],
+                "selectionMode": "ALL"
+            }
+        },
+        "actions": {
+            "cpu-stress": {
+                "actionId": "aws:ssm:send-command",
+                "parameters": {
+                    "documentArn": "arn:aws:ssm:us-east-1::document/AWSFIS-Run-CPU-Stress",
+                    "documentParameters": "{\"DurationSeconds\":\"180\",\"InstallDependencies\":\"True\"}",
+                    "duration": "PT4M"
+                },
+                "targets": {
+                    "Instances": "all-web-instances"
+                },
+                "state": {
+                    "status": "completed",
+                    "reason": "Action completed successfully"
+                },
+                "startTime": "2026-10-16T00:47:19.244000+00:00",
+                "endTime": "2026-10-16T00:50:22.112000+00:00"
+            }
+        },
+        "stopConditions": [
+            {
+                "source": "aws:cloudwatch:alarm",
+                "value": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-canary-failing"
+            }
+        ],
+        "creationTime": "2026-10-16T00:47:07.207000+00:00",
+        "startTime": "2026-10-16T00:47:07.542000+00:00",
+        "endTime": "2026-10-16T00:51:20.398000+00:00",
+        "tags": {
+            "lab": "08-self-healing-chaos",
+            "run": "gha-38814313911"
+        },
+        "experimentOptions": {
+            "accountTargeting": "single-account",
+            "emptyTargetResolutionMode": "fail",
+            "actionsMode": "run-all"
+        }
+    }
+}

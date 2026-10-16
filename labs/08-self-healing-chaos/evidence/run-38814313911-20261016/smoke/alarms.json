@@ -1,0 +1,125 @@
+{
+    "MetricAlarms": [
+        {
+            "AlarmName": "awslabs-lab08-canary-failing",
+            "AlarmArn": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-canary-failing",
+            "AlarmDescription": "Canary success < 50% for 2 consecutive minutes. FIS stop condition for every lab 08 experiment.",
+            "AlarmConfigurationUpdatedTimestamp": "2026-10-16T00:39:47.645000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [],
+            "InsufficientDataActions": [],
+            "StateValue": "INSUFFICIENT_DATA",
+            "StateReason": "Unchecked: Initial alarm creation",
+            "StateUpdatedTimestamp": "2026-10-16T00:39:47.645000+00:00",
+            "MetricName": "SuccessPercent",
+            "Namespace": "CloudWatchSynthetics",
+            "Statistic": "Average",
+            "Dimensions": [
+                {
+                    "Name": "CanaryName",
+                    "Value": "lab08-alb-probe"
+                }
+            ],
+            "Period": 60,
+            "EvaluationPeriods": 2,
+            "DatapointsToAlarm": 2,
+            "Threshold": 50.0,
+            "ComparisonOperator": "LessThanThreshold",
+            "TreatMissingData": "notBreaching",
+            "StateTransitionedTimestamp": "2026-10-16T00:39:47.645000+00:00"
+        },
+        {
+            "AlarmName": "awslabs-lab08-cpu-high",
+            "AlarmArn": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-cpu-high",
+            "AlarmDescription": "Max CPU across the ASG >= 80% for 1 minute. ALARM -> EventBridge -> runbook scales OUT; back to OK -> runbook scales IN to the baseline.",
+            "AlarmConfigurationUpdatedTimestamp": "2026-10-16T00:39:19.564000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [],
+            "InsufficientDataActions": [],
+            "StateValue": "INSUFFICIENT_DATA",
+            "StateReason": "Unchecked: Initial alarm creation",
+            "StateUpdatedTimestamp": "2026-10-16T00:39:19.564000+00:00",
+            "MetricName": "CPUUtilization",
+            "Namespace": "AWS/EC2",
+            "Statistic": "Maximum",
+            "Dimensions": [
+                {
+                    "Name": "AutoScalingGroupName",
+                    "Value": "awslabs-lab08-asg"
+                }
+            ],
+            "Period": 60,
+            "EvaluationPeriods": 1,
+            "Threshold": 80.0,
+            "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+            "TreatMissingData": "notBreaching",
+            "StateTransitionedTimestamp": "2026-10-16T00:39:19.564000+00:00"
+        },
+        {
+            "AlarmName": "awslabs-lab08-healthy-hosts-low",
+            "AlarmArn": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-healthy-hosts-low",
+            "AlarmDescription": "Healthy ALB targets below the baseline (2). The ASG replaces the instance; this alarm measures how fast we noticed.",
+            "AlarmConfigurationUpdatedTimestamp": "2026-10-16T00:39:00.972000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [],
+            "InsufficientDataActions": [],
+            "StateValue": "OK",
+            "StateReason": "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",
+            "StateReasonData": "{\"version\":\"1.0\",\"queryDate\":\"2026-10-16T00:40:02.093+0000\",\"statistic\":\"Minimum\",\"period\":60,\"recentDatapoints\":[],\"threshold\":2.0,\"evaluatedDatapoints\":[{\"timestamp\":\"2026-10-16T00:37:00.000+0000\"}]}",
+            "StateUpdatedTimestamp": "2026-10-16T00:40:02.095000+00:00",
+            "MetricName": "HealthyHostCount",
+            "Namespace": "AWS/ApplicationELB",
+            "Statistic": "Minimum",
+            "Dimensions": [
+                {
+                    "Name": "LoadBalancer",
+                    "Value": "app/awslabs-lab08-alb/f8860a485302a717"
+                },
+                {
+                    "Name": "TargetGroup",
+                    "Value": "targetgroup/awslabs-lab08-tg/9fafdb59a6da845e"
+                }
+            ],
+            "Period": 60,
+            "EvaluationPeriods": 1,
+            "Threshold": 2.0,
+            "ComparisonOperator": "LessThanThreshold",
+            "TreatMissingData": "notBreaching",
+            "StateTransitionedTimestamp": "2026-10-16T00:40:02.095000+00:00"
+        },
+        {
+            "AlarmName": "awslabs-lab08-latency-high",
+            "AlarmArn": "arn:aws:cloudwatch:us-east-1:<account-id>:alarm:awslabs-lab08-latency-high",
+            "AlarmDescription": "ALB p90 TargetResponseTime > 0.15s for 1 minute. Detect-only (no automated fix for fleet-wide latency).",
+            "AlarmConfigurationUpdatedTimestamp": "2026-10-16T00:39:00.974000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [],
+            "InsufficientDataActions": [],
+            "StateValue": "OK",
+            "StateReason": "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",
+            "StateReasonData": "{\"version\":\"1.0\",\"queryDate\":\"2026-10-16T00:39:39.001+0000\",\"statistic\":\"p90\",\"period\":60,\"recentDatapoints\":[],\"threshold\":0.15,\"evaluatedDatapoints\":[{\"timestamp\":\"2026-10-16T00:36:00.000+0000\"}]}",
+            "StateUpdatedTimestamp": "2026-10-16T00:39:39.002000+00:00",
+            "MetricName": "TargetResponseTime",
+            "Namespace": "AWS/ApplicationELB",
+            "ExtendedStatistic": "p90",
+            "Dimensions": [
+                {
+                    "Name": "LoadBalancer",
+                    "Value": "app/awslabs-lab08-alb/f8860a485302a717"
+                }
+            ],
+            "Period": 60,
+            "EvaluationPeriods": 1,
+            "Threshold": 0.15,
+            "ComparisonOperator": "GreaterThanThreshold",
+            "TreatMissingData": "notBreaching",
+            "StateTransitionedTimestamp": "2026-10-16T00:39:39.002000+00:00"
+        }
+    ],
+    "CompositeAlarms": [],
+    "LogAlarms": []
+}

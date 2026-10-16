@@ -1,0 +1,55 @@
+{
+  "experiment": "terminate",
+  "fis_experiment_id": "EXP21eScjwmnW5uqErN",
+  "fis_template_id": "EXTBtAvnjNcZRRfYc",
+  "fis_final_state": "completed",
+  "fis_state_reason": "Experiment completed.",
+  "fault_started_at": "2026-10-16T00:42:50Z",
+  "fault_ended_at": "2026-10-16T00:42:51Z",
+  "fault_duration_s": 0.4,
+  "detection_alarm": "awslabs-lab08-healthy-hosts-low",
+  "baseline_capacity": 2,
+  "detected_at": "2026-10-16T00:45:02Z",
+  "time_to_detect_s": 131.4,
+  "alarm_cleared_at": "2026-10-16T00:46:02Z",
+  "healthy_dip_at": "2026-10-16T00:42:59Z",
+  "healthy_floor": 1,
+  "recovered_at": "2026-10-16T00:43:51Z",
+  "recovery_signal": "healthy ALB targets back to 2 (5-s target-health samples)",
+  "time_to_recover_s": 60.9,
+  "probe_impact": {
+    "probes": 29,
+    "failed": 1,
+    "availability_pct": 96.55,
+    "longest_failure_s": 2.1,
+    "latency_ms_p50": 113.4,
+    "latency_ms_p95": 130.7,
+    "latency_ms_max": 133.2,
+    "baseline_latency_ms_p50": 115.9,
+    "baseline_latency_ms_p95": 130.4,
+    "status_codes": [
+      "502"
+    ]
+  },
+  "canary_impact": {
+    "runs": 3,
+    "passed": 3,
+    "failed": 0,
+    "failures": []
+  },
+  "checks": [
+    [
+      "PASS",
+      "terminate: detected by awslabs-lab08-healthy-hosts-low in 131.4 s"
+    ],
+    [
+      "PASS",
+      "terminate: recovered in 60.9 s (healthy ALB targets back to 2 (5-s target-health samples))"
+    ],
+    [
+      "INFO",
+      "terminate: user impact 1/29 probes failed, longest failure 2.1 s, p95 130.7 ms (baseline p95 130.4 ms); canary 0 failed / 3 runs"
+    ]
+  ],
+  "passed": true
+}

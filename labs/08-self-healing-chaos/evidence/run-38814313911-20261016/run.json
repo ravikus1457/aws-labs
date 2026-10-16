@@ -1,0 +1,15 @@
+{
+  "run": "gha-38814313911",
+  "started_at": "2026-10-16T00:42:02Z",
+  "region": "us-east-1",
+  "baseline": 2,
+  "probe_interval_s": 2,
+  "sample_interval_s": 5,
+  "fault_parameters": {
+    "cpu_stress_seconds": 180,
+    "latency_ms": 200,
+    "latency_seconds": 120,
+    "network_interface": "ens5"
+  },
+  "canary_runtime": "syn-python-selenium-13.0"
+}

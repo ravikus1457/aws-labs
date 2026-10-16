@@ -1,0 +1,10 @@
+{
+  "experiment": "cpu_stress",
+  "template_id": "EXT9xGMq6mVqyFKyS",
+  "fis_experiment_id": "EXPLApY57uZL849jj8",
+  "detect_alarm": "awslabs-lab08-cpu-high",
+  "baseline": 2,
+  "max": 3,
+  "started_by_script_at": "2026-10-16T00:47:06Z",
+  "collection_ended_at": "2026-10-16T00:53:30Z"
+}

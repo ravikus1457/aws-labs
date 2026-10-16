@@ -1,0 +1,20 @@
+{
+    "CanaryRuns": [
+        {
+            "Id": "e728ce7b-8ffc-40f2-bebd-c04d28e66660",
+            "Name": "lab08-alb-probe",
+            "Status": {
+                "State": "PASSED",
+                "StateReason": "",
+                "StateReasonCode": "",
+                "TestResult": "PASSED"
+            },
+            "Timeline": {
+                "Started": "2026-10-16T00:39:46.607000+00:00",
+                "Completed": "2026-10-16T00:39:57.333000+00:00"
+            },
+            "ArtifactS3Location": "awslabs-lab08-canary-<account-id>/canary/us-east-1/lab08-alb-probe/2026/10/16/00/39-43-669",
+            "Location": "us-east-1"
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+{
+    "Canary": {
+        "Id": "ac67bb55-7622-466e-be7a-acdbcedf9fde",
+        "Name": "lab08-alb-probe",
+        "Code": {
+            "SourceLocationArn": "arn:aws:lambda:us-east-1:<account-id>:layer:cwsyn-lab08-alb-probe-ac67bb55-7622-466e-be7a-acdbcedf9fde:1",
+            "Handler": "canary.handler"
+        },
+        "ExecutionRoleArn": "arn:aws:iam::<account-id>:role/awslabs-lab08-canary",
+        "Schedule": {
+            "Expression": "rate(1 minute)",
+            "DurationInSeconds": 0,
+            "RetryConfig": {
+                "MaxRetries": 0
+            }
+        },
+        "RunConfig": {
+            "TimeoutInSeconds": 30,
+            "MemoryInMB": 960,
+            "ActiveTracing": false,
+            "EphemeralStorage": 1024
+        },
+        "SuccessRetentionPeriodInDays": 2,
+        "FailureRetentionPeriodInDays": 2,
+        "Status": {
+            "State": "RUNNING"
+        },
+        "Timeline": {
+            "Created": "2026-10-16T00:39:19.743000+00:00",
+            "LastModified": "2026-10-16T00:39:46.594000+00:00",
+            "LastStarted": "2026-10-16T00:39:46.594000+00:00"
+        },
+        "ArtifactS3Location": "awslabs-lab08-canary-<account-id>/canary/",
+        "EngineArn": "arn:aws:lambda:us-east-1:<account-id>:function:cwsyn-lab08-alb-probe-ac67bb55-7622-466e-be7a-acdbcedf9fde:1",
+        "RuntimeVersion": "syn-python-selenium-13.0",
+        "ProvisionedResourceCleanup": "AUTOMATIC",
+        "EngineConfigs": [
+            {
+                "EngineArn": "arn:aws:lambda:us-east-1:<account-id>:function:cwsyn-lab08-alb-probe-ac67bb55-7622-466e-be7a-acdbcedf9fde:1"
+            }
+        ],
+        "Tags": {
+            "project": "awslabs",
+            "stack": "app",
+            "run_id": "lab08",
+            "lab": "08-self-healing-chaos",
+            "managed_by": "terraform"
+        }
+    }
+}

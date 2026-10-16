@@ -1,0 +1,48 @@
+{
+    "AutomationExecutionMetadataList": [
+        {
+            "AutomationExecutionId": "e4eccf6c-f8a8-4fa2-930f-df379771b43b",
+            "DocumentName": "awslabs-lab08-scale",
+            "DocumentVersion": "1",
+            "AutomationExecutionStatus": "Success",
+            "ExecutionStartTime": "2026-10-16T00:41:39.998000+00:00",
+            "ExecutionEndTime": "2026-10-16T00:41:43.843000+00:00",
+            "ExecutedBy": "arn:aws:sts::<account-id>:assumed-role/awslabs-lab08-events/8503b863728d36509827c80358cf0759",
+            "LogFile": "",
+            "Outputs": {
+                "Scale.Result": [
+                    "{\"direction\":\"in\",\"previous\":\"3\",\"desired\":\"2\",\"action\":\"set_desired_capacity\"}"
+                ]
+            },
+            "Mode": "Auto",
+            "Targets": [],
+            "ResolvedTargets": {
+                "ParameterValues": [],
+                "Truncated": false
+            },
+            "AutomationType": "Local"
+        },
+        {
+            "AutomationExecutionId": "7abd6032-f080-4c1f-8fcd-f41d83020a37",
+            "DocumentName": "awslabs-lab08-scale",
+            "DocumentVersion": "1",
+            "AutomationExecutionStatus": "Success",
+            "ExecutionStartTime": "2026-10-16T00:40:28.004000+00:00",
+            "ExecutionEndTime": "2026-10-16T00:40:31.964000+00:00",
+            "ExecutedBy": "arn:aws:sts::<account-id>:assumed-role/awslabs-lab08-events/ef023f35575e3e96901238973fba7a4e",
+            "LogFile": "",
+            "Outputs": {
+                "Scale.Result": [
+                    "{\"direction\":\"out\",\"previous\":\"2\",\"desired\":\"3\",\"action\":\"set_desired_capacity\"}"
+                ]
+            },
+            "Mode": "Auto",
+            "Targets": [],
+            "ResolvedTargets": {
+                "ParameterValues": [],
+                "Truncated": false
+            },
+            "AutomationType": "Local"
+        }
+    ]
+}

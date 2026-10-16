@@ -1,0 +1,76 @@
+{
+    "AutomationExecution": {
+        "AutomationExecutionId": "78faf3ce-ab28-4884-8d8e-784f455548c7",
+        "DocumentName": "awslabs-lab08-scale",
+        "DocumentVersion": "1",
+        "ExecutionStartTime": "2026-10-16T00:49:40.004000+00:00",
+        "ExecutionEndTime": "2026-10-16T00:49:43.912000+00:00",
+        "AutomationExecutionStatus": "Success",
+        "StepExecutions": [
+            {
+                "StepName": "Scale",
+                "Action": "aws:executeScript",
+                "TimeoutSeconds": 120,
+                "ExecutionStartTime": "2026-10-16T00:49:40.291000+00:00",
+                "ExecutionEndTime": "2026-10-16T00:49:43.877000+00:00",
+                "StepStatus": "Success",
+                "Inputs": {
+                    "Handler": "\"handler\"",
+                    "InputPayload": "{\"asg\":\"awslabs-lab08-asg\",\"max\":\"3\",\"baseline\":\"2\",\"direction\":\"out\"}",
+                    "Runtime": "\"python3.11\"",
+                    "Script": "\"import boto3\\n\\ndef handler(events, context):\\n    asg_name = events[\\\"asg\\\"]\\n    direction = events[\\\"direction\\\"]\\n    baseline = int(events[\\\"baseline\\\"])\\n    cap = int(events[\\\"max\\\"])\\n    client = boto3.client(\\\"autoscaling\\\")\\n    groups = client.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])[\\\"AutoScalingGroups\\\"]\\n    if not groups:\\n        raise Exception(\\\"ASG not found: \\\" + asg_name)\\n    current = groups[0][\\\"DesiredCapacity\\\"]\\n    cap = min(cap, groups[0][\\\"MaxSize\\\"])\\n    if direction == \\\"out\\\":\\n        target = max(current, min(current + 1, cap))  # \\\"out\\\" never lowers capacity\\n    else:\\n        target = max(baseline, groups[0][\\\"MinSize\\\"]) if current > baseline else current\\n    if target == current:\\n        return {\\\"direction\\\": direction, \\\"previous\\\": str(current), \\\"desired\\\": str(target), \\\"action\\\": \\\"none\\\"}\\n    client.set_desired_capacity(AutoScalingGroupName=asg_name, DesiredCapacity=target, HonorCooldown=False)\\n    return {\\\"direction\\\": direction, \\\"previous\\\": str(current), \\\"desired\\\": str(target), \\\"action\\\": \\\"set_desired_capacity\\\"}\""
+                },
+                "Outputs": {
+                    "ExecutedRuntime": [
+                        "python3.11"
+                    ],
+                    "IsRuntimeAutoUpgraded": [
+                        "false"
+                    ],
+                    "OutputPayload": [
+                        "{\"Payload\":{\"direction\":\"out\",\"previous\":\"2\",\"desired\":\"3\",\"action\":\"set_desired_capacity\"}}"
+                    ],
+                    "Result": [
+                        "{\"direction\":\"out\",\"previous\":\"2\",\"desired\":\"3\",\"action\":\"set_desired_capacity\"}"
+                    ],
+                    "ScriptExecutionId": [
+                        "e958c5bb-c931-4235-bd63-919f29342d6f"
+                    ]
+                },
+                "StepExecutionId": "b311bdff-6a69-4cef-a440-4aed9e579e62",
+                "OverriddenParameters": {},
+                "IsEnd": true
+            }
+        ],
+        "StepExecutionsTruncated": false,
+        "Parameters": {
+            "AutoScalingGroupName": [
+                "awslabs-lab08-asg"
+            ],
+            "AutomationAssumeRole": [
+                "arn:aws:iam::<account-id>:role/awslabs-lab08-remediation"
+            ],
+            "BaselineCapacity": [
+                "2"
+            ],
+            "Direction": [
+                "out"
+            ],
+            "MaxCapacity": [
+                "3"
+            ]
+        },
+        "Outputs": {
+            "Scale.Result": [
+                "{\"direction\":\"out\",\"previous\":\"2\",\"desired\":\"3\",\"action\":\"set_desired_capacity\"}"
+            ]
+        },
+        "Mode": "Auto",
+        "ExecutedBy": "arn:aws:sts::<account-id>:assumed-role/awslabs-lab08-events/ef023f35575e3e96901238973fba7a4e",
+        "Targets": [],
+        "ResolvedTargets": {
+            "ParameterValues": [],
+            "Truncated": false
+        }
+    }
+}

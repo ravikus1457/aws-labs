@@ -1,0 +1,22 @@
+Exercising lab 08: http://awslabs-lab08-alb-329034688.us-east-1.elb.amazonaws.com (ASG awslabs-lab08-asg, baseline 2, region us-east-1)
+--- GET /healthz through the ALB ---
+--- SSM preflight (what the FIS documents need) ---
+--- Synthetics canary ---
+--- remediation wiring: set-alarm-state ALARM on awslabs-lab08-cpu-high ---
+scale-out observed: desired=3 after 10 s
+scale-in observed: desired=2 after 70 s
+--- Assertions ---
+PASS: ALB /healthz returned 200 {"status":"ok"}
+PASS: 30 requests reached 2 distinct instances (AZs: us-east-1a us-east-1b )
+PASS: 2/2 targets healthy
+PASS: ASG health check type is ELB (unhealthy-in-the-ALB instances get replaced, not just stopped ones)
+PASS: 2 instances registered Online with SSM (FIS send-command can reach them)
+PASS: stress-ng, tc, interface ens5 and lab08-app present on 2 instances
+PASS: FIS template terminate (EXTBtAvnjNcZRRfYc) exists, stop condition = canary alarm
+PASS: FIS template cpu_stress (EXT9xGMq6mVqyFKyS) exists, stop condition = canary alarm
+PASS: FIS template network_latency (EXT3ewsqRMsqPZya) exists, stop condition = canary alarm
+PASS: 4 alarms present: awslabs-lab08-canary-failing=INSUFFICIENT_DATA, awslabs-lab08-cpu-high=INSUFFICIENT_DATA, awslabs-lab08-healthy-hosts-low=OK, awslabs-lab08-latency-high=OK
+PASS: canary lab08-alb-probe RUNNING on syn-python-selenium-13.0, 1 passed run(s)
+PASS: forced ALARM -> EventBridge -> awslabs-lab08-scale scaled the ASG out (2/2 executions Success)
+PASS: alarm back to OK -> runbook scaled in to 2
+app: http://awslabs-lab08-alb-329034688.us-east-1.elb.amazonaws.com/   canary: lab08-alb-probe   runbook: awslabs-lab08-scale

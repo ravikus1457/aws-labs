@@ -1,0 +1,10 @@
+{
+  "experiment": "terminate",
+  "template_id": "EXTBtAvnjNcZRRfYc",
+  "fis_experiment_id": "EXP21eScjwmnW5uqErN",
+  "detect_alarm": "awslabs-lab08-healthy-hosts-low",
+  "baseline": 2,
+  "max": 3,
+  "started_by_script_at": "2026-10-16T00:42:28Z",
+  "collection_ended_at": "2026-10-16T00:46:41Z"
+}
